@@ -8,6 +8,7 @@ import time
 import threading
 import datetime
 import sys
+import shlex
 from jsonsync import JsonItem
 
 WORK_DIR = "/home"
@@ -16,7 +17,9 @@ DATASETS_DIR = f"{WORK_DIR}/datasets"
 DATASETS_PATH = f"{DATASETS_DIR}/mongod.log"
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.propagate = False
+#logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 logging_console_handler = logging.StreamHandler()
 logging_formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 logging_console_handler.setFormatter(logging_formatter)
@@ -48,7 +51,8 @@ class Benchmark:
     @property
     def config(self):
         if not self._cached_config:
-            self._cached_config = yaml.safe_load(f"{self.script_dir}/config.yaml")
+            with open(f"{self.script_dir}/config.yaml") as file:
+                self._cached_config = yaml.safe_load(file)
         return self._cached_config
 
     def get_disk_usage(self, path):
@@ -71,11 +75,7 @@ class Benchmark:
 
     def docker_build(self):
         result = subprocess.run(
-                [
-                    'docker build',
-                    f'--tag {self.container_name}',
-                    f'{self.script_dir}',
-                ],
+                f'docker build --tag {self.container_name} {self.script_dir}',
                 shell = True,
                 check = True
                 )
@@ -83,12 +83,7 @@ class Benchmark:
 
     def docker_attach(self):
         result = subprocess.run(
-                [
-                    'docker exec',
-                    '-it',
-                    f'{self.container_name}',
-                    'bash'
-                ],
+                f'docker exec -it {self.container_name} bash',
                 shell = True,
                 check = True
                 )
@@ -101,27 +96,32 @@ class Benchmark:
                 ]
 
         limits_param = [
-                '--cpuset-cpus="0,1,2,3"'
-                '--memory=8g'
+                '--cpus=4',
+                '--memory=8g',
                 '--memory-swap=8g'
                 ]
 
         if background:
             interactive_param = [
-                    '--it',
+                    '-d'
+                    ]
+            interactive_exec = 'bash'
+        else:
+            interactive_param = [
+                    '-it',
                     f'--workdir {WORK_DIR}'
                     ]
             interactive_exec = f'bash -c "cd {WORK_DIR} && /bin/bash -l"'
-        else:
-            interactive_param = []
-            interactive_exec = ''
 
         result = subprocess.run(
-                [
-                    'docker run',
+                ' '.join([
+                    'docker',
+                    'run',
                     '--privileged',
                     '--rm',
+                    '-it',
                     '--network host',
+                    f'--workdir {WORK_DIR}',
                     f'--name {self.container_name}',
                     f'--mount "type=bind,src={self.script_dir},dst={ASSETS_DIR}"',
                     f'--mount "type=bind,src={self.dataset},dst={DATASETS_DIR}"',
@@ -130,9 +130,16 @@ class Benchmark:
                     *interactive_param,
                     f"{self.container_name}",
                     interactive_exec,
-                ],
+                ]),
                 shell = True,
                 check = True
+                )
+        logger.debug(result)
+
+    def docker_remove(self):
+        result = subprocess.run(
+                f'docker container stop {self.container_name}',
+                shell = True
                 )
         logger.debug(result)
 
@@ -143,7 +150,8 @@ class Benchmark:
             statement = ' '.join(statement)
 
         result = subprocess.run(
-                f"docker exec {self.container_name} bash {statement}",
+                #f"docker exec {self.container_name} bash -c \"{shlex.quote(statement)}\"",
+                f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
                 stdout=subprocess.PIPE,
                 shell = True,
                 check = True
@@ -175,7 +183,7 @@ class Benchmark:
             metric_sample = 0
             for line in output:
                 process = line.strip().split()[10].strip()
-                for related_process in self.config.related_process:
+                for related_process in self.config["related_processes"]:
                     if related_process.startswith(process):
                         metric_sample += int(line.strip().split()[5]) * kb_to_b
                         break
@@ -185,7 +193,7 @@ class Benchmark:
             while self.bench_info['running']:
                 append_memory()
 
-                interval = self.config.system_metric.memory.ingest_polling_interval
+                interval = self.config["system_metric"]["memory"]["ingest_polling_interval"]
                 time.sleep(interval)
 
         self.bench_thread = threading.Thread(
@@ -252,7 +260,8 @@ class clp_s_bench(Benchmark):
         self.timestamp = timestamp_key
         self.target_encoded_size = target_encoded_size
 
-        self.properties = f"timestamp={timestamp_key}, target_encoded_size={target_encoded_size}"
+        #self.properties = f"timestamp={timestamp_key}, target_encoded_size={target_encoded_size}"
+        self.properties = f"target_encoded_size={target_encoded_size}"
 
     @property
     def container_name(self):
@@ -266,7 +275,7 @@ class clp_s_bench(Benchmark):
         self.docker_execute([
             CLP_S_BINARY,
             'c',
-            f'--timestamp-key {self.timestamp}',
+            f'--timestamp-key "{self.timestamp}"',
             f'--target-encoded-size {self.target_encoded_size}',
             CLP_OUT_PATH,
             DATASETS_PATH,
@@ -297,13 +306,17 @@ class clp_s_bench(Benchmark):
 
 if __name__ == "__main__":
     bench = clp_s_bench(sys.argv[1])
-    logging.info("Building container...")
+    bench.docker_remove()
+
+    logger.info("Building container...")
     bench.docker_build()
-    logging.info("Running container...")
-    bench.docker_run()
-    logging.info("Benchmarking ingestion...")
+    logger.info("Running container...")
+    bench.docker_run(background=True)
+    logger.info("Benchmarking ingestion...")
     bench.bench_ingest()
-    logging.info("Benchmarking search...")
+    logger.info("Benchmarking search...")
     bench.bench_search()
+    logger.info("Removing container...")
+    bench.docker_remove()
 
     bench.print()

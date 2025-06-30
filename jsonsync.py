@@ -72,7 +72,7 @@ class JsonItem:
 
     def write(self):
         with open(self.filename, 'w') as file:
-            json.dump(self.compile(), file)
+            json.dump(self.compile(), file, indent=2)
 
     @classmethod
     def read(cls, filename):
