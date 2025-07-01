@@ -143,7 +143,7 @@ class Benchmark:
                 )
         logger.debug(result)
 
-    def docker_execute(self, statement):
+    def docker_execute(self, statement, check=True):
         if type(statement) is str:
             pass
         if type(statement) is list:
@@ -154,7 +154,7 @@ class Benchmark:
                 f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
                 stdout=subprocess.PIPE,
                 shell = True,
-                check = True
+                check = check
                 )
         logger.debug(result)
         return result.stdout.decode("utf-8").strip()
@@ -166,6 +166,10 @@ class Benchmark:
     def clear_cache(self):
         raise NotImplementedError
     def reset(self):
+        raise NotImplementedError
+    def launch(self):
+        raise NotImplementedError
+    def terminate(self):
         raise NotImplementedError
 
     @property
@@ -187,6 +191,7 @@ class Benchmark:
                     if related_process.startswith(process):
                         metric_sample += int(line.strip().split()[5]) * kb_to_b
                         break
+            logger.info(f"Memory used: {metric_sample//(1024*1024)} MB")
             self.bench_info['memory'].append(metric_sample)
 
         def poll_memory():
@@ -210,6 +215,9 @@ class Benchmark:
         self.bench_info['time_taken'] = self.bench_info['end_time'] - self.bench_info['start_time']
 
     def bench_ingest(self):
+        self.launch()
+        self.reset()
+
         self.__bench_start()
         self.ingest()
         self.__bench_stop()
@@ -225,15 +233,25 @@ class Benchmark:
                 }
         self.output.write()
 
-    def bench_search(self, cold=True):
-        mode = "query_" + ("cold" if cold else "hot")
+        self.terminate()
 
+    def bench_search(self, cold=True):
+        self.launch()
+
+        mode = "query_" + ("cold" if cold else "hot")
         for ind, query in enumerate(self.config["queries"]):
+            
+            if cold:
+                self.clear_cache()
+            else:
+                for _ in range(self.config["hot_run_warm_up_times"]):
+                    self.search(query)
+
             self.__bench_start()
             res = self.search(query)
             self.__bench_stop()
 
-            logging.info(f"Query #{ind} returned {res} results.")
+            logger.info(f"Query #{ind} returned {res} results.")
 
             self.output[self.dataset_name][self.properties][mode][ind] = {
                 'time_taken': self.bench_info['time_taken'],
@@ -245,6 +263,8 @@ class Benchmark:
                 }
             self.output.write()
 
+        self.terminate()
+
     def print(self):
         print(self.output[self.dataset_name])
 
@@ -255,7 +275,7 @@ class clp_s_bench(Benchmark):
     def __init__(self, dataset, timestamp_key=r"t.\$date", target_encoded_size=268435456):
         super().__init__(dataset)
 
-        logging.info("target_encoded_size:", target_encoded_size//(1024*1024), 'MB')
+        logger.info(f"target_encoded_size: {target_encoded_size//(1024*1024)} MB")
 
         self.timestamp = timestamp_key
         self.target_encoded_size = target_encoded_size
@@ -270,6 +290,12 @@ class clp_s_bench(Benchmark):
     @property
     def compressed_size(self):
         return self.get_disk_usage(CLP_OUT_PATH)
+
+    def launch(self):
+        self.docker_execute(f"mkdir -p {CLP_OUT_PATH}")
+
+    def terminate(self):
+        pass
 
     def ingest(self):
         self.docker_execute([
@@ -293,7 +319,7 @@ class clp_s_bench(Benchmark):
 
     def clear_cache(self):
         self.docker_execute("sync")
-        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches")
+        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
 
     def reset(self):
         self.docker_execute(f"rm -rf {CLP_OUT_PATH}")
@@ -314,8 +340,10 @@ if __name__ == "__main__":
     bench.docker_run(background=True)
     logger.info("Benchmarking ingestion...")
     bench.bench_ingest()
-    logger.info("Benchmarking search...")
-    bench.bench_search()
+    logger.info("Benchmarking cold search...")
+    bench.bench_search(cold=True)
+    logger.info("Benchmarking hot search...")
+    bench.bench_search(cold=False)
     logger.info("Removing container...")
     bench.docker_remove()
 
