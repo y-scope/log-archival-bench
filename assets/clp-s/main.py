@@ -57,22 +57,9 @@ class clp_s_bench(Benchmark):
         return []
 
 
-if __name__ == "__main__":
+def main():
     bench = clp_s_bench(sys.argv[1])
-    bench.docker_remove()
+    bench.run_everything()
 
-    logger.info("Building container...")
-    bench.docker_build()
-    logger.info("Running container...")
-    bench.docker_run(background=True)
-    logger.info("Benchmarking ingestion...")
-    bench.bench_ingest()
-    logger.info("Benchmarking cold search...")
-    bench.bench_search(cold=True)
-    logger.info("Benchmarking hot search...")
-    bench.bench_search(cold=False)
-    logger.info("Removing container...")
-    bench.docker_remove()
-
-    #bench.print()
-
+if __name__ == "__main__":
+    main()

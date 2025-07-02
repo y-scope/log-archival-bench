@@ -17,7 +17,14 @@ class clickhouse_native_json_bench(Benchmark):
     def __init__(self, dataset):
         super().__init__(dataset)
 
-        self.properties = ""  # information about passed parameters to output
+        self.properties = "No extra configuration"  # information about passed parameters to output
+
+    @property
+    def mount_points(self):
+        return {
+            f"{self.script_dir}/include/config.xml": "/etc/clickhouse-server/config.d/benchconfig.xml",
+            f"{self.script_dir}/include/users.xml": "/etc/clickhouse/server/users.d/benchconfig.xml",
+        }
 
     @property
     def compressed_size(self):
@@ -113,27 +120,10 @@ class clickhouse_native_json_bench(Benchmark):
         self.docker_execute("clickhouse-server stop >/dev/null 2>&1", check=False)
 
 
-if __name__ == "__main__":
+def main():
     bench = clickhouse_native_json_bench(sys.argv[1])
-    bench.docker_remove()
+    bench.run_everything()
 
-    logger.info("Building container...")
-    bench.docker_build()
-
-    logger.info("Running container...")
-    bench.docker_run(background=True, mount={
-        f"{bench.script_dir}/include/config.xml": "/etc/clickhouse-server/config.d/benchconfig.xml",
-        f"{bench.script_dir}/include/users.xml": "/etc/clickhouse/server/users.d/benchconfig.xml",
-        })
-
-    logger.info("Benchmarking ingestion...")
-    bench.bench_ingest()
-    logger.info("Benchmarking cold search...")
-    bench.bench_search(cold=True)
-    logger.info("Benchmarking hot search...")
-    bench.bench_search(cold=False)
-    logger.info("Removing container...")
-    bench.docker_remove()
-
-    #bench.print()
+if __name__ == "__main__":
+    main()
 

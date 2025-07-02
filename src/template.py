@@ -77,6 +77,10 @@ class Benchmark:
     def compressed_size(self):
         raise NotImplementedError
 
+    @property
+    def mount_points(self):
+        return {}
+
     def docker_build(self):
         result = subprocess.run(
                 f'docker build --tag {self.container_name} {self.script_dir}',
@@ -93,10 +97,10 @@ class Benchmark:
                 )
         logger.debug(result)
 
-    def docker_run(self, background=True, mount={}):
+    def docker_run(self, background=True):
         mount_param = [
                 f'--mount "type=bind,src={key},dst={value}"'
-                for key, value in mount.items()
+                for key, value in self.mount_points.items()
                 ]
 
         limits_param = [
@@ -140,10 +144,11 @@ class Benchmark:
                 )
         logger.debug(result)
 
-    def docker_remove(self):
+    def docker_remove(self, check=True):
         result = subprocess.run(
                 f'docker container stop {self.container_name}',
                 shell = True,
+                check = check,
                 stdout=subprocess.DEVNULL
                 )
         logger.debug(result)
@@ -286,3 +291,31 @@ class Benchmark:
 
     def print(self):
         print(self.output[self.dataset_name])
+
+    def run_everything(self):
+        logger.info("Removing possible previous container...")
+        self.docker_remove(check=False)
+        logger.info("Building container...")
+        self.docker_build()
+        logger.info("Running container...")
+        self.docker_run(background=True)
+        logger.info("Benchmarking ingestion...")
+        self.bench_ingest()
+        logger.info("Benchmarking cold search...")
+        self.bench_search(cold=True)
+        logger.info("Benchmarking hot search...")
+        self.bench_search(cold=False)
+        logger.info("Removing container...")
+        self.docker_remove()
+
+    def run_ingest(self):
+        logger.info("Removing possible previous container...")
+        self.docker_remove(check=False)
+        logger.info("Building container...")
+        self.docker_build()
+        logger.info("Running container...")
+        self.docker_run(background=True)
+        logger.info("Benchmarking ingestion...")
+        self.bench_ingest()
+        logger.info("Removing container...")
+        self.docker_remove()
