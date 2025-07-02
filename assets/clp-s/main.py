@@ -18,10 +18,6 @@ class clp_s_bench(Benchmark):
         self.properties = f"target_encoded_size={target_encoded_size}"
 
     @property
-    def container_name(self):
-        return "clp-clp-bench"
-
-    @property
     def compressed_size(self):
         return self.get_disk_usage(CLP_OUT_PATH)
 

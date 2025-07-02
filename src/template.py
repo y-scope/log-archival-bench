@@ -43,7 +43,7 @@ class Benchmark:
 
     @property
     def container_name(self):
-        raise NotImplementedError
+        return self.config['container_id']
 
     @property
     def script_dir(self):
