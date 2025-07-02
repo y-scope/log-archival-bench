@@ -1,0 +1,25 @@
+system_metric:
+  enable: true
+  memory:
+    ingest_polling_interval: 5
+    run_query_benchmark_polling_interval: 5
+
+container_id: clickhouse-native-json-clp-bench
+assets_path: /home/assets
+datasets_path: /home/datasets/mongod.log
+hot_run_warm_up_times: 3
+related_processes:
+  - clickhouse-server
+  - clickhouse-client
+  - clickhouse-watchd
+queries:
+  - '"not(isNull(attr.tickets))"'
+  - '"id = 22419"'
+  - >
+    "attr.message.msg like 'log_release%' AND attr.message.session_name = 'connection'"
+  - >
+    "ctx = 'initandlisten' AND (attr.message.msg like 'log_remove%' OR msg != 'WiredTigermessage')"
+  - >
+    "c = 'WTWRTLOG' and attr.message.ts_sec > 1679490000"
+  - >
+    "ctx = 'FlowControlRefresher' AND attr.numTrimmed = 0 "

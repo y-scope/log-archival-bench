@@ -57,14 +57,14 @@ class Benchmark:
         return self._cached_config
 
     def get_disk_usage(self, path):
-        return self.docker_execute([
+        return int(self.docker_execute([
             'du',
             path,
             '-bc',
 
             '|',
             r'awk "END {print\$1}"',
-            ])
+            ]))
 
     def check_results(self, ind, res):
         return (res == [38611, 336293, 1, 122, 52421, 38611][ind])
@@ -96,7 +96,7 @@ class Benchmark:
     def docker_run(self, background=True, mount={}):
         mount_param = [
                 f'--mount "type=bind,src={key},dst={value}"'
-                for key, value in mount
+                for key, value in mount.items()
                 ]
 
         limits_param = [
@@ -153,9 +153,8 @@ class Benchmark:
             pass
         if type(statement) is list:
             statement = ' '.join(statement)
-
+        
         result = subprocess.run(
-                #f"docker exec {self.container_name} bash -c \"{shlex.quote(statement)}\"",
                 f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
                 stdout=subprocess.PIPE,
                 shell = True,
@@ -250,7 +249,7 @@ class Benchmark:
                 }
         self.output.write()
 
-        self.terminate()
+        #self.terminate()
 
     def bench_search(self, cold=True):
         self.launch()

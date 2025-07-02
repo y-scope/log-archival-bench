@@ -61,7 +61,8 @@ class tool_bench(Benchmark):
     @property
     def terminate_procs(self):
         """
-        Processe names as shown on `ps -aux` to terminate, reverts the launch process
+        Process names as shown on `ps -aux` to terminate, reverts the launch process
+        Alternatively, override the terminate(self) function in Benchmark
         """
         return []
 
