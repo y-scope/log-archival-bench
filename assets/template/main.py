@@ -2,7 +2,7 @@
 
 import sys
 
-from template import DATASETS_PATH, WORK_DIR, Benchmark, logger
+from src.template import DATASETS_PATH, WORK_DIR, Benchmark, logger
 """
 DATASETS_PATH: The in-container path to the log file
 WORK_DIR: The in-container path to an accessible location e.g. "/home"

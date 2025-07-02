@@ -3,7 +3,7 @@
 import sys
 import time
 
-from template import DATASETS_PATH, Benchmark, logger
+from src.template import DATASETS_PATH, Benchmark, logger
 """
 DATASETS_PATH: The in-container path to the log file
 WORK_DIR: The in-container path to an accessible location e.g. "/home"

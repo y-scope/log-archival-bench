@@ -3,14 +3,14 @@ import subprocess
 import logging
 import os
 import yaml
-import json
 import time
 import threading
 import datetime
 import sys
 import shlex
 import uuid
-from jsonsync import JsonItem
+import inspect
+from src.jsonsync import JsonItem
 
 WORK_DIR = "/home"
 ASSETS_DIR = f"{WORK_DIR}/assets"
@@ -41,13 +41,20 @@ class Benchmark:
         self.bench_info = {}
         self.properties = "default"
 
+    def __init_subclass__(cls, **kwargs):  # hackery for script_dir so that it finds the assets dir
+        super().__init_subclass__(**kwargs)
+        # This gets the filename where the subclass is defined
+        frame = inspect.stack()[1]
+        cls.source_file = os.path.abspath(frame.filename)
+
     @property
     def container_name(self):
         return self.config['container_id']
 
     @property
     def script_dir(self):
-        return pathlib.Path(sys.argv[0]).parent.resolve()
+        return pathlib.Path(type(self).source_file).parent.resolve()
+        #return pathlib.Path(sys.argv[0]).parent.resolve()
 
     @property
     def config(self):
