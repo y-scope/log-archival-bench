@@ -6,15 +6,14 @@ from assets.clickhouse_native_json.main import clickhouse_native_json_bench
 from src.template import Benchmark
 
 import os
-import sys
 from pathlib import Path
 
-script_dir = Path(__file__).parent
+current_dir = Path(os.getcwd())
 
-if os.path.basename(script_dir.resolve()) != "clp-bench-refactor":
+if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
     raise Exception("Must be run in clp-bench-refactor directory, if it was renamed, comment this line out")
 
-data_dir = script_dir / "data"
+data_dir = current_dir / "data"
 bench_target_dirs = [p for p in data_dir.iterdir() if p.is_dir()]
 
 
