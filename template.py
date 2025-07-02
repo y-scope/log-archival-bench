@@ -170,12 +170,14 @@ class Benchmark:
         raise NotImplementedError
     def launch(self):
         raise NotImplementedError
-    def terminate(self):
-        raise NotImplementedError
 
     @property
     def terminate_procs(self):
         return []
+
+    def terminate(self):
+        for procname in self.terminate_procs:
+            self.docker_execute(f"pkill -f {procname}")
 
     def __bench_start(self):
         self.bench_info['start_time'] = time.time()
@@ -300,9 +302,6 @@ class clp_s_bench(Benchmark):
 
     def launch(self):
         self.docker_execute(f"mkdir -p {CLP_OUT_PATH}")
-
-    def terminate(self):
-        pass
 
     def ingest(self):
         self.docker_execute([
