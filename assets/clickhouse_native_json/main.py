@@ -17,7 +17,7 @@ class clickhouse_native_json_bench(Benchmark):
     def __init__(self, dataset):
         super().__init__(dataset)
 
-        self.properties = "No extra configuration"  # information about passed parameters to output
+        self.properties = "mongod only"  # information about passed parameters to output
 
     @property
     def mount_points(self):

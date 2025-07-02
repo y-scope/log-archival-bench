@@ -251,10 +251,10 @@ class Benchmark:
         self.__bench_stop()
         
         self.output[self.dataset_name][self.properties]['ingest'] = {
-                'time_taken': self.bench_info['time_taken'],
+                'time_taken_s': self.bench_info['time_taken'],
                 'memory_average_B': self.bench_info['memory_average'],
-                'compressed_size': self.compressed_size,
-                'decompressed_size': self.decompressed_size,
+                'compressed_size_B': self.compressed_size,
+                'decompressed_size_B': self.decompressed_size,
                 'start_time': datetime.datetime.fromtimestamp(
                     self.bench_info['start_time']
                     ).strftime('%Y-%m-%d %H:%M:%S')
@@ -285,7 +285,7 @@ class Benchmark:
                 logger.warning("The above result is inconsistent with previous results.")
 
             self.output[self.dataset_name][self.properties][mode][ind] = {
-                'time_taken': self.bench_info['time_taken'],
+                'time_taken_s': self.bench_info['time_taken'],
                 'memory_average_B': self.bench_info['memory_average'],
                 'result': res,
                 'start_time': datetime.datetime.fromtimestamp(

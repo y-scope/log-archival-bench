@@ -18,11 +18,13 @@ bench_target_dirs = [p for p in data_dir.iterdir() if p.is_dir()]
 
 
 benchmarks = [clp_s_bench, clickhouse_native_json_bench]
+mongod_only = [clickhouse_native_json_bench]
 
 for bencher in benchmarks:
     bench = bencher("mongod")
     bench.run_everything()
 
-    for bench_target in bench_target_dirs:
-        bench = bencher(bench_target)
-        bench.run_ingest()
+    if bencher not in mongod_only:
+        for bench_target in bench_target_dirs:
+            bench = bencher(bench_target)
+            bench.run_ingest()

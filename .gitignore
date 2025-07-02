@@ -3,3 +3,4 @@ output.json
 /venv
 /mongod
 /data
+/clp_bench.xlsx
