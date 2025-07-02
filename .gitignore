@@ -1,5 +1,5 @@
 __pycache__
 output.json
-./venv
-./mongod
-./data
+/venv
+/mongod
+/data
