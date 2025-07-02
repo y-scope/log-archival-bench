@@ -9,6 +9,7 @@ import threading
 import datetime
 import sys
 import shlex
+import uuid
 from jsonsync import JsonItem
 
 WORK_DIR = "/home"
@@ -64,6 +65,9 @@ class Benchmark:
             '|',
             r'awk "END {print\$1}"',
             ])
+
+    def check_results(self, ind, res):
+        return (res == [38611, 336293, 1, 122, 52421, 38611][ind])
 
     @property
     def decompressed_size(self):
@@ -182,7 +186,9 @@ class Benchmark:
     def __bench_start(self):
         self.bench_info['start_time'] = time.time()
         self.bench_info['memory'] = []
-        self.bench_info['running'] = True
+
+        bench_uuid = uuid.uuid4()
+        self.bench_info['running'] = bench_uuid
 
         def append_memory():
             kb_to_b = 1024
@@ -197,23 +203,25 @@ class Benchmark:
             logger.info(f"Memory used: {metric_sample//(1024*1024)} MB")
             self.bench_info['memory'].append(metric_sample)
 
-        def poll_memory():
-            while self.bench_info['running']:
-                interval = int(self.config["system_metric"]["memory"]["ingest_polling_interval"])
-                #time.sleep(interval)
+        def poll_memory(bench_uuid):
+            while True:
+                interval = self.config["system_metric"]["memory"]["ingest_polling_interval"]
                 time.sleep(interval - (time.time() % interval))  # wait for next "5 second interval"
 
-                if self.bench_info['running']:
+                if self.bench_info['running'] == bench_uuid:
                     append_memory()
+                else:
+                    break
 
         self.bench_thread = threading.Thread(
                 target = poll_memory,
+                args = (bench_uuid,),
                 daemon = True
                 )
         self.bench_thread.start()
 
     def __bench_stop(self):
-        self.bench_info['running'] = False
+        self.bench_info['running'] = None
         self.bench_info['end_time'] = time.time()
 
         try:
@@ -261,6 +269,9 @@ class Benchmark:
             self.__bench_stop()
 
             logger.info(f"Query #{ind} returned {res} results.")
+
+            if not self.check_results(ind, res):
+                logger.warning("The above result is inconsistent with previous results.")
 
             self.output[self.dataset_name][self.properties][mode][ind] = {
                 'time_taken': self.bench_info['time_taken'],

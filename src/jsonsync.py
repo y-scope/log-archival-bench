@@ -71,6 +71,9 @@ class JsonItem:
             return self.base
 
     def write(self):
+        if self.filename is None:
+            raise NameError("Writing with JsonItem not associated with file")
+
         with open(self.filename, 'w') as file:
             json.dump(self.compile(), file, indent=2)
 
