@@ -139,7 +139,8 @@ class Benchmark:
     def docker_remove(self):
         result = subprocess.run(
                 f'docker container stop {self.container_name}',
-                shell = True
+                shell = True,
+                stdout=subprocess.DEVNULL
                 )
         logger.debug(result)
 
@@ -196,10 +197,12 @@ class Benchmark:
 
         def poll_memory():
             while self.bench_info['running']:
-                append_memory()
+                interval = int(self.config["system_metric"]["memory"]["ingest_polling_interval"])
+                #time.sleep(interval)
+                time.sleep(interval - (time.time() % interval))  # wait for next "5 second interval"
 
-                interval = self.config["system_metric"]["memory"]["ingest_polling_interval"]
-                time.sleep(interval)
+                if self.bench_info['running']:
+                    append_memory()
 
         self.bench_thread = threading.Thread(
                 target = poll_memory,
@@ -211,7 +214,11 @@ class Benchmark:
         self.bench_info['running'] = False
         self.bench_info['end_time'] = time.time()
 
-        self.bench_info['memory_average'] = sum(self.bench_info['memory']) / len(self.bench_info['memory'])
+        try:
+            self.bench_info['memory_average'] = sum(self.bench_info['memory']) / len(self.bench_info['memory'])
+        except ZeroDivisionError:
+            self.bench_info['memory_average'] = -1  # not even 5 seconds: no benchmark
+
         self.bench_info['time_taken'] = self.bench_info['end_time'] - self.bench_info['start_time']
 
     def bench_ingest(self):
@@ -347,4 +354,4 @@ if __name__ == "__main__":
     logger.info("Removing container...")
     bench.docker_remove()
 
-    bench.print()
+    #bench.print()
