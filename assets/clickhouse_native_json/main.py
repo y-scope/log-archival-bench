@@ -40,7 +40,7 @@ order_by({','.join(self.order_by)}) \
                     "json.attr.message.msg like 'log_release%' AND json.attr.message.session_name = 'connection'"\
                     """,
                     """\
-                    "json.ctx = 'initandlisten' AND (json.attr.message.msg like 'log_remove%' OR json.msg != 'WiredTigermessage')"\
+                    "json.ctx = 'initandlisten' AND (json.attr.message.msg like 'log_remove%' OR json.msg != 'WiredTiger message')"\
                     """,
                     """\
                     "json.c = 'WTWRTLOG' and json.attr.message.ts_sec > 1679490000"\

@@ -10,7 +10,7 @@ system_metric:
     run_query_benchmark_polling_interval: 1
 
 # Identifier for the benchmark container. Usually `${tool}-clp-bench`
-container_id: sparksql-clp-bench
+container_id: openobserve-clp-bench
 # Path to the assets directory in the container. Leave as default unless modifying `docker-run.sh`
 assets_path: /home/assets
 # Path for datasets in the container; may refer to a file, directory, or file pattern. clp-bench
@@ -21,27 +21,24 @@ datasets_path: /home/datasets/mongod.log
 hot_run_warm_up_times: 3
 # List of command substrings (the first substring of the entire command split by space from `ps
 # aux`) to track relevant memory usage
-related_processes:
-  - 'python3'
-  - 'java'
+related_processes: ["/openobserve"]
 # Array of queries for benchmarking. Ensure escape characters are carefully handled. Note that each
 # query should be wrapped with double quotes (or single quote, depends on whether the query contains
 # double quotes) as the query will first be passed as an argument of `docker exec` rather than
 # directly to the scripts
 queries:
   # Query all JSON log lines containing "attr" object with "tickets" field
-  - '"attr.tickets IS NOT NULL"'
+  - '"attr_tickets is not null"'
   # Query all JSON log lines containing "id" field that equals to 22419
   - '"id=22419"'
   # Query all JSON log lines containing "attr" object with a nested "message" object with a "msg"
   # field that starts with "log_release" and a "session_name" field that is "connection"
-  - '"attr.message.msg LIKE ''log_release%'' AND attr.message.session_name=''connection''"'
+  - '"re_match(attr_message_msg, ''^log_release.*'') AND attr_message_session_name=''connection''"'
   # Query all JSON log lines where "ctx" is "initandlisten" and either "msg" does not equal to
   # "WiredTiger message" or "attr.message.msg" starts with "log_remove"
-  - '"ctx=''initandlisten'' AND (msg!=''WiredTiger message'' OR attr.message.msg LIKE ''log_remove%'')"'
+  - '"ctx=''initandlisten'' AND (NOT msg=''WiredTiger message'' OR re_match(attr_message_msg, ''^log_remove.*''))"'
   # Query all JSON log lines where "c" is "WTWRTLOG" and "attr.message.ts_sec" is greater than
   # 1679490000
-  - '"c=''WTWRTLOG'' AND attr.message.ts_sec > 1679490000"'
+  - '"c=''WTWRTLOG'' AND attr_message_ts_sec > 1679490000"'
   # Query all JSON log lines where "ctx" is "FlowControlRefresher" and "attr.numTrimmed" equals 0
-  - '"ctx=''FlowControlRefresher'' AND attr.numTrimmed=0"'
-
+  - '"ctx=''FlowControlRefresher'' AND attr_numtrimmed=0"'

@@ -3,6 +3,7 @@
 from assets.clp_s.main import clp_s_bench
 from assets.clickhouse_native_json.main import clickhouse_native_json_bench
 from assets.sparksql.main import sparksql_bench
+from assets.openobserve.main import openobserve_bench
 
 import os
 from pathlib import Path
@@ -62,6 +63,7 @@ benchmarks = [  # benchmark object, arguments
             'additional_order_by': set(),
             }),
         (sparksql_bench, {}),
+        (openobserve_bench, {}),
         ]
 
 for bencher, kwargs in benchmarks:
