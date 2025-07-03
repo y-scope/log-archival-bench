@@ -74,8 +74,15 @@ order_by({','.join(self.order_by)}) \
         Runs the benchmarked tool
         """
         self.docker_execute("nohup /entrypoint.sh &")
-        while self.docker_execute('clickhouse-client --query "SELECT 1" 2>/dev/null') != "1":
-            time.sleep(1)
+        while True:
+            try:
+                val = self.docker_execute('clickhouse-client --query "SELECT 1" 2>/dev/null')
+                if val != "1":
+                    time.sleep(1)
+                else:
+                    break
+            except CalledProcessError:
+                time.sleep(1)
 
         self.docker_execute([
             'clickhouse-client',
