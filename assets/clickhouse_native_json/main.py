@@ -2,6 +2,7 @@
 
 import sys
 import time
+import subprocess
 
 from src.template import DATASETS_PATH, Benchmark, logger
 """
@@ -81,7 +82,7 @@ order_by({','.join(self.order_by)}) \
                     time.sleep(1)
                 else:
                     break
-            except CalledProcessError:
+            except subprocess.CalledProcessError:
                 time.sleep(1)
 
         self.docker_execute([
