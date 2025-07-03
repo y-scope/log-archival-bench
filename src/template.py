@@ -74,7 +74,7 @@ class Benchmark:
             ]))
 
     def check_results(self, ind, res):
-        return (res == [38611, 336293, 1, 122, 52421, 38611][ind])
+        return (int(res) == [38611, 336293, 1, 122, 52421, 38611][ind])
 
     @property
     def decompressed_size(self):
@@ -194,8 +194,9 @@ class Benchmark:
         for procname in self.terminate_procs:
             self.docker_execute(f"pkill -f {procname}")
 
-    def __bench_start(self):
+    def __bench_start(self, ingest=True):
         self.bench_info['start_time'] = time.time()
+        self.bench_info['ingest'] = ingest
         self.bench_info['memory'] = []
 
         bench_uuid = uuid.uuid4()
@@ -216,7 +217,10 @@ class Benchmark:
 
         def poll_memory(bench_uuid):
             while True:
-                interval = self.config["system_metric"]["memory"]["ingest_polling_interval"]
+                if self.bench_info['ingest'] is True:
+                    interval = self.config["system_metric"]["memory"]["ingest_polling_interval"]
+                else:
+                    interval = self.config["system_metric"]["memory"]["run_query_benchmark_polling_interval"]
                 time.sleep(interval - (time.time() % interval))  # wait for next "5 second interval"
 
                 if self.bench_info['running'] == bench_uuid:
@@ -246,7 +250,7 @@ class Benchmark:
         self.launch()
         self.reset()
 
-        self.__bench_start()
+        self.__bench_start(ingest=True)
         self.ingest()
         self.__bench_stop()
         
@@ -275,7 +279,7 @@ class Benchmark:
                 for _ in range(self.config["hot_run_warm_up_times"]):
                     self.search(query)
 
-            self.__bench_start()
+            self.__bench_start(ingest=False)
             res = self.search(query)
             self.__bench_stop()
 

@@ -65,16 +65,12 @@ for output_dir in outputs:
 
                 if memory_cold:
                     memory_cold_val = sum(memory_cold)/len(memory_cold) / (1024*1024)
-                else:
-                    memory_cold_val = "No data"
+                    search[dataset][methodology]["memory_average_cold_MB"] = memory_cold_val
 
                 if memory_hot:
                     memory_hot_val = (sum(memory_hot)/len(memory_hot)) / (1024*1024)
-                else:
-                    memory_hot_val = "No data"
+                    search[dataset][methodology]["memory_average_hot_MB"] = memory_hot_val
 
-                search[dataset][methodology]["memory_average_cold_MB"] = memory_cold_val
-                search[dataset][methodology]["memory_average_hot_MB"] = memory_hot_val
 
 with pd.ExcelWriter("clp_bench.xlsx") as writer:
     for dataset, data in ingest.items():

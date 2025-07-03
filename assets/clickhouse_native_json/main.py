@@ -44,7 +44,7 @@ class clickhouse_native_json_bench(Benchmark):
         Runs the benchmarked tool
         """
         self.docker_execute("nohup /entrypoint.sh &")
-        while self.docker_execute('clickhouse-client --query "SELECT 1"') != "1":
+        while self.docker_execute('clickhouse-client --query "SELECT 1" 2>/dev/null') != "1":
             time.sleep(1)
 
         self.docker_execute([
