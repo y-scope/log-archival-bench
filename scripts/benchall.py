@@ -68,11 +68,12 @@ for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        if dataset_name != 'mongod':  # only use mongod for now
-            continue
+        #if dataset_name != 'mongod':  # only use mongod for now
+        #    continue
 
         if bencher == clp_s_bench:  # give additional parameters according to dataset name
             kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
 
         bench = bencher(bench_target, **kwargs)
         bench.run_applicable(dataset_name)
+        #bench.run_everything(['ingest', 'cold'])

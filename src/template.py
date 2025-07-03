@@ -298,33 +298,28 @@ class Benchmark:
     def print(self):
         print(self.output[self.dataset_name])
 
-    def run_everything(self):
+    def run_everything(self, run=['ingest', 'cold', 'hot']):
         logger.info("Removing possible previous container...")
         self.docker_remove(check=False)
         logger.info("Building container...")
         self.docker_build()
         logger.info("Running container...")
         self.docker_run(background=True)
-        logger.info("Benchmarking ingestion...")
-        self.bench_ingest()
-        logger.info("Benchmarking cold search...")
-        self.bench_search(cold=True)
-        logger.info("Benchmarking hot search...")
-        self.bench_search(cold=False)
+        for i in run:
+            if i == 'ingest':
+                logger.info("Benchmarking ingestion...")
+                self.bench_ingest()
+            elif i == 'cold':
+                logger.info("Benchmarking cold search...")
+                self.bench_search(cold=True)
+            elif i == 'hot':
+                logger.info("Benchmarking hot search...")
+                self.bench_search(cold=False)
         logger.info("Removing container...")
         self.docker_remove()
 
     def run_ingest(self):
-        logger.info("Removing possible previous container...")
-        self.docker_remove(check=False)
-        logger.info("Building container...")
-        self.docker_build()
-        logger.info("Running container...")
-        self.docker_run(background=True)
-        logger.info("Benchmarking ingestion...")
-        self.bench_ingest()
-        logger.info("Removing container...")
-        self.docker_remove()
+        self.run_everything(['ingest'])
 
     def run_applicable(self, dataset_name):
         if dataset_name == "mongod":
