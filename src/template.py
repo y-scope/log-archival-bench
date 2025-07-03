@@ -32,7 +32,7 @@ class Benchmark:
             self.config = yaml.safe_load(file)
 
         self.dataset = os.path.abspath(dataset_dir)
-        self.dataset_name = os.path.basename(dataset_dir)
+        self.dataset_name = os.path.basename(self.dataset)
 
         self.outputjson = f"{self.script_dir}/output.json"
         assert os.path.exists(f"{self.script_dir}/Dockerfile")
@@ -268,9 +268,9 @@ class Benchmark:
         mode = "query_" + ("cold" if cold else "hot")
         for ind, query in enumerate(self.config["queries"]):
             
-            if cold:
-                self.clear_cache()
-            else:
+            self.clear_cache()
+
+            if not cold:
                 for _ in range(self.config["hot_run_warm_up_times"]):
                     self.search(query)
 

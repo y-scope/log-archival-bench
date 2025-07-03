@@ -53,7 +53,7 @@ order_by({','.join(self.order_by)}) \
     def mount_points(self):
         return {
             f"{self.script_dir}/include/config.xml": "/etc/clickhouse-server/config.d/benchconfig.xml",
-            f"{self.script_dir}/include/users.xml": "/etc/clickhouse/server/users.d/benchconfig.xml",
+            f"{self.script_dir}/include/users.xml": "/etc/clickhouse-server/users.d/benchconfig.xml",
         }
 
     @property
@@ -132,7 +132,7 @@ order_by({','.join(self.order_by)}) \
 
         if self.manual_column_names:
             table_fields = """ \
-            t Tuple(\\$date String), \
+            t Tuple(\\$date timestamp), \
             s String, \
             c String, \
             id int, \

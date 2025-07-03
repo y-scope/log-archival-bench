@@ -2,6 +2,7 @@
 
 from assets.clp_s.main import clp_s_bench
 from assets.clickhouse_native_json.main import clickhouse_native_json_bench
+from assets.sparksql.main import sparksql_bench
 
 import os
 from pathlib import Path
@@ -34,6 +35,16 @@ benchmarks = [  # benchmark object, arguments
             'keys': {'id'},
             'additional_order_by': set(),
             }),
+        (clickhouse_native_json_bench, {  # give column names, order and primary key
+            'manual_column_names': True,
+            'keys': {'c'},
+            'additional_order_by': set(),
+            }),
+        (clickhouse_native_json_bench, {  # give column names, order and primary key
+            'manual_column_names': True,
+            'keys': {'t.\\$date', 'id'},
+            'additional_order_by': set(),
+            }),
         (clickhouse_native_json_bench, {  # give column names, use date as primary key
             'manual_column_names': True,
             'keys': {'t.\\$date'},
@@ -50,6 +61,7 @@ benchmarks = [  # benchmark object, arguments
             'keys': set(),
             'additional_order_by': set(),
             }),
+        (sparksql_bench, {}),
         ]
 
 for bencher, kwargs in benchmarks:

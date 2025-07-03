@@ -26,8 +26,7 @@ if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
 assets_dir = current_dir / "assets"
 outputs = [p for p in assets_dir.iterdir() if p.is_dir() if os.path.basename(str(p)) != "__pycache__"]
 
-ingest = JsonItem({})
-search = JsonItem({})
+sheets = JsonItem({})
 
 for output_dir in outputs:
     tool = os.path.basename(output_dir.resolve())
@@ -41,16 +40,17 @@ for output_dir in outputs:
 
                 methodology = f"{tool} ({configuration})"
 
+
                 for key, value in configuration_val["ingest"].items():
                     if key == "memory_average_B":
-                        ingest[dataset][methodology]["memory_average_MB"] = value / (1024*1024)
+                        sheets[f"{dataset} (ingest)"][methodology]["memory_average_MB"] = value / (1024*1024)
                     elif key == "compressed_size_B":
-                        ingest[dataset][methodology]["compressed_size_MB"] = value / (1024*1024)
+                        sheets[f"{dataset} (ingest)"][methodology]["compressed_size_MB"] = value / (1024*1024)
                     elif key == "decompressed_size_B":
-                        ingest[dataset][methodology]["decompressed_size_MB"] = value / (1024*1024)
+                        sheets[f"{dataset} (ingest)"][methodology]["decompressed_size_MB"] = value / (1024*1024)
                     else:
-                        ingest[dataset][methodology][key] = value
-                ingest[dataset][methodology]["compression_ratio"] = \
+                        sheets[f"{dataset} (ingest)"][methodology][key] = value
+                sheets[f"{dataset} (ingest)"][methodology]["compression_ratio"] = \
                         configuration_val["ingest"]["decompressed_size_B"] \
                         / configuration_val["ingest"]["compressed_size_B"]
 
@@ -58,45 +58,34 @@ for output_dir in outputs:
                 memory_hot = []
                 if "query_cold" in configuration_val and "query_hot" in configuration_val:
                     for key, value in enumerate(configuration_val["query_cold"]):
-                        search[dataset][methodology][f"q{key}_cold"] = value["time_taken_s"]
+                        sheets[f"{dataset} (search)"][methodology][f"q{key}_cold"] = value["time_taken_s"]
+                        sheets[f"{dataset} (result)"][methodology][f"q{key}_cold"] = value["result"]
                         if value["memory_average_B"] != -1:
                             memory_cold.append(value["memory_average_B"])
 
                     for key, value in enumerate(configuration_val["query_hot"]):
-                        search[dataset][methodology][f"q{key}_hot"] = value["time_taken_s"]
+                        sheets[f"{dataset} (search)"][methodology][f"q{key}_hot"] = value["time_taken_s"]
+                        sheets[f"{dataset} (result)"][methodology][f"q{key}_hot"] = value["result"]
                         if value["memory_average_B"] != -1:
                             memory_hot.append(value["memory_average_B"])
 
                 if memory_cold:
                     memory_cold_val = sum(memory_cold)/len(memory_cold) / (1024*1024)
-                    search[dataset][methodology]["memory_average_cold_MB"] = memory_cold_val
+                    sheets[f"{dataset} (search)"][methodology]["memory_average_cold_MB"] = memory_cold_val
 
                 if memory_hot:
                     memory_hot_val = (sum(memory_hot)/len(memory_hot)) / (1024*1024)
-                    search[dataset][methodology]["memory_average_hot_MB"] = memory_hot_val
+                    sheets[f"{dataset} (search)"][methodology]["memory_average_hot_MB"] = memory_hot_val
 
 
 with pd.ExcelWriter("clp_bench.xlsx") as writer:
-    for dataset, data in ingest.items():
+    for sheet_name, data in sheets.items():
         df = pd.DataFrame(data.compile())
         df.sort_index()
-        sheet_name = f"{dataset} (ingest)"
 
         df.to_excel(writer, sheet_name=sheet_name)
         worksheet = writer.sheets[sheet_name]
         for i, column in enumerate(df.columns):
             column_width = max(df[column].astype(str).map(len).max(), len(column))
             worksheet.column_dimensions[get_column_letter(i+2)].width = column_width + 6  # +1 for 1 indexing, +1 more for column that titles rows
-        worksheet.column_dimensions[get_column_letter(1)].width = 30
-    
-    for dataset, data in search.items():
-        df = pd.DataFrame(data.compile())
-        df.sort_index()
-        sheet_name = f"{dataset} (search)"
-
-        df.to_excel(writer, sheet_name=sheet_name)
-        worksheet = writer.sheets[sheet_name]
-        for i, column in enumerate(df.columns):
-            column_width = max(df[column].astype(str).map(len).max(), len(column))
-            worksheet.column_dimensions[get_column_letter(i+2)].width = column_width + 6  # more column width for buffer
         worksheet.column_dimensions[get_column_letter(1)].width = 30
