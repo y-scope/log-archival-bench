@@ -14,16 +14,53 @@ if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
 data_dir = current_dir / "data"
 bench_target_dirs = [p for p in data_dir.iterdir() if p.is_dir()]
 
+clp_s_timestamp_keys = {
+        "cockroachdb": "timestamp",
+        "elasticsearch": "@timestamp",
+        "postgresql": "timestamp",
+        "spark-event-logs": "Timestamp",
+        "mongod": r"t.\$date"
+        }
 
-benchmarks = [clp_s_bench, clickhouse_native_json_bench]
-#benchmarks = [clickhouse_native_json_bench]
-mongod_only = [clickhouse_native_json_bench]
+benchmarks = [  # benchmark object, arguments
+        (clp_s_bench, {}),
+        (clickhouse_native_json_bench, {  # give column names, don't order
+            'manual_column_names': True,
+            'keys': set(),
+            'additional_order_by': set(),
+            }),
+        (clickhouse_native_json_bench, {  # give column names, order and primary key
+            'manual_column_names': True,
+            'keys': {'id'},
+            'additional_order_by': set(),
+            }),
+        (clickhouse_native_json_bench, {  # give column names, use date as primary key
+            'manual_column_names': True,
+            'keys': {'t.\\$date'},
+            'additional_order_by': set(),
+            }),
+        # can even try to use json values with a default as primary or sorting
+        (clickhouse_native_json_bench, {  # give column names, order only
+            'manual_column_names': True,
+            'keys': set(),
+            'additional_order_by': {'id'},
+            }),
+        (clickhouse_native_json_bench, {  # no column names
+            'manual_column_names': False,
+            'keys': set(),
+            'additional_order_by': set(),
+            }),
+        ]
 
-for bencher in benchmarks:
-    bench = bencher("mongod")
-    bench.run_everything()
+for bencher, kwargs in benchmarks:
+    for bench_target in bench_target_dirs:
+        dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-    if bencher not in mongod_only:
-        for bench_target in bench_target_dirs:
-            bench = bencher(bench_target)
-            bench.run_ingest()
+        if dataset_name != 'mongod':  # only use mongod for now
+            continue
+
+        if bencher == clp_s_bench:  # give additional parameters according to dataset name
+            kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
+
+        bench = bencher(bench_target, **kwargs)
+        bench.run_applicable(dataset_name)

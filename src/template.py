@@ -28,6 +28,9 @@ logger.addHandler(logging_console_handler)
 
 class Benchmark:
     def __init__(self, dataset_dir):
+        with open(f"{self.script_dir}/config.yaml") as file:
+            self.config = yaml.safe_load(file)
+
         self.dataset = os.path.abspath(dataset_dir)
         self.dataset_name = os.path.basename(dataset_dir)
 
@@ -36,7 +39,6 @@ class Benchmark:
         assert os.path.exists(f"{self.script_dir}/config.yaml")
 
         self.output = JsonItem.read(self.outputjson)
-        self._cached_config = None
 
         self.bench_info = {}
         self.properties = "default"
@@ -55,13 +57,6 @@ class Benchmark:
     def script_dir(self):
         return pathlib.Path(type(self).source_file).parent.resolve()
         #return pathlib.Path(sys.argv[0]).parent.resolve()
-
-    @property
-    def config(self):
-        if not self._cached_config:
-            with open(f"{self.script_dir}/config.yaml") as file:
-                self._cached_config = yaml.safe_load(file)
-        return self._cached_config
 
     def get_disk_usage(self, path):
         return int(self.docker_execute([
@@ -330,3 +325,9 @@ class Benchmark:
         self.bench_ingest()
         logger.info("Removing container...")
         self.docker_remove()
+
+    def run_applicable(self, dataset_name):
+        if dataset_name == "mongod":
+            self.run_everything()
+        else:
+            self.run_ingest()

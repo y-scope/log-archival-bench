@@ -6,6 +6,7 @@ import json
 import numpy as np
 import pandas as pd
 import sys
+from openpyxl.utils import get_column_letter
 
 # Get the current working directory
 current_dir = os.getcwd()
@@ -43,12 +44,15 @@ for output_dir in outputs:
                 for key, value in configuration_val["ingest"].items():
                     if key == "memory_average_B":
                         ingest[dataset][methodology]["memory_average_MB"] = value / (1024*1024)
-                    elif key == "compressed_size":
+                    elif key == "compressed_size_B":
                         ingest[dataset][methodology]["compressed_size_MB"] = value / (1024*1024)
-                    elif key == "decompressed_size":
+                    elif key == "decompressed_size_B":
                         ingest[dataset][methodology]["decompressed_size_MB"] = value / (1024*1024)
                     else:
                         ingest[dataset][methodology][key] = value
+                ingest[dataset][methodology]["compression_ratio"] = \
+                        configuration_val["ingest"]["decompressed_size_B"] \
+                        / configuration_val["ingest"]["compressed_size_B"]
 
                 memory_cold = []
                 memory_hot = []
@@ -76,9 +80,23 @@ with pd.ExcelWriter("clp_bench.xlsx") as writer:
     for dataset, data in ingest.items():
         df = pd.DataFrame(data.compile())
         df.sort_index()
-        df.to_excel(writer, sheet_name=f"{dataset} (ingest)")
+        sheet_name = f"{dataset} (ingest)"
+
+        df.to_excel(writer, sheet_name=sheet_name)
+        worksheet = writer.sheets[sheet_name]
+        for i, column in enumerate(df.columns):
+            column_width = max(df[column].astype(str).map(len).max(), len(column))
+            worksheet.column_dimensions[get_column_letter(i+2)].width = column_width + 6  # +1 for 1 indexing, +1 more for column that titles rows
+        worksheet.column_dimensions[get_column_letter(1)].width = 30
     
     for dataset, data in search.items():
         df = pd.DataFrame(data.compile())
         df.sort_index()
-        df.to_excel(writer, sheet_name=f"{dataset} (search)")
+        sheet_name = f"{dataset} (search)"
+
+        df.to_excel(writer, sheet_name=sheet_name)
+        worksheet = writer.sheets[sheet_name]
+        for i, column in enumerate(df.columns):
+            column_width = max(df[column].astype(str).map(len).max(), len(column))
+            worksheet.column_dimensions[get_column_letter(i+2)].width = column_width + 6  # more column width for buffer
+        worksheet.column_dimensions[get_column_letter(1)].width = 30
