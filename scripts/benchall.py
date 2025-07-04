@@ -21,49 +21,50 @@ clp_s_timestamp_keys = {
         "elasticsearch": "@timestamp",
         "postgresql": "timestamp",
         "spark-event-logs": "Timestamp",
-        "mongod": r"t.\$date"
+        #"mongod": r"t.\$date"
+        "mongod": "id"
         }
 
 benchmarks = [  # benchmark object, arguments
         (clp_s_bench, {}),
-        (clickhouse_native_json_bench, {  # give column names, don't order
-            'manual_column_names': True,
-            'keys': set(),
-            'additional_order_by': set(),
-            }),
-        (clickhouse_native_json_bench, {  # give column names, order and primary key
-            'manual_column_names': True,
-            'keys': {'id'},
-            'additional_order_by': set(),
-            }),
-        (clickhouse_native_json_bench, {  # give column names, order and primary key
-            'manual_column_names': True,
-            'keys': {'c'},
-            'additional_order_by': set(),
-            }),
-        (clickhouse_native_json_bench, {  # give column names, order and primary key
-            'manual_column_names': True,
-            'keys': {'t.\\$date', 'id'},
-            'additional_order_by': set(),
-            }),
-        (clickhouse_native_json_bench, {  # give column names, use date as primary key
-            'manual_column_names': True,
-            'keys': {'t.\\$date'},
-            'additional_order_by': set(),
-            }),
-        # can even try to use json values with a default as primary or sorting
-        (clickhouse_native_json_bench, {  # give column names, order only
-            'manual_column_names': True,
-            'keys': set(),
-            'additional_order_by': {'id'},
-            }),
-        (clickhouse_native_json_bench, {  # no column names
-            'manual_column_names': False,
-            'keys': set(),
-            'additional_order_by': set(),
-            }),
-        (sparksql_bench, {}),
-        (openobserve_bench, {}),
+        #(clickhouse_native_json_bench, {  # give column names, don't order
+        #    'manual_column_names': True,
+        #    'keys': set(),
+        #    'additional_order_by': set(),
+        #    }),
+        #(clickhouse_native_json_bench, {  # give column names, order and primary key
+        #    'manual_column_names': True,
+        #    'keys': {'id'},
+        #    'additional_order_by': set(),
+        #    }),
+        #(clickhouse_native_json_bench, {  # give column names, order and primary key
+        #    'manual_column_names': True,
+        #    'keys': {'c'},
+        #    'additional_order_by': set(),
+        #    }),
+        #(clickhouse_native_json_bench, {  # give column names, order and primary key
+        #    'manual_column_names': True,
+        #    'keys': {'t.\\$date', 'id'},
+        #    'additional_order_by': set(),
+        #    }),
+        #(clickhouse_native_json_bench, {  # give column names, use date as primary key
+        #    'manual_column_names': True,
+        #    'keys': {'t.\\$date'},
+        #    'additional_order_by': set(),
+        #    }),
+        ## can even try to use json values with a default as primary or sorting
+        #(clickhouse_native_json_bench, {  # give column names, order only
+        #    'manual_column_names': True,
+        #    'keys': set(),
+        #    'additional_order_by': {'id'},
+        #    }),
+        #(clickhouse_native_json_bench, {  # no column names
+        #    'manual_column_names': False,
+        #    'keys': set(),
+        #    'additional_order_by': set(),
+        #    }),
+        #(sparksql_bench, {}),
+        #(openobserve_bench, {}),
         ]
 
 for bencher, kwargs in benchmarks:

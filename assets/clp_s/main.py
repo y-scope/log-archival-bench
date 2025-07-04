@@ -9,7 +9,7 @@ class clp_s_bench(Benchmark):
     def __init__(self, dataset, timestamp_key=r"t.\$date", target_encoded_size=268435456):
         super().__init__(dataset)
 
-        logger.info(f"target_encoded_size: {target_encoded_size//(1024*1024)} MB")
+        logger.info(f"target_encoded_size: {target_encoded_size//(1024*1024)} MB, timestamp_key: {timestamp_key}")
 
         self.timestamp = timestamp_key
         self.target_encoded_size = target_encoded_size
