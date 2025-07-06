@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+import time
+
+from src.template import DATASETS_PATH, ASSETS_DIR, WORK_DIR, Benchmark, logger
+"""
+DATASETS_PATH: The in-container path to the log file
+ASSETS_DIR: The directory this file resides in, inside the container
+WORK_DIR: The in-container path to an accessible location e.g. "/home"
+Benchmark: Base class for benchmarks, has docker_execute to execute command within container
+logger: A logging.Logger
+"""
+
+PARQUET_DATA_PATH = "/home/hive-data"
+PARQUET_SCHEMA_NAME = "bench_schema"
+PARQUET_TABLE_NAME = "bench_table"
+class parquet_bench(Benchmark):
+    # add any parameters to the tool here
+    def __init__(self, dataset):
+        super().__init__(dataset)
+
+        self.properties = "json string"  # information about passed parameters to output
+
+    @property
+    def compressed_size(self):
+        """
+        Returns the size of the compressed dataset
+        """
+        return self.get_disk_usage(PARQUET_DATA_PATH)
+
+    @property
+    def mount_points(self):
+        return {
+            f"{self.script_dir}/include": "/home/include",
+        }
+
+    def launch(self):
+        """
+        Runs the benchmarked tool
+        """
+        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
+        self.wait_for_port(8080)
+        self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
+        self.wait_for_port(7777)
+        self.docker_execute("echo 'test test'")
+        time.sleep(20)
+        #self.wait_for_port(7777)
+
+        #time.sleep(120)
+
+    def hive_execute(self, query, check=True):
+        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --execute "{query}"', check)
+
+    def ingest(self):
+        """
+        Ingests the dataset at DATASETS_PATH
+        """
+        self.hive_execute(f"CREATE SCHEMA IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME};")
+        self.hive_execute(f""" \
+        CREATE TABLE IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME}.{PARQUET_TABLE_NAME} ( \
+            line VARCHAR \
+        ) \
+        WITH ( \
+            format = 'PARQUET' \
+        ); \
+        """)
+
+        self.docker_execute([
+            f"python3 {ASSETS_DIR}/ingest.py {DATASETS_PATH}"
+            ])
+    
+    def search(self, query):
+        """
+        Searches an already-ingested dataset with query, which is populated within config.yaml
+        """
+        return (self.hive_execute(f"USE {PARQUET_SCHEMA_NAME}; SELECT * from {PARQUET_TABLE_NAME} WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
+
+    def clear_cache(self):
+        """
+        Clears the cache within the docker container for cold run
+        """
+        self.docker_execute("sync")
+        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
+        self.docker_execute('curl -X GET "http://localhost:7777/v1/operation/server/clearCache?type=memory"')
+        self.docker_execute('curl -X GET "http://localhost:7777/v1/operation/server/clearCache?type=ssd"')
+
+    def reset(self):
+        """
+        Removes a previously ingested dataset before ingesting a new one, must not throw error
+        when no dataset was ingested
+        """
+        self.docker_execute(f"mkdir -p {PARQUET_DATA_PATH}")
+        self.hive_execute(f"DELETE FROM {PARQUET_SCHEMA_NAME}.{PARQUET_TABLE_NAME} WHERE true;", check=False)
+
+    def terminate(self):
+        self.docker_execute("pkill -f /usr/lib/jvm/java-11-openjdk-amd64/bin/java")
+        self.docker_execute("pkill presto_server")
+        self.wait_for_port(8080, waitclose=True)
+        self.wait_for_port(7777, waitclose=True)
+        #self.docker_execute("ps -aux")
+        #print('asdf\n'*10)
+
+def main():
+    bench = parquet_bench(sys.argv[1])
+    bench.run_everything()
+
+if __name__ == "__main__":
+    main()

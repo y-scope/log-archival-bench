@@ -83,6 +83,25 @@ class Benchmark:
     def mount_points(self):
         return {}
 
+    def wait_for_port(self, port_num, waitclose=False):
+        try:
+            self.docker_execute("which nc")
+        except subprocess.CalledProcessError:
+            raise Exception("nc not found in container")
+
+        while True:
+            try:
+                self.docker_execute(f"nc -z localhost {port_num}")
+                if waitclose:
+                    time.sleep(1)
+                else:
+                    break
+            except subprocess.CalledProcessError:
+                if waitclose:
+                    break
+                else:
+                    time.sleep(1)
+
     def docker_build(self):
         result = subprocess.run(
                 f'docker build --tag {self.container_name} {self.script_dir}',

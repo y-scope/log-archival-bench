@@ -33,12 +33,7 @@ class openobserve_bench(Benchmark):
         """
         self.docker_execute("/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
         self.docker_execute("nohup /openobserve &")
-        while True:
-            try:
-                self.docker_execute("nc -z localhost 5080")
-                break
-            except subprocess.CalledProcessError:
-                pass
+        self.wait_for_port(5080)
 
     def ingest(self):
         """

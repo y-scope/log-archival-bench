@@ -1,0 +1,45 @@
+# This config file contains essential benchmarking configurations
+
+system_metric:
+  # Toggle to enable system metric monitoring (e.g., memory usage). Set to `true` to activate
+  enable: true
+  memory:
+    # Time interval (in seconds) for polling memory during data ingestion
+    ingest_polling_interval: 5
+    # Time interval (in seconds) for polling memory during query benchmarking
+    run_query_benchmark_polling_interval: 1
+
+# Identifier for the benchmark container. Usually `${tool}-clp-bench`
+container_id: parquet-clp-bench
+# Path to the assets directory in the container. Leave as default unless modifying `docker-run.sh`
+assets_path: /home/assets
+# Path for datasets in the container; may refer to a file, directory, or file pattern. clp-bench
+# does not validate the dataset's presence
+datasets_path: /home/datasets/mongod.log
+# Number of repetitions for query warm-up in hot-run mode before measuring latency. This may be
+# automated in the future
+hot_run_warm_up_times: 3
+# List of command substrings (the first substring of the entire command split by space from `ps
+# aux`) to track relevant memory usage
+related_processes: ["python3", "java", "/usr/lib/jvm/java-11-openjdk-amd64/bin/java"]
+# Array of queries for benchmarking. Ensure escape characters are carefully handled. Note that each
+# query should be wrapped with double quotes (or single quote, depends on whether the query contains
+# double quotes) as the query will first be passed as an argument of `docker exec` rather than
+# directly to the scripts
+queries:
+  # Query all JSON log lines containing "attr" object with "tickets" field
+  - '"json_extract(json_parse(line), ''$.attr.tickets'') IS NOT NULL"'
+  # Query all JSON log lines containing "id" field that equals to 22419
+  - '"json_extract_scalar(json_parse(line), ''$.id'') = ''22419'';"'
+  # Query all JSON log lines containing "attr" object with a nested "message" object with a "msg"
+  # field that starts with "log_release" and a "session_name" field that is "connection"
+  - '"json_extract_scalar(json_parse(line), ''$.attr.message.msg'') LIKE ''log_release%'' AND json_extract_scalar(json_parse(line), ''$.attr.message.session_name'') = ''connection'';"'
+  # Query all JSON log lines where "ctx" is "initandlisten" and either "msg" does not equal to
+  # "WiredTigermessage" or "attr.message.msg" starts with "log_remove"
+  - '"json_extract_scalar(json_parse(line), ''$.ctx'') = ''initandlisten'' AND (json_extract_scalar(json_parse(line), ''$.msg'') != ''WiredTiger message'' OR json_extract_scalar(json_parse(line), ''$.attr.message.msg'') LIKE ''log_remove%'')"'
+  # Query all JSON log lines where "c" is "WTWRTLOG" and "attr.message.ts_sec" is greater than
+  # 1679490000
+  - '"json_extract_scalar(json_parse(line), ''$.c'') = ''WTWRTLOG'' AND CAST(json_extract_scalar(json_parse(line), ''$.attr.message.ts_sec'') AS bigint) > 1679490000;"'
+  # Query all JSON log lines where "ctx" is "FlowControlRefresher" and "attr.numTrimmed" equals 0
+  - '"json_extract_scalar(json_parse(line), ''$.ctx'') = ''FlowControlRefresher'' AND json_extract_scalar(json_parse(line), ''$.attr.numTrimmed'') = ''0'';"'
+  # - '"ctx: FlowControlRefresher AND attr.numTrimmed: 0"'
