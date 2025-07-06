@@ -43,3 +43,92 @@ queries:
   # Query all JSON log lines where "ctx" is "FlowControlRefresher" and "attr.numTrimmed" equals 0
   - '"json_extract_scalar(json_parse(line), ''$.ctx'') = ''FlowControlRefresher'' AND json_extract_scalar(json_parse(line), ''$.attr.numTrimmed'') = ''0'';"'
   # - '"ctx: FlowControlRefresher AND attr.numTrimmed: 0"'
+queries_columns_values:
+  # Query all JSON log lines containing "attr" object with "tickets" field
+  - |
+    "contains(int_columns, 'attr.tickets');"
+  # Query all JSON log lines containing "id" field that equals to 22419
+  - |
+    "array_position(int_columns, 'id') > 0 
+    AND element_at(
+      int_values, 
+      array_position(int_columns, 'id')
+    ) = 22419;"
+  # Query all JSON log lines containing "attr" object with a nested "message" object with a "msg"
+  # field that starts with "log_release" and a "session_name" field that is "connection"
+  - |
+    "array_position(
+    string_columns, 'attr.message.msg'
+    ) > 0 
+    AND element_at(
+      string_values, 
+      array_position(
+        string_columns, 'attr.message.msg'
+      )
+    ) LIKE 'log_release%' 
+    AND array_position(
+      string_columns, 'attr.message.session_name'
+    ) > 0 
+    AND element_at(
+      string_values, 
+      array_position(
+        string_columns, 'attr.message.session_name'
+      )
+    ) = 'connection';"
+  # Query all JSON log lines where "ctx" is "initandlisten" and either "msg" does not equal to
+  # "WiredTiger message" or "attr.message.msg" starts with "log_remove"
+  - |
+    "(
+      array_position(string_columns, 'ctx') > 0 
+      AND element_at(
+        string_values, 
+        array_position(string_columns, 'ctx')
+      ) = 'initandlisten'
+    ) 
+    AND (
+      (
+        array_position(string_columns, 'msg') = 0 
+        OR element_at(
+          string_values, 
+          array_position(string_columns, 'msg')
+        ) != 'WiredTiger message'
+      ) 
+      OR (
+        array_position(
+          string_columns, 'attr.message.msg'
+        ) > 0 
+        AND element_at(
+          string_values, 
+          array_position(
+            string_columns, 'attr.message.msg'
+          )
+        ) LIKE 'log_remove%'
+      )
+    )"
+  # Query all JSON log lines where "c" is "WTWRTLOG" and "attr.message.ts_sec" is greater than
+  # 1679490000
+  - |
+    "array_position(string_columns, 'c') > 0 
+    AND element_at(
+      string_values, 
+      array_position(string_columns, 'c')
+    ) = 'WTWRTLOG' 
+    AND array_position(int_columns, 'attr.message.ts_sec') > 0 
+    AND element_at(
+      int_values, 
+      array_position(int_columns, 'attr.message.ts_sec')
+    ) > 1679490000;"
+  # Query all JSON log lines where "ctx" is "FlowControlRefresher" and "attr.numTrimmed" equals 0
+  - |
+    "array_position(string_columns, 'ctx') > 0 
+    AND element_at(
+      string_values, 
+      array_position(string_columns, 'ctx')
+    ) = 'FlowControlRefresher' 
+    AND array_position(int_columns, 'attr.numTrimmed') > 0 
+    AND element_at(
+      int_values, 
+      array_position(int_columns, 'attr.numTrimmed')
+    ) = 0;"
+  # - '"ctx: FlowControlRefresher AND attr.numTrimmed: 0"'
+

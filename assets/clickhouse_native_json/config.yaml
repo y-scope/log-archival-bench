@@ -23,3 +23,14 @@ queries:
     "c = 'WTWRTLOG' and attr.message.ts_sec > 1679490000"
   - >
     "ctx = 'FlowControlRefresher' AND attr.numTrimmed = 0 "
+queries_automatic_json:
+  - '"not(isNull(json.attr.tickets))"'
+  - '"json.id = 22419"'
+  - >
+    "json.attr.message.msg like 'log_release%' AND json.attr.message.session_name = 'connection'"
+  - >
+    "json.ctx = 'initandlisten' AND (json.attr.message.msg like 'log_remove%' OR json.msg != 'WiredTiger message')"
+  - >
+    "json.c = 'WTWRTLOG' and json.attr.message.ts_sec > 1679490000"
+  - >
+    "json.ctx = 'FlowControlRefresher' AND json.attr.numTrimmed = 0"

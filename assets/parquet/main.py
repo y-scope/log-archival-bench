@@ -18,10 +18,18 @@ PARQUET_SCHEMA_NAME = "bench_schema"
 PARQUET_TABLE_NAME = "bench_table"
 class parquet_bench(Benchmark):
     # add any parameters to the tool here
-    def __init__(self, dataset):
+    def __init__(self, dataset, mode='json string'):
         super().__init__(dataset)
 
-        self.properties = "json string"  # information about passed parameters to output
+        if mode not in ('json string', 'columns values'):
+            raise Exception('mode must be either "json string" or "columns values"')
+
+        self.column_values = False
+        if mode == 'columns values':
+            self.column_values = True
+            self.queries = self.config['queries_columns_values']
+
+        self.properties = mode
 
     @property
     def compressed_size(self):
@@ -44,7 +52,7 @@ class parquet_bench(Benchmark):
         self.wait_for_port(8080)
         self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
         self.wait_for_port(7777)
-        self.docker_execute("echo 'test test'")
+        #self.docker_execute("echo 'test test'")
         time.sleep(20)
         #self.wait_for_port(7777)
 
@@ -58,18 +66,39 @@ class parquet_bench(Benchmark):
         Ingests the dataset at DATASETS_PATH
         """
         self.hive_execute(f"CREATE SCHEMA IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME};")
-        self.hive_execute(f""" \
-        CREATE TABLE IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME}.{PARQUET_TABLE_NAME} ( \
-            line VARCHAR \
-        ) \
-        WITH ( \
-            format = 'PARQUET' \
-        ); \
-        """)
 
-        self.docker_execute([
-            f"python3 {ASSETS_DIR}/ingest.py {DATASETS_PATH}"
-            ])
+        if self.column_values:
+            self.hive_execute(f""" \
+            CREATE TABLE IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME}.{PARQUET_TABLE_NAME} ( \
+                "string_columns" array(varchar), \
+                "string_values" array(varchar), \
+                "int_columns" array(varchar), \
+                "int_values" array(bigint), \
+                "float_columns" array(varchar), \
+                "float_values" array(double), \
+                "bool_columns" array(varchar), \
+                "bool_values" array(boolean) \
+            ) \
+            WITH ( \
+                format = 'PARQUET' \
+            ); \
+            """)
+            self.docker_execute([
+                f"python3 {ASSETS_DIR}/ingest_column_values.py {DATASETS_PATH}"
+                ])
+        else:
+            self.hive_execute(f""" \
+            CREATE TABLE IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME}.{PARQUET_TABLE_NAME} ( \
+                line VARCHAR \
+            ) \
+            WITH ( \
+                format = 'PARQUET' \
+            ); \
+            """)
+            self.docker_execute([
+                f"python3 {ASSETS_DIR}/ingest_json_string.py {DATASETS_PATH}"
+                ])
+
     
     def search(self, query):
         """

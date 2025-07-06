@@ -8,9 +8,6 @@ BATCH_SIZE = 10000
 
 schema = pa.schema([("line", pa.string())])
 
-pa.set_cpu_count(1)
-pa.set_io_thread_count(1)
-
 #with pq.ParquetWriter(OUTPUT_FILE, schema) as writer:
 with pq.ParquetWriter(OUTPUT_FILE, schema, compression="ZSTD", compression_level=3) as writer:
     batch = []

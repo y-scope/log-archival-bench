@@ -4,6 +4,7 @@ from assets.clp_s.main import clp_s_bench
 from assets.clickhouse_native_json.main import clickhouse_native_json_bench
 from assets.sparksql.main import sparksql_bench
 from assets.openobserve.main import openobserve_bench
+from assets.parquet.main import parquet_bench
 
 import os
 from pathlib import Path
@@ -26,7 +27,7 @@ clp_s_timestamp_keys = {
         }
 
 benchmarks = [  # benchmark object, arguments
-        (clp_s_bench, {}),
+        #(clp_s_bench, {}),
         #(clickhouse_native_json_bench, {  # give column names, don't order
         #    'manual_column_names': True,
         #    'keys': set(),
@@ -65,14 +66,16 @@ benchmarks = [  # benchmark object, arguments
         #    }),
         #(sparksql_bench, {}),
         #(openobserve_bench, {}),
+        #(parquet_bench, {'mode': 'json string'}),
+        (parquet_bench, {'mode': 'columns values'}),
         ]
 
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        #if dataset_name != 'mongod':  # only use mongod for now
-        #    continue
+        if dataset_name != 'mongod':  # only use mongod for now
+            continue
 
         if bencher == clp_s_bench:  # give additional parameters according to dataset name
             kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]

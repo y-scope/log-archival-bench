@@ -32,23 +32,7 @@ order_by({','.join(self.order_by)}) \
 """
 
         if not manual_column_names:
-            self.config["queries"] = [
-                    # override configuration queries for json
-                    '"not(isNull(json.attr.tickets))"',
-                    '"json.id = 22419"',
-                    """\
-                    "json.attr.message.msg like 'log_release%' AND json.attr.message.session_name = 'connection'"\
-                    """,
-                    """\
-                    "json.ctx = 'initandlisten' AND (json.attr.message.msg like 'log_remove%' OR json.msg != 'WiredTiger message')"\
-                    """,
-                    """\
-                    "json.c = 'WTWRTLOG' and json.attr.message.ts_sec > 1679490000"\
-                    """,
-                    """\
-                    "json.ctx = 'FlowControlRefresher' AND json.attr.numTrimmed = 0"\
-                    """,
-                    ]
+            self.queries = self.config["queries_automatic_json"]
 
     @property
     def mount_points(self):

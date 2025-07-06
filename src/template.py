@@ -30,6 +30,7 @@ class Benchmark:
     def __init__(self, dataset_dir):
         with open(f"{self.script_dir}/config.yaml") as file:
             self.config = yaml.safe_load(file)
+        self.queries = self.config["queries"]
 
         self.dataset = os.path.abspath(dataset_dir)
         self.dataset_name = os.path.basename(self.dataset)
@@ -285,7 +286,7 @@ class Benchmark:
         self.launch()
 
         mode = "query_" + ("cold" if cold else "hot")
-        for ind, query in enumerate(self.config["queries"]):
+        for ind, query in enumerate(self.queries):
             
             self.clear_cache()
 
