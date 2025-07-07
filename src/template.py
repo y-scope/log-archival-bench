@@ -292,7 +292,7 @@ class Benchmark:
                 }
         self.output.write()
 
-        #self.terminate()
+        self.terminate()
 
     def bench_search(self, cold=True):
         self.launch()
