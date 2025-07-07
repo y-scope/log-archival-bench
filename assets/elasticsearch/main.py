@@ -30,12 +30,12 @@ class elasticsearch_bench(Benchmark):
         """
         Runs the benchmarked tool
         """
-        time.sleep(10)
+        #time.sleep(10)
         # temporary solution
         self.docker_execute(f"bash -c '{ASSETS_DIR}/launch.sh'")
-        time.sleep(10)
-        self.docker_execute(f"bash -c '{ASSETS_DIR}/launch.sh'", check=False)
-        time.sleep(10)
+        time.sleep(20)
+        #self.docker_execute(f"bash -c '{ASSETS_DIR}/launch.sh'", check=False)
+        #time.sleep(10)
 
     def ingest(self):
         """

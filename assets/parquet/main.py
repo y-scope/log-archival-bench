@@ -128,6 +128,7 @@ class parquet_bench(Benchmark):
         self.docker_execute("pkill presto_server")
         self.wait_for_port(8080, waitclose=True)
         self.wait_for_port(7777, waitclose=True)
+        time.sleep(10)
         #self.docker_execute("ps -aux")
         #print('asdf\n'*10)
 
