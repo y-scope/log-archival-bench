@@ -18,8 +18,9 @@ refer to the `traverse_data` function in `ingest_script` . This process generall
 reorganizing specific fields, moving them into outer or inner objects to ensure proper query
 functionality.
 
+> Caveat: if over 98% of the benchmarking machine storage is full, this will not work
+due to a temporary workaround in launch.sh setting disk allocation high watermark to 98%
 
 [download]: https://www.elastic.co/downloads/past-releases/elasticsearch-8-6-2
 [disabling-xpack]: https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html
 [elasticsearch]: https://www.elastic.co/downloads/elasticsearch
-

@@ -17,3 +17,4 @@ sed -i "/elasticsearch/ s/\/nonexistent/\/usr\/share\/elasticsearch/" /etc/passw
 # "/usr/share/elasticsearch/bin/elasticsearch -d"
 su elasticsearch -c "/usr/share/elasticsearch/bin/elasticsearch -d"
 
+curl -X PUT 'http://localhost:9202/_cluster/settings' -H "Content-Type: application/json" -d '{"transient": {"cluster.routing.allocation.disk.watermark.flood_stage": "99%", "cluster.routing.allocation.disk.watermark.high": "98%", "cluster.routing.allocation.disk.watermark.low": "97%"}}'

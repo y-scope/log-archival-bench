@@ -50,7 +50,7 @@ class parquet_bench(Benchmark):
         """
         self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
         self.wait_for_port(8080)
-        self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
+        self.docker_execute("bash -c \"/home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log\" &")
         self.wait_for_port(7777)
         #self.docker_execute("echo 'test test'")
         time.sleep(60)
@@ -128,7 +128,7 @@ class parquet_bench(Benchmark):
         self.docker_execute("pkill presto_server")
         self.wait_for_port(8080, waitclose=True)
         self.wait_for_port(7777, waitclose=True)
-        time.sleep(10)
+        time.sleep(60)
         #self.docker_execute("ps -aux")
         #print('asdf\n'*10)
 

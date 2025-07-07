@@ -1,5 +1,6 @@
 import logging
 import sys
+import json
 
 from elasticsearch import Elasticsearch
 
@@ -10,8 +11,7 @@ es = Elasticsearch(
 )
 results = []
 
-query = sys.argv[1]
-
+query = json.loads(sys.argv[1])
 
 # Function to execute a query without cache
 def execute_query_without_cache(query):
@@ -19,8 +19,8 @@ def execute_query_without_cache(query):
     page = es.search(
         index=collection_name,
         scroll="8m",  # Keep the search context open for 2 minutes
-        body=query,
         request_cache=False,
+        **query
     )
 
     for result in page["hits"]["hits"]:
@@ -45,4 +45,3 @@ while True:
     except Exception as e:
         logging.error(e)
         continue
-

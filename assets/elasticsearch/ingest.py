@@ -74,7 +74,7 @@ def ingest_dataset():
         raise_on_error=False,
         raise_on_exception=False,
         chunk_size=10000,
-        request_timeout=120,
+        #request_timeout=120,
     ):
         if success:
             count += 1
@@ -91,4 +91,3 @@ if __name__ == "__main__":
         ingest_dataset()
     except Exception as e:
         print(e)
-

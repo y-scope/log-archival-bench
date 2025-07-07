@@ -28,4 +28,3 @@ queries:
     '{"query": {"bool": {"must": [{"match": {"ctx": "FlowControlRefresher"}}, {
     "match": {"attr.numTrimmed": 0}}]}}, "size": 10000}'
   
-

@@ -22,4 +22,3 @@ RUN apt-get update \
     vim;
 
 RUN pip3 install elasticsearch==8.6.2 requests;
-

@@ -24,18 +24,18 @@ class elasticsearch_bench(Benchmark):
         """
         Returns the size of the compressed dataset
         """
-        return self.docker_execute(f"python3 {ASSETS_DIR}/measure-compressed-size.py")
+        return int(self.docker_execute(f"python3 {ASSETS_DIR}/measure-compressed-size.py"))
 
     def launch(self):
         """
         Runs the benchmarked tool
         """
-        #time.sleep(10)
+        time.sleep(10)
         # temporary solution
         self.docker_execute(f"bash -c '{ASSETS_DIR}/launch.sh'")
-        time.sleep(20)
+        #time.sleep(20)
         #self.docker_execute(f"bash -c '{ASSETS_DIR}/launch.sh'", check=False)
-        #time.sleep(10)
+        time.sleep(10)
 
     def ingest(self):
         """
@@ -78,7 +78,7 @@ class elasticsearch_bench(Benchmark):
         Process names as shown on `ps -aux` to terminate, reverts the launch process
         Alternatively, override the terminate(self) function in Benchmark
         """
-        return ['java']
+        return ['java', '/usr/share/elasticsearch/jdk/bin/java']
 
 
 def main():

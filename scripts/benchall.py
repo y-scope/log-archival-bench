@@ -71,10 +71,10 @@ benchmarks = [  # benchmark object, arguments
         #    }),
         #(sparksql_bench, {}),
         #(openobserve_bench, {}),
-        (parquet_bench, {'mode': 'json string'}),
         (parquet_bench, {'mode': 'columns values'}),
-        (zstandard_bench, {}),
-        (elasticsearch_bench, {}),
+        (parquet_bench, {'mode': 'json string'}),
+        #(zstandard_bench, {}),
+        #(elasticsearch_bench, {}),
     ]
 
 for bencher, kwargs in benchmarks:
