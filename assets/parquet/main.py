@@ -50,13 +50,9 @@ class parquet_bench(Benchmark):
         """
         self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
         self.wait_for_port(8080)
-        self.docker_execute("bash -c \"/home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log\" &")
+        self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
         self.wait_for_port(7777)
-        #self.docker_execute("echo 'test test'")
-        time.sleep(60)
-        #self.wait_for_port(7777)
-
-        #time.sleep(120)
+        time.sleep(60)  # this needs to be more than 10
 
     def hive_execute(self, query, check=True):
         return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --execute "{query}"', check)
@@ -128,7 +124,7 @@ class parquet_bench(Benchmark):
         self.docker_execute("pkill presto_server")
         self.wait_for_port(8080, waitclose=True)
         self.wait_for_port(7777, waitclose=True)
-        time.sleep(60)
+        time.sleep(10)
         #self.docker_execute("ps -aux")
         #print('asdf\n'*10)
 
