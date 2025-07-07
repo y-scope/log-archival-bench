@@ -53,7 +53,7 @@ class parquet_bench(Benchmark):
         self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
         self.wait_for_port(7777)
         #self.docker_execute("echo 'test test'")
-        time.sleep(20)
+        time.sleep(60)
         #self.wait_for_port(7777)
 
         #time.sleep(120)
