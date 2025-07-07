@@ -73,7 +73,7 @@ benchmarks = [  # benchmark object, arguments
         #(openobserve_bench, {}),
         (parquet_bench, {'mode': 'json string'}),
         (parquet_bench, {'mode': 'columns values'}),
-        #(zstandard_bench, {}),
+        (zstandard_bench, {}),
         #(elasticsearch_bench, {}),
     ]
 
@@ -83,8 +83,8 @@ for bencher, kwargs in benchmarks:
         try:
             dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-            if dataset_name != 'mongod':  # only use mongod for now
-                continue
+            #if dataset_name != 'mongod':  # only use mongod for now
+            #    continue
 
             #if bencher == clp_s_bench and dataset_name != 'mongod':
             if bencher == clp_s_bench:  # give additional parameters according to dataset name
