@@ -7,6 +7,7 @@ from assets.openobserve.main import openobserve_bench
 from assets.parquet.main import parquet_bench
 from assets.zstandard.main import zstandard_bench
 from assets.elasticsearch.main import elasticsearch_bench
+from src.jsonsync import JsonItem
 
 import os
 from pathlib import Path
@@ -78,15 +79,21 @@ benchmarks = [  # benchmark object, arguments
 
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
-        dataset_name = os.path.basename(bench_target.resolve()).strip()
+        dataset_name = 'dataset ingestion failed'
+        try:
+            dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        if dataset_name != 'mongod':  # only use mongod for now
-            continue
+            if dataset_name != 'mongod':  # only use mongod for now
+                continue
 
-        #if bencher == clp_s_bench and dataset_name != 'mongod':
-        if bencher == clp_s_bench:  # give additional parameters according to dataset name
-            kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
+            #if bencher == clp_s_bench and dataset_name != 'mongod':
+            if bencher == clp_s_bench:  # give additional parameters according to dataset name
+                kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
 
-        bench = bencher(bench_target, **kwargs)
-        bench.run_applicable(dataset_name)
-        #bench.run_everything(['ingest', 'cold'])
+            bench = bencher(bench_target, **kwargs)
+            bench.run_applicable(dataset_name)
+            #bench.run_everything(['ingest', 'cold'])
+        except Exception as e:
+            with open((current_dir / 'exceptions.json').resolve(), 'a') as file:
+                file.write(f"{bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}")
+            print(f"{bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}")

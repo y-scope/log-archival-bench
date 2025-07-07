@@ -174,6 +174,18 @@ class Benchmark:
                 stdout=subprocess.DEVNULL
                 )
         logger.debug(result)
+        while True:
+            try:
+                subprocess.run(
+                    f'docker exec {self.container_name} echo www',
+                    shell = True,
+                    check = True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                    )
+                time.sleep(1)
+            except subprocess.CalledProcessError:
+                break
 
     def docker_execute(self, statement, check=True):
         if type(statement) is str:
