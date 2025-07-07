@@ -219,7 +219,7 @@ class Benchmark:
 
     def terminate(self):
         for procname in self.terminate_procs:
-            self.docker_execute(f"pkill -f {procname}")
+            self.docker_execute(f"pkill -f {procname}", check=False)
 
     def bench_start(self, ingest=True):
         self.bench_info['start_time'] = time.time()
