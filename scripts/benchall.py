@@ -5,6 +5,8 @@ from assets.clickhouse_native_json.main import clickhouse_native_json_bench
 from assets.sparksql.main import sparksql_bench
 from assets.openobserve.main import openobserve_bench
 from assets.parquet.main import parquet_bench
+from assets.zstandard.main import zstandard_bench
+from assets.elasticsearch.main import elasticsearch_bench
 
 import os
 from pathlib import Path
@@ -29,48 +31,50 @@ clp_s_timestamp_keys = {
 benchmarks = [  # benchmark object, arguments
         #(clp_s_bench, {"timestamp_key": "id"}),
         #(clp_s_bench, {"timestamp_key": r"t.\$date"}),
-        (clp_s_bench, {}),
-        (clickhouse_native_json_bench, {  # give column names, don't order
-            'manual_column_names': True,
-            'keys': set(),
-            'additional_order_by': set(),
-            }),
-        (clickhouse_native_json_bench, {  # give column names, order and primary key
-            'manual_column_names': True,
-            'keys': {'id'},
-            'additional_order_by': set(),
-            }),
-        (clickhouse_native_json_bench, {  # give column names, order and primary key
-            'manual_column_names': True,
-            'keys': {'c'},
-            'additional_order_by': set(),
-            }),
-        (clickhouse_native_json_bench, {  # give column names, order and primary key
-            'manual_column_names': True,
-            'keys': {'t.\\$date', 'id'},
-            'additional_order_by': set(),
-            }),
-        (clickhouse_native_json_bench, {  # give column names, use date as primary key
-            'manual_column_names': True,
-            'keys': {'t.\\$date'},
-            'additional_order_by': set(),
-            }),
-        # can even try to use json values with a default as primary or sorting
-        (clickhouse_native_json_bench, {  # give column names, order only
-            'manual_column_names': True,
-            'keys': set(),
-            'additional_order_by': {'id'},
-            }),
-        (clickhouse_native_json_bench, {  # no column names
-            'manual_column_names': False,
-            'keys': set(),
-            'additional_order_by': set(),
-            }),
-        (sparksql_bench, {}),
-        (openobserve_bench, {}),
-        (parquet_bench, {'mode': 'json string'}),
-        (parquet_bench, {'mode': 'columns values'}),
-        ]
+        #(clp_s_bench, {}),
+        #(clickhouse_native_json_bench, {  # give column names, don't order
+        #    'manual_column_names': True,
+        #    'keys': set(),
+        #    'additional_order_by': set(),
+        #    }),
+        #(clickhouse_native_json_bench, {  # give column names, order and primary key
+        #    'manual_column_names': True,
+        #    'keys': {'id'},
+        #    'additional_order_by': set(),
+        #    }),
+        #(clickhouse_native_json_bench, {  # give column names, order and primary key
+        #    'manual_column_names': True,
+        #    'keys': {'c'},
+        #    'additional_order_by': set(),
+        #    }),
+        #(clickhouse_native_json_bench, {  # give column names, order and primary key
+        #    'manual_column_names': True,
+        #    'keys': {'t.\\$date', 'id'},
+        #    'additional_order_by': set(),
+        #    }),
+        #(clickhouse_native_json_bench, {  # give column names, use date as primary key
+        #    'manual_column_names': True,
+        #    'keys': {'t.\\$date'},
+        #    'additional_order_by': set(),
+        #    }),
+        ## can even try to use json values with a default as primary or sorting
+        #(clickhouse_native_json_bench, {  # give column names, order only
+        #    'manual_column_names': True,
+        #    'keys': set(),
+        #    'additional_order_by': {'id'},
+        #    }),
+        #(clickhouse_native_json_bench, {  # no column names
+        #    'manual_column_names': False,
+        #    'keys': set(),
+        #    'additional_order_by': set(),
+        #    }),
+        #(sparksql_bench, {}),
+        #(openobserve_bench, {}),
+        #(parquet_bench, {'mode': 'json string'}),
+        #(parquet_bench, {'mode': 'columns values'}),
+        (zstandard_bench, {}),
+        (elasticsearch_bench, {}),
+    ]
 
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:

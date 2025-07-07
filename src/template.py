@@ -209,7 +209,7 @@ class Benchmark:
         for procname in self.terminate_procs:
             self.docker_execute(f"pkill -f {procname}")
 
-    def __bench_start(self, ingest=True):
+    def bench_start(self, ingest=True):
         self.bench_info['start_time'] = time.time()
         self.bench_info['ingest'] = ingest
         self.bench_info['memory'] = []
@@ -250,7 +250,7 @@ class Benchmark:
                 )
         self.bench_thread.start()
 
-    def __bench_stop(self):
+    def bench_stop(self):
         self.bench_info['running'] = None
         self.bench_info['end_time'] = time.time()
 
@@ -265,9 +265,9 @@ class Benchmark:
         self.launch()
         self.reset()
 
-        self.__bench_start(ingest=True)
+        self.bench_start(ingest=True)
         self.ingest()
-        self.__bench_stop()
+        self.bench_stop()
         
         self.output[self.dataset_name][self.properties]['ingest'] = {
                 'time_taken_s': self.bench_info['time_taken'],
@@ -294,9 +294,9 @@ class Benchmark:
                 for _ in range(self.config["hot_run_warm_up_times"]):
                     self.search(query)
 
-            self.__bench_start(ingest=False)
+            self.bench_start(ingest=False)
             res = self.search(query)
-            self.__bench_stop()
+            self.bench_stop()
 
             logger.info(f"Query #{ind} returned {res} results.")
 
