@@ -4,3 +4,4 @@ output.json
 /mongod
 /data
 /clp_bench.xlsx
+/exceptions.log

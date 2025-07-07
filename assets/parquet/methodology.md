@@ -4,6 +4,7 @@
 
 pyarrow 20.0.0
 Presto Version: [presto-server-0.293-SNAPSHOT][presto]
+Velox Version: [Velox][velox]
 
 ## Setup
 
@@ -85,4 +86,5 @@ AND element_at(
 ) = 'error';
 ```
 
-[presto]: https://github.com/y-scope/presto/tree/ec3aedb239508ccd91891260ae89e111eb268761
+[presto]: https://github.com/anlowee/presto/tree/faae543ae318f0289f5d0b537c5724e1b085a2fc
+[velox]: https://github.com/anlowee/velox/tree/5a55969d5fd21bb4bcb53645b832344ff6bbd634
