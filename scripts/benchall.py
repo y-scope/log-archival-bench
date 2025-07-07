@@ -94,6 +94,6 @@ for bencher, kwargs in benchmarks:
             bench.run_applicable(dataset_name)
             #bench.run_everything(['ingest', 'cold'])
         except Exception as e:
-            with open((current_dir / 'exceptions.json').resolve(), 'a') as file:
+            with open((current_dir / 'exceptions.log').resolve(), 'a') as file:
                 file.write(f"{bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}")
             print(f"{bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}")

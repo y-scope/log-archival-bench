@@ -11,7 +11,7 @@ if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
 
 # Use glob to find all matching files
 files_to_remove = glob.glob('assets/*/output.json')
-files_to_remove += glob.glob('exceptions.json')
+files_to_remove += glob.glob('exceptions.log')
 
 for file_path in files_to_remove:
     try:
