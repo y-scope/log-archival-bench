@@ -186,6 +186,7 @@ class Benchmark:
                 time.sleep(1)
             except subprocess.CalledProcessError:
                 break
+        time.sleep(10)
 
     def docker_execute(self, statement, check=True):
         if type(statement) is str:

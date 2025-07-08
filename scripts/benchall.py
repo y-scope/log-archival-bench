@@ -10,6 +10,7 @@ from assets.elasticsearch.main import elasticsearch_bench
 from src.jsonsync import JsonItem
 
 import os
+import datetime
 from pathlib import Path
 
 current_dir = Path(os.getcwd())
@@ -19,6 +20,13 @@ if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
 
 data_dir = current_dir / "data"
 bench_target_dirs = [p for p in data_dir.iterdir() if p.is_dir()]
+
+def get_target_from_name(name):
+    for bench_target in bench_target_dirs:
+        dataset_name = os.path.basename(bench_target.resolve()).strip()
+        if dataset_name == name:
+            return bench_target
+    raise Exception(f'{name} not found in {bench_target_dirs}')
 
 clp_s_timestamp_keys = {
         "cockroachdb": "timestamp",
@@ -32,7 +40,7 @@ clp_s_timestamp_keys = {
 benchmarks = [  # benchmark object, arguments
         #(clp_s_bench, {"timestamp_key": "id"}),
         #(clp_s_bench, {"timestamp_key": r"t.\$date"}),
-        #(clp_s_bench, {}),
+        (clp_s_bench, {}),
         #(clickhouse_native_json_bench, {  # give column names, don't order
         #    'manual_column_names': True,
         #    'keys': set(),
@@ -64,36 +72,45 @@ benchmarks = [  # benchmark object, arguments
         #    'keys': set(),
         #    'additional_order_by': {'id'},
         #    }),
-        #(clickhouse_native_json_bench, {  # no column names
-        #    'manual_column_names': False,
-        #    'keys': set(),
-        #    'additional_order_by': set(),
-        #    }),
-        #(sparksql_bench, {}),
-        #(openobserve_bench, {}),
-        (parquet_bench, {'mode': 'json string'}),
-        (parquet_bench, {'mode': 'columns values'}),
-        (zstandard_bench, {}),
+        (clickhouse_native_json_bench, {  # no column names
+            'manual_column_names': False,
+            'keys': set(),
+            'additional_order_by': set(),
+            }),
+        (sparksql_bench, {}),
+        (openobserve_bench, {}),
+        #(parquet_bench, {'mode': 'json string'}),
+        #(parquet_bench, {'mode': 'columns values'}),
+        #(zstandard_bench, {}),
         #(elasticsearch_bench, {}),
     ]
 
+def run(bencher, kwargs, bench_target):
+    dataset_name = 'error when finding dataset name'
+    try:
+        dataset_name = os.path.basename(bench_target.resolve()).strip()
+
+        print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
+
+        #if bencher == clp_s_bench and dataset_name != 'mongod':
+        if bencher == clp_s_bench:  # give additional parameters according to dataset name
+            kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
+
+        bench = bencher(bench_target, **kwargs)
+        bench.run_applicable(dataset_name)
+        #bench.run_everything(['ingest', 'cold'])
+    except Exception as e:
+        with open((current_dir / 'exceptions.log').resolve(), 'a') as file:
+            file.write(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}\n")
+        print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}")
+
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
-        dataset_name = 'dataset ingestion failed'
-        try:
-            dataset_name = os.path.basename(bench_target.resolve()).strip()
+        dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-            #if dataset_name != 'mongod':  # only use mongod for now
-            #    continue
+        #if dataset_name != 'mongod':  # only use mongod for now
+        #    continue
+        run(bencher, kwargs, bench_target)
 
-            #if bencher == clp_s_bench and dataset_name != 'mongod':
-            if bencher == clp_s_bench:  # give additional parameters according to dataset name
-                kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
-
-            bench = bencher(bench_target, **kwargs)
-            bench.run_applicable(dataset_name)
-            #bench.run_everything(['ingest', 'cold'])
-        except Exception as e:
-            with open((current_dir / 'exceptions.log').resolve(), 'a') as file:
-                file.write(f"{bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}")
-            print(f"{bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}")
+run(zstandard_bench, {}, get_target_from_name('spark-event-logs'))
+run(parquet_bench, {'mode': 'columns values'}, get_target_from_name('mongod'))
