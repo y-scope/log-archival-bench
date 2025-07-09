@@ -55,7 +55,7 @@ for output_dir in outputs:
                             configuration_val["ingest"]["decompressed_size_B"] \
                             / configuration_val["ingest"]["compressed_size_B"]
                 except ZeroDivisionError:
-                    sheets[f"{dataset} (ingest)"][methodology]["compression_ratio"] = "compressed size is 0"
+                    sheets[f"{dataset} (ingest)"][methodology]["compression_ratio"] = "compression failed: compressed size is 0"
 
                 memory_cold = []
                 memory_hot = []
