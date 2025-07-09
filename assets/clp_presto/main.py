@@ -14,7 +14,7 @@ logger: A logging.Logger
 """
 
 CLP_PRESTO_CONTAINER_STORAGE = "/home/clp-json-x86_64-v0.2.0-dev"
-CLP_PRESTO_HOST_STORAGE = os.path.abspath("~/clp-json-x86_64-v0.2.0-dev")
+CLP_PRESTO_HOST_STORAGE = os.path.abspath(os.path.expanduser("~/clp-json-x86_64-v0.2.0-dev"))
 SQL_PASSWORD = "pKvIMoPXAbk"
 class clp_presto_bench(Benchmark):
     # add any parameters to the tool here
@@ -61,7 +61,7 @@ class clp_presto_bench(Benchmark):
         """
         Ingests the dataset at DATASETS_PATH
         """
-        os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key '{self.timestamp}' ~/clp-bench/mongodb/mongod.log")
+        os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key '{self.timestamp}' {self.dataset}/mongod.log")
         self.docker_execute(f"mysql -h 10.1.0.21 -P 6001 -u clp-user -p{SQL_PASSWORD} -e 'UPDATE clp_datasets SET archive_storage_directory=\"{CLP_PRESTO_CONTAINER_STORAGE}/var/data/archives/default\" WHERE name=\"default\";' clp-db")
     
     def search(self, query):
