@@ -34,8 +34,8 @@ clp_s_timestamp_keys = {
         "elasticsearch": "@timestamp",
         "postgresql": "timestamp",
         "spark-event-logs": "Timestamp",
-        #"mongod": r"t.\$date"
-        "mongod": "id"
+        "mongod": r"t.\$date"
+        #"mongod": "id"
         }
 
 benchmarks = [  # benchmark object, arguments
@@ -116,3 +116,4 @@ for bencher, kwargs in benchmarks:
 
 #run(zstandard_bench, {}, get_target_from_name('spark-event-logs'))
 #run(parquet_bench, {'mode': 'columns values'}, get_target_from_name('mongod'))
+run(clp_bench, {}, get_target_from_name('mongod'))  # rerun mongod because it was using id
