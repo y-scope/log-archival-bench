@@ -50,9 +50,12 @@ for output_dir in outputs:
                         sheets[f"{dataset} (ingest)"][methodology]["decompressed_size_MB"] = value / (1024*1024)
                     else:
                         sheets[f"{dataset} (ingest)"][methodology][key] = value
-                sheets[f"{dataset} (ingest)"][methodology]["compression_ratio"] = \
-                        configuration_val["ingest"]["decompressed_size_B"] \
-                        / configuration_val["ingest"]["compressed_size_B"]
+                try:
+                    sheets[f"{dataset} (ingest)"][methodology]["compression_ratio"] = \
+                            configuration_val["ingest"]["decompressed_size_B"] \
+                            / configuration_val["ingest"]["compressed_size_B"]
+                except ZeroDivisionError:
+                    sheets[f"{dataset} (ingest)"][methodology]["compression_ratio"] = "compressed size is 0"
 
                 memory_cold = []
                 memory_hot = []
