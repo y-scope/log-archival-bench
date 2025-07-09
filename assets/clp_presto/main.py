@@ -42,6 +42,7 @@ class clp_presto_bench(Benchmark):
         """
         Runs the benchmarked tool
         """
+        os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/stop-clp.sh -f", check=False)
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/start-clp.sh")
         self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
         self.wait_for_port(8080)
@@ -91,8 +92,8 @@ class clp_presto_bench(Benchmark):
         self.sql_execute('DELETE FROM clp_default_tags', check=False)
 
     def terminate(self):
-        self.docker_execute("pkill -f /usr/lib/jvm/java-11-openjdk-amd64/bin/java")
-        self.docker_execute("pkill presto_server")
+        self.docker_execute("pkill -f /usr/lib/jvm/java-11-openjdk-amd64/bin/java", check=False)
+        self.docker_execute("pkill presto_server", check=False)
         self.wait_for_port(8080, waitclose=True)
         self.wait_for_port(7777, waitclose=True)
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/stop-clp.sh -f")

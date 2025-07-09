@@ -110,9 +110,9 @@ for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        #if dataset_name != 'mongod':  # only use mongod for now
-        #    continue
+        if dataset_name != 'mongod':  # only use mongod for now
+            continue
         run(bencher, kwargs, bench_target)
 
 #run(zstandard_bench, {}, get_target_from_name('spark-event-logs'))
-run(parquet_bench, {'mode': 'columns values'}, get_target_from_name('mongod'))
+#run(parquet_bench, {'mode': 'columns values'}, get_target_from_name('mongod'))
