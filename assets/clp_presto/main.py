@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
+import time
+import os
 
 from src.template import DATASETS_PATH, ASSETS_DIR, WORK_DIR, Benchmark, logger
 """
@@ -11,39 +13,62 @@ Benchmark: Base class for benchmarks, has docker_execute to execute command with
 logger: A logging.Logger
 """
 
-class tool_bench(Benchmark):
+CLP_PRESTO_CONTAINER_STORAGE = "/home/clp-json-x86_64-v0.2.0-dev"
+CLP_PRESTO_HOST_STORAGE = os.path.abspath("~/clp-json-x86_64-v0.2.0-dev")
+SQL_PASSWORD = "pKvIMoPXAbk"
+class clp_presto_bench(Benchmark):
     # add any parameters to the tool here
-    def __init__(self, dataset):
+    def __init__(self, dataset, timestamp=r't.\$date'):
         super().__init__(dataset)
 
-        self.properties = ""  # information about passed parameters to output
+        self.properties = f"timestamp {timestamp}"  # information about passed parameters to output
+        self.timestamp = timestamp
 
     @property
     def compressed_size(self):
         """
         Returns the size of the compressed dataset
         """
-        return self.get_disk_usage("path/to/storage")
+        return self.get_disk_usage(f"{CLP_PRESTO_CONTAINER_STORAGE}/var")
+
+    @property
+    def mount_points(self):
+        return {
+            f"{self.script_dir}/include": "/home/include",
+            CLP_PRESTO_HOST_STORAGE: CLP_PRESTO_CONTAINER_STORAGE,
+        }
 
     def launch(self):
         """
         Runs the benchmarked tool
         """
-        pass
+        os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/start_clp.sh")
+        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
+        self.wait_for_port(8080)
+        self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
+        self.wait_for_port(7777)
+        time.sleep(60)  # this needs to be more than 10
+
+    def hive_execute(self, query, check=True):
+        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --execute "{query}"', check)
+
+    def sql_execute(self, query, check=True):
+        if query[-1] != ';':
+            query = query+';'
+        return self.docker_execute(f"mysql -h 10.1.0.21 -P 6001 -u clp-user -p{SQL_PASSWORD} -e '{query}' clp-db", check)
 
     def ingest(self):
         """
         Ingests the dataset at DATASETS_PATH
         """
-        self.docker_execute([
-            ])
+        os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key '{self.timestamp}' ~/clp-bench/mongodb/mongod.log")
+        self.docker_execute(f"mysql -h 10.1.0.21 -P 6001 -u clp-user -p{SQL_PASSWORD} -e 'UPDATE clp_datasets SET archive_storage_directory=\"{CLP_PRESTO_CONTAINER_STORAGE}/var/data/archives/default\" WHERE name=\"default\";' clp-db")
     
     def search(self, query):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        return self.docker_execute([
-            ])
+        return (self.hive_execute(f"USE default; SELECT * from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
 
     def clear_cache(self):
         """
@@ -57,19 +82,25 @@ class tool_bench(Benchmark):
         Removes a previously ingested dataset before ingesting a new one, must not throw error
         when no dataset was ingested
         """
-        pass
+        self.docker_execute(f'rm -r {CLP_PRESTO_CONTAINER_STORAGE}/var/data')
+        self.sql_execute('DELETE FROM clp_datasets', check=False)
+        self.sql_execute('DELETE FROM clp_default_archive_tags', check=False)
+        self.sql_execute('DELETE FROM clp_default_archives', check=False)
+        self.sql_execute('DELETE FROM clp_default_column_metadata', check=False)
+        self.sql_execute('DELETE FROM clp_default_files', check=False)
+        self.sql_execute('DELETE FROM clp_default_tags', check=False)
 
-    @property
-    def terminate_procs(self):
-        """
-        Process names as shown on `ps -aux` to terminate, reverts the launch process
-        Alternatively, override the terminate(self) function in Benchmark
-        """
-        return []
+    def terminate(self):
+        self.docker_execute("pkill -f /usr/lib/jvm/java-11-openjdk-amd64/bin/java")
+        self.docker_execute("pkill presto_server")
+        self.wait_for_port(8080, waitclose=True)
+        self.wait_for_port(7777, waitclose=True)
+        os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/stop_clp.sh -f")
+        time.sleep(10)
 
 
 def main():
-    bench = tool_bench(sys.argv[1])
+    bench = clp_presto_bench(sys.argv[1])
     bench.run_everything()
 
 if __name__ == "__main__":
