@@ -105,7 +105,7 @@ class Benchmark:
 
     def docker_build(self):
         result = subprocess.run(
-                f'docker build --pull --tag {self.container_name} {self.script_dir}',
+                f'docker build --tag {self.container_name} {self.script_dir}',
                 shell = True,
                 check = True
                 )
