@@ -21,15 +21,31 @@ class parquet_bench(Benchmark):
     def __init__(self, dataset, mode='json string'):
         super().__init__(dataset)
 
-        if mode not in ('json string', 'columns values'):
-            raise Exception('mode must be either "json string" or "columns values"')
+        if mode not in ('json string', 'pairwise arrays'):
+            raise Exception('mode must be either "json string" or "pairwise arrays"')
 
-        self.column_values = False
-        if mode == 'columns values':
-            self.column_values = True
-            self.queries = self.config['queries_columns_values']
+        self.pairwise_arrays = False
+        if mode == 'pairwise arrays':
+            self.pairwise_arrays = True
+            self.queries = self.config['queries_pairwise_arrays']
 
-        self.properties = mode
+        if mode == 'json string':
+            self.properties = 'json string'
+        elif mode == 'pairwise arrays':
+            self.properties = 'pairwise arrays (no memory restriction)'
+
+    @property
+    def limits_param(self):
+        if self.pairwise_arrays:
+            return [
+                    '--cpus=4'
+                    ]
+        else:
+            return [
+                    '--cpus=4',
+                    '--memory=8g',
+                    '--memory-swap=8g'
+                    ]
 
     @property
     def compressed_size(self):
@@ -63,7 +79,7 @@ class parquet_bench(Benchmark):
         """
         self.hive_execute(f"CREATE SCHEMA IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME};")
 
-        if self.column_values:
+        if self.pairwise_arrays:
             self.hive_execute(f""" \
             CREATE TABLE IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME}.{PARQUET_TABLE_NAME} ( \
                 "string_columns" array(varchar), \
@@ -80,7 +96,7 @@ class parquet_bench(Benchmark):
             ); \
             """)
             self.docker_execute([
-                f"python3 {ASSETS_DIR}/ingest_column_values.py {DATASETS_PATH}"
+                f"python3 {ASSETS_DIR}/ingest_pairwise_arrays.py {DATASETS_PATH}"
                 ])
         else:
             self.hive_execute(f""" \

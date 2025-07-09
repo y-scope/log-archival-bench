@@ -119,16 +119,18 @@ class Benchmark:
                 )
         logger.debug(result)
 
+    @property
+    def limits_param(self):
+        return [
+                '--cpus=4',
+                '--memory=8g',
+                '--memory-swap=8g'
+                ]
+
     def docker_run(self, background=True):
         mount_param = [
                 f'--mount "type=bind,src={key},dst={value}"'
                 for key, value in self.mount_points.items()
-                ]
-
-        limits_param = [
-                '--cpus=4',
-                '--memory=8g',
-                '--memory-swap=8g'
                 ]
 
         if background:
@@ -156,7 +158,7 @@ class Benchmark:
                     f'--mount "type=bind,src={self.script_dir},dst={ASSETS_DIR}"',
                     f'--mount "type=bind,src={self.dataset},dst={DATASETS_DIR}"',
                     *mount_param,
-                    *limits_param,
+                    *self.limits_param,
                     *interactive_param,
                     f"{self.container_name}",
                     interactive_exec,

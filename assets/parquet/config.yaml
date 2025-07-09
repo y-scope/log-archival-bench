@@ -43,7 +43,7 @@ queries:
   # Query all JSON log lines where "ctx" is "FlowControlRefresher" and "attr.numTrimmed" equals 0
   - '"json_extract_scalar(json_parse(line), ''$.ctx'') = ''FlowControlRefresher'' AND json_extract_scalar(json_parse(line), ''$.attr.numTrimmed'') = ''0'';"'
   # - '"ctx: FlowControlRefresher AND attr.numTrimmed: 0"'
-queries_columns_values:
+queries_pairwise_arrays:
   # Query all JSON log lines containing "attr" object with "tickets" field
   - |
     "contains(int_columns, 'attr.tickets')"

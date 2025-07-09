@@ -13,7 +13,7 @@ Velox Version: [Velox][velox]
 * zstd(3) compression used
 * This ingestion was done solely with PyArrow generating a parquet file
 
-### Columns Values
+### Pairwise Arrays
 * Parsed every JSON log recusively into array columns <variable type>_columns and
 <variable type>_values
 * Dot syntax used for child objects
@@ -56,7 +56,7 @@ Original data:
 | {"msg": { "ts": 1, "status": "error", "thread_num": 4, "backtrace": "" }} |
 | ... |
 
-### Columns Values
+### Pairwise Arrays
 Compressed data structure:
 | string_columns | string_values | int_columns | int_values |
 |-|-|-|-|
@@ -75,7 +75,7 @@ SELECT * FROM table WHERE
 json_extract_scalar(json_parse(line), 'msg.status') = "error";
 ```
 
-### Columns Values
+### Pairwise Arrays
 
 ```
 SELECT * FROM table WHERE
