@@ -7,6 +7,7 @@ from assets.openobserve.main import openobserve_bench
 from assets.parquet.main import parquet_bench
 from assets.zstandard.main import zstandard_bench
 from assets.elasticsearch.main import elasticsearch_bench
+from assets.clp_presto.main import clp_presto_bench
 from src.jsonsync import JsonItem
 
 import os
@@ -83,6 +84,7 @@ benchmarks = [  # benchmark object, arguments
         #(parquet_bench, {'mode': 'columns values'}),
         #(zstandard_bench, {}),
         #(elasticsearch_bench, {}),
+        (clp_presto_bench, {}),
     ]
 
 def run(bencher, kwargs, bench_target):
@@ -93,7 +95,7 @@ def run(bencher, kwargs, bench_target):
         print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
 
         #if bencher == clp_s_bench and dataset_name != 'mongod':
-        if bencher == clp_s_bench:  # give additional parameters according to dataset name
+        if bencher == clp_s_bench or bencher == clp_presto_bench:  # give additional parameters according to dataset name
             kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
 
         bench = bencher(bench_target, **kwargs)

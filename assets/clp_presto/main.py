@@ -18,11 +18,11 @@ CLP_PRESTO_HOST_STORAGE = os.path.abspath("~/clp-json-x86_64-v0.2.0-dev")
 SQL_PASSWORD = "pKvIMoPXAbk"
 class clp_presto_bench(Benchmark):
     # add any parameters to the tool here
-    def __init__(self, dataset, timestamp=r't.\$date'):
+    def __init__(self, dataset, timestamp_key=r't.\$date'):
         super().__init__(dataset)
 
-        self.properties = f"timestamp {timestamp}"  # information about passed parameters to output
-        self.timestamp = timestamp
+        self.properties = f"timestamp {timestamp_key}"  # information about passed parameters to output
+        self.timestamp = timestamp_key
 
     @property
     def compressed_size(self):
