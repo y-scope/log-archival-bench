@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from src.template import DATASETS_PATH, WORK_DIR, Benchmark, logger
+from src.template import WORK_DIR, Benchmark, logger
 
 CLP_OUT_PATH = f"{WORK_DIR}/archives"
 CLP_S_BINARY = "/clp/clp-s"
@@ -31,7 +31,7 @@ class clp_s_bench(Benchmark):
             f'--timestamp-key "{self.timestamp}"',
             f'--target-encoded-size {self.target_encoded_size}',
             CLP_OUT_PATH,
-            DATASETS_PATH,
+            self.datasets_path,
             ])
     
     def search(self, query):

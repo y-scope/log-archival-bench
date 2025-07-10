@@ -4,9 +4,8 @@ import sys
 import subprocess
 import datetime
 
-from src.template import DATASETS_PATH, ASSETS_DIR, WORK_DIR, Benchmark, logger
+from src.template import ASSETS_DIR, WORK_DIR, Benchmark, logger
 """
-DATASETS_PATH: The in-container path to the log file
 ASSETS_DIR: The directory this file resides in, inside the container
 WORK_DIR: The in-container path to an accessible location e.g. "/home"
 Benchmark: Base class for benchmarks, has docker_execute to execute command within container
@@ -37,9 +36,9 @@ class zstandard_bench(Benchmark):
 
     def ingest(self):
         """
-        Ingests the dataset at DATASETS_PATH
+        Ingests the dataset at self.datasets_path
         """
-        self.docker_execute(f"zstd -3 -o {ZST_FILE_PATH} {DATASETS_PATH}")
+        self.docker_execute(f"zstd -3 -o {ZST_FILE_PATH} {self.datasets_path}")
     
     def search(self, query):
         """
@@ -60,7 +59,7 @@ class zstandard_bench(Benchmark):
 
         logger.info("Decompression done")
         try:
-            self.docker_execute(f"cmp -s {DECOMPRESSED_FILE_PATH} {DATASETS_PATH}")
+            self.docker_execute(f"cmp -s {DECOMPRESSED_FILE_PATH} {self.datasets_path}")
             failed = False
         except subprocess.CalledProcessError:
             failed = True

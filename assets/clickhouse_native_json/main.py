@@ -4,9 +4,8 @@ import sys
 import time
 import subprocess
 
-from src.template import DATASETS_PATH, Benchmark, logger
+from src.template import Benchmark, logger
 """
-DATASETS_PATH: The in-container path to the log file
 WORK_DIR: The in-container path to an accessible location e.g. "/home"
 Benchmark: Base class for benchmarks, has docker_execute to execute command within container
 logger: A logging.Logger
@@ -73,13 +72,13 @@ order_by({','.join(self.order_by)}) \
 
     def ingest(self):
         """
-        Ingests the dataset at DATASETS_PATH
+        Ingests the dataset at self.datasets_path
         """
         format = "JSON" if self.manual_column_names else "JSONAsObject"
         self.docker_execute([
             'clickhouse-client',
             f""" \
-            --query "INSERT INTO {CLICKHOUSE_COLLECTION_NAME} FROM INFILE '{DATASETS_PATH}' FORMAT {format}" \
+            --query "INSERT INTO {CLICKHOUSE_COLLECTION_NAME} FROM INFILE '{self.datasets_path}' FORMAT {format}" \
             """
             ])
         self.docker_execute(f'clickhouse-client --query "OPTIMIZE TABLE {CLICKHOUSE_COLLECTION_NAME} FINAL"')

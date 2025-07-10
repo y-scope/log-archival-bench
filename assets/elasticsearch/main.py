@@ -3,9 +3,8 @@
 import sys
 import time
 
-from src.template import DATASETS_PATH, ASSETS_DIR, WORK_DIR, Benchmark, logger
+from src.template import ASSETS_DIR, WORK_DIR, Benchmark, logger
 """
-DATASETS_PATH: The in-container path to the log file
 ASSETS_DIR: The directory this file resides in, inside the container
 WORK_DIR: The in-container path to an accessible location e.g. "/home"
 Benchmark: Base class for benchmarks, has docker_execute to execute command within container
@@ -39,10 +38,10 @@ class elasticsearch_bench(Benchmark):
 
     def ingest(self):
         """
-        Ingests the dataset at DATASETS_PATH
+        Ingests the dataset at self.datasets_path
         """
         self.docker_execute([
-            f"python3 {ASSETS_DIR}/ingest.py {DATASETS_PATH}"
+            f"python3 {ASSETS_DIR}/ingest.py {self.datasets_path}"
             ])
     
     def search(self, query):
