@@ -50,8 +50,8 @@ class clp_presto_bench(Benchmark):
         self.wait_for_port(7777)
         time.sleep(60)  # this needs to be more than 10
 
-    def hive_execute(self, query, check=True):
-        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --execute "{query}"', check)
+    def presto_execute(self, query, check=True):
+        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog clp --execute "{query}"', check)
 
     def sql_execute(self, query, check=True):
         if query[-1] != ';':
@@ -62,14 +62,16 @@ class clp_presto_bench(Benchmark):
         """
         Ingests the dataset at DATASETS_PATH
         """
+        os.system("mkdir -p /home/pacificviking/clp-json-x86_64-v0.2.0-dev/var/data/baker21")
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key '{self.timestamp}' {self.dataset}/mongod.log")
-        self.docker_execute(f"mysql -h 10.1.0.21 -P 6001 -u clp-user -p{SQL_PASSWORD} -e 'UPDATE clp_datasets SET archive_storage_directory=\"{CLP_PRESTO_CONTAINER_STORAGE}/var/data/archives/default\" WHERE name=\"default\";' clp-db")
+        self.sql_execute(f"UPDATE clp_datasets SET archive_storage_directory=\"{CLP_PRESTO_CONTAINER_STORAGE}/var/data/archives/default\" WHERE name=\"default\"")
     
     def search(self, query):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        return (self.hive_execute(f"USE default; SELECT * from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
+        #return (self.presto_execute(f"USE default; SELECT * from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
+        return (self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
 
     def clear_cache(self):
         """
@@ -90,6 +92,8 @@ class clp_presto_bench(Benchmark):
         self.sql_execute('DELETE FROM clp_default_column_metadata', check=False)
         self.sql_execute('DELETE FROM clp_default_files', check=False)
         self.sql_execute('DELETE FROM clp_default_tags', check=False)
+        os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/stop-clp.sh -f")
+        os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/start-clp.sh")
 
     def terminate(self):
         self.docker_execute("pkill -f /usr/lib/jvm/java-11-openjdk-amd64/bin/java", check=False)

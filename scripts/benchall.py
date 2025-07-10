@@ -44,47 +44,67 @@ benchmarks = [  # benchmark object, arguments
         #(clp_s_bench, {}),
         #(clickhouse_native_json_bench, {  # give column names, don't order
         #    'manual_column_names': True,
-        #    'keys': set(),
-        #    'additional_order_by': set(),
+        #    'keys': [],
+        #    'additional_order_by': [],
         #    }),
         #(clickhouse_native_json_bench, {  # give column names, order and primary key
         #    'manual_column_names': True,
-        #    'keys': {'id'},
-        #    'additional_order_by': set(),
+        #    'keys': ['id'],
+        #    'additional_order_by': [],
         #    }),
         #(clickhouse_native_json_bench, {  # give column names, order and primary key
         #    'manual_column_names': True,
-        #    'keys': {'c'},
-        #    'additional_order_by': set(),
+        #    'keys': ['c'],
+        #    'additional_order_by': [],
         #    }),
         #(clickhouse_native_json_bench, {  # give column names, order and primary key
         #    'manual_column_names': True,
-        #    'keys': {'t.\\$date', 'id'},
-        #    'additional_order_by': set(),
+        #    'keys': ['t.\\$date', 'id'],
+        #    'additional_order_by': [],
         #    }),
         #(clickhouse_native_json_bench, {  # give column names, use date as primary key
         #    'manual_column_names': True,
-        #    'keys': {'t.\\$date'},
-        #    'additional_order_by': set(),
+        #    'keys': ['t.\\$date'],
+        #    'additional_order_by': [],
         #    }),
         ## can even try to use json values with a default as primary or sorting
         #(clickhouse_native_json_bench, {  # give column names, order only
         #    'manual_column_names': True,
-        #    'keys': set(),
-        #    'additional_order_by': {'id'},
+        #    'keys': [],
+        #    'additional_order_by': ['id'],
         #    }),
         #(clickhouse_native_json_bench, {  # no column names
         #    'manual_column_names': False,
-        #    'keys': set(),
-        #    'additional_order_by': set(),
+        #    'keys': [],
+        #    'additional_order_by': [],
         #    }),
+        (clickhouse_native_json_bench, {
+            'manual_column_names': False,
+            'keys': ['json.id'],
+            'additional_order_by': [],
+            }),
+        (clickhouse_native_json_bench, {
+            'manual_column_names': False,
+            'keys': [],
+            'additional_order_by': ['json.id'],
+            }),
+        (clickhouse_native_json_bench, {
+            'manual_column_names': False,
+            'keys': ['json.c'],
+            'additional_order_by': [],
+            }),
+        (clickhouse_native_json_bench, {
+            'manual_column_names': False,
+            'keys': ['json.t.\\$date'],
+            'additional_order_by': [],
+            }),
         #(sparksql_bench, {}),
         #(openobserve_bench, {}),
         #(parquet_bench, {'mode': 'json string'}),
-        #(parquet_bench, {'mode': 'columns values'}),
+        #(parquet_bench, {'mode': 'pairwise arrays'}),
         #(zstandard_bench, {}),
         #(elasticsearch_bench, {}),
-        (clp_presto_bench, {}),
+        #(clp_presto_bench, {}),
     ]
 
 def run(bencher, kwargs, bench_target):
@@ -110,10 +130,10 @@ for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        if dataset_name != 'mongod':  # only use mongod for now
-            continue
+        #if dataset_name != 'mongod':  # only use mongod for now
+        #    continue
         run(bencher, kwargs, bench_target)
 
 #run(zstandard_bench, {}, get_target_from_name('spark-event-logs'))
 #run(parquet_bench, {'mode': 'columns values'}, get_target_from_name('mongod'))
-run(clp_bench, {}, get_target_from_name('mongod'))  # rerun mongod because it was using id
+#run(clp_s_bench, {}, get_target_from_name('mongod'))  # rerun mongod because it was using id

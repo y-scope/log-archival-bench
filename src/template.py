@@ -188,6 +188,12 @@ class Benchmark:
                 time.sleep(1)
             except subprocess.CalledProcessError:
                 break
+        result = subprocess.run(
+                f'docker container rm {self.container_name}',
+                shell = True,
+                check = False,
+                stdout=subprocess.DEVNULL
+                )
         time.sleep(10)
 
     def docker_execute(self, statement, check=True):
