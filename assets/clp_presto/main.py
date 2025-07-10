@@ -21,7 +21,7 @@ class clp_presto_bench(Benchmark):
     def __init__(self, dataset, timestamp_key=r't.\$date'):
         super().__init__(dataset)
 
-        self.properties = f"timestamp {timestamp_key}"  # information about passed parameters to output
+        self.properties = f"timestamp {timestamp_key} (ingestion data unreliable)"  # information about passed parameters to output
         self.timestamp = timestamp_key
 
     @property

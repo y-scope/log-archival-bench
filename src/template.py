@@ -15,7 +15,6 @@ from src.jsonsync import JsonItem
 WORK_DIR = "/home"
 ASSETS_DIR = f"{WORK_DIR}/assets"
 DATASETS_DIR = f"{WORK_DIR}/datasets"
-DATASETS_PATH = f"{DATASETS_DIR}/mongod.log"
 
 logger = logging.getLogger(__name__)
 logger.propagate = False
@@ -27,7 +26,7 @@ logging_console_handler.setFormatter(logging_formatter)
 logger.addHandler(logging_console_handler)
 
 class Benchmark:
-    def __init__(self, dataset_dir):
+    def __init__(self, dataset_dir, dataset_variation='mongod.log'):
         with open(f"{self.script_dir}/config.yaml") as file:
             self.config = yaml.safe_load(file)
         self.queries = self.config["queries"]
@@ -42,7 +41,14 @@ class Benchmark:
         self.output = JsonItem.read(self.outputjson)
 
         self.bench_info = {}
-        self.properties = "default"
+
+        self.datasets_path = f"{DATASETS_DIR}/{dataset_variation}"  # inside container
+
+        if self.datasets_path.endswith("mongod.log"):
+            self.properties = ""
+        else:
+            self.properties = f"dataset variation {dataset_variation}"
+
 
     def __init_subclass__(cls, **kwargs):  # hackery for script_dir so that it finds the assets dir
         super().__init_subclass__(**kwargs)
@@ -74,7 +80,7 @@ class Benchmark:
 
     @property
     def decompressed_size(self):
-        return self.get_disk_usage(DATASETS_PATH)
+        return self.get_disk_usage(self.datasets_path)
 
     @property
     def compressed_size(self):

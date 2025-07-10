@@ -16,9 +16,6 @@ CLICKHOUSE_COLLECTION_NAME = "clickhouse_clp_bench"
 class clickhouse_native_json_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset, manual_column_names=True, keys=[], additional_order_by=[]):
-        if not manual_column_names:
-            assert not keys and not additional_order_by
-
         super().__init__(dataset)
 
         self.manual_column_names = manual_column_names
@@ -151,6 +148,9 @@ order_by({','.join(self.order_by)}) \
         else:
             params.append(f"ORDER BY ({','.join(self.order_by)})")
 
+        if (not self.manual_column_names) and self.order_by:
+            params.append("SETTINGS allow_nullable_key = 1")
+
         self.docker_execute([
             'clickhouse-client',
             f"""\
@@ -168,7 +168,7 @@ order_by({','.join(self.order_by)}) \
         if dataset_name == "mongod":
             self.run_everything()
         else:
-            if self.manual_column_names and self.order_by:
+            if self.manual_column_names or self.order_by:
                 logger.info("Not running anything: clickhouse manual entry only works on mongod")
             else:
                 self.run_ingest()

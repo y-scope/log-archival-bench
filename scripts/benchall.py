@@ -80,28 +80,28 @@ benchmarks = [  # benchmark object, arguments
         #    }),
         (clickhouse_native_json_bench, {
             'manual_column_names': False,
-            'keys': ['json.id'],
+            'keys': ['json.id.:Int64'],
             'additional_order_by': [],
             }),
         (clickhouse_native_json_bench, {
             'manual_column_names': False,
             'keys': [],
-            'additional_order_by': ['json.id'],
+            'additional_order_by': ['json.id.:Int64'],
             }),
         (clickhouse_native_json_bench, {
             'manual_column_names': False,
-            'keys': ['json.c'],
+            'keys': ['json.c.:String'],
             'additional_order_by': [],
             }),
         (clickhouse_native_json_bench, {
             'manual_column_names': False,
-            'keys': ['json.t.\\$date'],
+            'keys': ['json.t.\\$date.:timestamp'],
             'additional_order_by': [],
             }),
         #(sparksql_bench, {}),
         #(openobserve_bench, {}),
         #(parquet_bench, {'mode': 'json string'}),
-        #(parquet_bench, {'mode': 'pairwise arrays'}),
+        (parquet_bench, {'mode': 'pairwise arrays'}),
         #(zstandard_bench, {}),
         #(elasticsearch_bench, {}),
         #(clp_presto_bench, {}),
@@ -123,8 +123,8 @@ def run(bencher, kwargs, bench_target):
         #bench.run_everything(['ingest', 'cold'])
     except Exception as e:
         with open((current_dir / 'exceptions.log').resolve(), 'a') as file:
-            file.write(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}\n")
-        print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {str(e)}")
+            file.write(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {type(e).__name__}: {str(e)}\n")
+        print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {type(e).__name__}: {str(e)}")
 
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
