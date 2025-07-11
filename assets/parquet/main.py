@@ -115,7 +115,10 @@ class parquet_bench(Benchmark):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        return (self.hive_execute(f"USE {PARQUET_SCHEMA_NAME}; SELECT * from {PARQUET_TABLE_NAME} WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
+        res = self.hive_execute(f"USE {PARQUET_SCHEMA_NAME}; SELECT * from {PARQUET_TABLE_NAME} WHERE {query.strip()[1:-1]}").strip()
+        if not res:
+            return 0
+        return res.count('\n') + 1
 
     def clear_cache(self):
         """

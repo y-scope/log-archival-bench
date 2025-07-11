@@ -102,7 +102,11 @@ benchmarks = [  # benchmark object, arguments
         #(parquet_bench, {'mode': 'pairwise arrays'}),
         #(zstandard_bench, {}),
         #(elasticsearch_bench, {}),
-        (clp_presto_bench, {}),
+        #(clp_presto_bench, {}),
+        (clp_presto_bench, {'timestamp_key': r't.\$date'}),
+        (clp_presto_bench, {'timestamp_key': r't[0]'}),
+        (clp_presto_bench, {'timestamp_key': r't[1]'}),
+        (clp_presto_bench, {'timestamp_key': 'wrong'}),
     ]
 
 def run(bencher, kwargs, bench_target):
@@ -112,8 +116,8 @@ def run(bencher, kwargs, bench_target):
 
         print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
 
-        if bencher == clp_s_bench or bencher == clp_presto_bench:  # give additional parameters according to dataset name
-            kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
+        #if bencher == clp_s_bench or bencher == clp_presto_bench:  # give additional parameters according to dataset name
+        #    kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
 
         # benchmark clp_presto on the cleaned (no spaces) mongod dataset
         if bencher == clp_presto_bench and dataset_name == 'mongod':

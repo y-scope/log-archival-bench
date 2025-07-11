@@ -13,8 +13,8 @@ logger: A logging.Logger
 """
 
 CLP_PRESTO_CONTAINER_STORAGE = "/home/clp-json-x86_64"
-CLP_PRESTO_HOST_STORAGE = os.path.abspath(os.path.expanduser("~/clp-json-x86_64-v0.4.0-dev"))
-SQL_PASSWORD = "wqEGPyBdx_w"
+CLP_PRESTO_HOST_STORAGE = os.path.abspath(os.path.expanduser("~/clp-json-x86_64-v0.2.0-dev"))
+SQL_PASSWORD = "IpNB5qdAm14"
 class clp_presto_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset, dataset_variation='mongod.log', timestamp_key=r't.\$date'):
@@ -64,7 +64,7 @@ class clp_presto_bench(Benchmark):
         Ingests the dataset at self.datasets_path
         """
         os.system(f"mkdir -p {CLP_PRESTO_HOST_STORAGE}/var/data/baker21")
-        os.system(f'{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key "{self.timestamp}" {self.dataset}/{self.dataset_variation}')
+        os.system(f'{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key {self.timestamp} {self.dataset}/{self.dataset_variation}')
         self.sql_execute(f"UPDATE clp_datasets SET archive_storage_directory=\"{CLP_PRESTO_CONTAINER_STORAGE}/var/data/archives/default\" WHERE name=\"default\"")
     
     def search(self, query):
@@ -72,7 +72,10 @@ class clp_presto_bench(Benchmark):
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
         #return (self.presto_execute(f"USE default; SELECT * from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
-        return (self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
+        res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip()
+        if not res:
+            return 0
+        return res.count('\n') + 1
 
     def clear_cache(self):
         """
