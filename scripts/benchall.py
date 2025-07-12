@@ -39,17 +39,17 @@ clp_s_timestamp_keys = {
         }
 
 benchmarks = [  # benchmark object, arguments
-        #(clp_s_bench, {}),
+        (clp_s_bench, {}),
         #(clickhouse_native_json_bench, {  # give column names, don't order
         #    'manual_column_names': True,
         #    'keys': [],
         #    'additional_order_by': [],
         #    }),
-        #(clickhouse_native_json_bench, {  # give column names, order and primary key
-        #    'manual_column_names': True,
-        #    'keys': ['id'],
-        #    'additional_order_by': [],
-        #    }),
+        (clickhouse_native_json_bench, {  # give column names, order and primary key
+            'manual_column_names': True,
+            'keys': ['id'],
+            'additional_order_by': [],
+            }),
         #(clickhouse_native_json_bench, {  # give column names, order and primary key
         #    'manual_column_names': True,
         #    'keys': ['c'],
@@ -60,11 +60,11 @@ benchmarks = [  # benchmark object, arguments
         #    'keys': ['t.\\$date', 'id'],
         #    'additional_order_by': [],
         #    }),
-        #(clickhouse_native_json_bench, {  # give column names, use date as primary key
-        #    'manual_column_names': True,
-        #    'keys': ['t.\\$date'],
-        #    'additional_order_by': [],
-        #    }),
+        (clickhouse_native_json_bench, {  # give column names, use date as primary key
+            'manual_column_names': True,
+            'keys': ['t.\\$date'],
+            'additional_order_by': [],
+            }),
         ## can even try to use json values with a default as primary or sorting
         #(clickhouse_native_json_bench, {  # give column names, order only
         #    'manual_column_names': True,
@@ -76,11 +76,11 @@ benchmarks = [  # benchmark object, arguments
         #    'keys': [],
         #    'additional_order_by': [],
         #    }),
-        #(clickhouse_native_json_bench, {
-        #    'manual_column_names': False,
-        #    'keys': ['json.id.:Int64'],
-        #    'additional_order_by': [],
-        #    }),
+        (clickhouse_native_json_bench, {
+            'manual_column_names': False,
+            'keys': ['json.id.:Int64'],
+            'additional_order_by': [],
+            }),
         #(clickhouse_native_json_bench, {
         #    'manual_column_names': False,
         #    'keys': [],
@@ -91,17 +91,17 @@ benchmarks = [  # benchmark object, arguments
         #    'keys': ['json.c.:String'],
         #    'additional_order_by': [],
         #    }),
-        #(clickhouse_native_json_bench, {
-        #    'manual_column_names': False,
-        #    'keys': ['json.t.\\$date.:timestamp'],
-        #    'additional_order_by': [],
-        #    }),
-        #(sparksql_bench, {}),
-        #(openobserve_bench, {}),
-        #(parquet_bench, {'mode': 'json string'}),
-        #(parquet_bench, {'mode': 'pairwise arrays'}),
-        #(zstandard_bench, {}),
-        #(elasticsearch_bench, {}),
+        (clickhouse_native_json_bench, {
+            'manual_column_names': False,
+            'keys': ['json.t.\\$date.:timestamp'],
+            'additional_order_by': [],
+            }),
+        (sparksql_bench, {}),
+        (openobserve_bench, {}),
+        (parquet_bench, {'mode': 'json string'}),
+        (parquet_bench, {'mode': 'pairwise arrays'}),
+        (zstandard_bench, {}),
+        (elasticsearch_bench, {}),
         (clp_presto_bench, {}),
     ]
 
@@ -110,14 +110,14 @@ def run(bencher, kwargs, bench_target):
     try:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
-
         if bencher == clp_s_bench or bencher == clp_presto_bench:  # give additional parameters according to dataset name
             kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
 
         # benchmark clp_presto on the cleaned (no spaces) mongod dataset
         if bencher == clp_presto_bench and dataset_name == 'mongod':
             kwargs["dataset_variation"] = "mongod.log.clean"
+
+        print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
 
         bench = bencher(bench_target, **kwargs)
         bench.run_applicable(dataset_name)

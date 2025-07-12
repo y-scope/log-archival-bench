@@ -7,6 +7,7 @@ import time
 import threading
 import datetime
 import sys
+import json
 import shlex
 import uuid
 import inspect
@@ -45,9 +46,9 @@ class Benchmark:
         self.datasets_path = f"{DATASETS_DIR}/{dataset_variation}"  # inside container
 
         if self.datasets_path.endswith("mongod.log"):
-            self.properties = ""
+            self.properties = {}
         else:
-            self.properties = f"dataset_variation={dataset_variation} "
+            self.properties = {"dataset_variation": dataset_variation}
 
 
     def __init_subclass__(cls, **kwargs):  # hackery for script_dir so that it finds the assets dir
@@ -296,7 +297,7 @@ class Benchmark:
         self.ingest()
         self.bench_stop()
         
-        self.output[self.dataset_name][self.properties.strip()]['ingest'] = {
+        self.output[self.dataset_name][json.dumps(self.properties)]['ingest'] = {
                 'time_taken_s': self.bench_info['time_taken'],
                 'memory_average_B': self.bench_info['memory_average'],
                 'compressed_size_B': self.compressed_size,
@@ -330,7 +331,7 @@ class Benchmark:
             if not self.check_results(ind, res):
                 logger.warning("The above result is inconsistent with previous results.")
 
-            self.output[self.dataset_name][self.properties.strip()][mode][ind] = {
+            self.output[self.dataset_name][json.dumps(self.properties)][mode][ind] = {
                 'time_taken_s': self.bench_info['time_taken'],
                 'memory_average_B': self.bench_info['memory_average'],
                 'result': res,

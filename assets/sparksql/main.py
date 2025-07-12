@@ -15,7 +15,7 @@ class sparksql_bench(Benchmark):
     def __init__(self, dataset):
         super().__init__(dataset)
 
-        self.properties = "no cluster"  # information about passed parameters to output
+        self.properties['note'] = "no cluster"  # information about passed parameters to output
 
     @property
     def compressed_size(self):

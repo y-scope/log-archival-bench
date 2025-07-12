@@ -29,9 +29,9 @@ class parquet_bench(Benchmark):
             self.queries = self.config['queries_pairwise_arrays']
 
         if mode == 'json string':
-            self.properties = 'json string'
+            self.properties['mode'] = 'json string'
         elif mode == 'pairwise arrays':
-            self.properties = 'pairwise arrays, no memory restriction)'
+            self.properties['mode'] = 'pairwise arrays, no memory restriction)'
 
     @property
     def limits_param(self):

@@ -21,11 +21,9 @@ class clickhouse_native_json_bench(Benchmark):
         self.keys = keys
         self.order_by = self.keys + [i for i in additional_order_by if i not in keys]
 
-        self.properties = f"""\
-{'manual columns' if manual_column_names else 'automatic columns'}, \
-keys({','.join(self.keys)}), \
-order_by({','.join(self.order_by)}) \
-"""
+        self.properties['manual_columns'] = str(manual_column_names)
+        self.properties['keys'] = str(keys)
+        self.properties['order_by'] = str(self.order_by)
 
         if not manual_column_names:
             self.queries = self.config["queries_automatic_json"]

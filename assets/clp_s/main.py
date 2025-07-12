@@ -14,7 +14,8 @@ class clp_s_bench(Benchmark):
         self.timestamp = timestamp_key
         self.target_encoded_size = target_encoded_size
 
-        self.properties += f"timestamp={timestamp_key}, target_encoded_size={target_encoded_size} "
+        self.properties["timestamp"] = timestamp_key
+        self.properties["target_encoded_size"] = target_encoded_size
         #self.properties = f"target_encoded_size={target_encoded_size}"
 
     @property

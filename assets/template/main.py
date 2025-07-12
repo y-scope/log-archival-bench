@@ -15,8 +15,6 @@ class tool_bench(Benchmark):
     def __init__(self, dataset):
         super().__init__(dataset)
 
-        self.properties = ""  # information about passed parameters to output
-
     @property
     def compressed_size(self):
         """
