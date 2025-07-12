@@ -27,23 +27,36 @@ class JsonItem:
 
         try:
             return self.base[key]
-        except (KeyError, IndexError):
+        except KeyError:
             self.base[key] = JsonItem(None)
             return self.base[key]
-
-    def __setitem__(self, key, value):
-        self.syncbase(key)
-        assert self.base is not None
-
-        try:
-            self.base[key] = JsonItem(value)
         except IndexError:
             assert type(self.base) is list
             assert len(self.base) <= key
 
             while len(self.base) <= key:
                 self.base.append(JsonItem(None))
-            self.base[key] = JsonItem(value)
+
+            return self.base[key]
+
+    def __setitem__(self, key, value):
+        self.syncbase(key)
+        assert self.base is not None
+
+        if type(value) is not JsonItem:
+            toinsert = JsonItem(value)
+        else:
+            toinsert = value
+
+        try:
+            self.base[key] = toinsert
+        except IndexError:
+            assert type(self.base) is list
+            assert len(self.base) <= key
+
+            while len(self.base) <= key:
+                self.base.append(JsonItem(None))
+            self.base[key] = toinsert
 
     def __delitem__(self, key):
         self.syncbase(key)
