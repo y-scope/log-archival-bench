@@ -13,8 +13,8 @@ logger: A logging.Logger
 """
 
 CLP_PRESTO_CONTAINER_STORAGE = "/home/clp-json-x86_64"
-CLP_PRESTO_HOST_STORAGE = os.path.abspath(os.path.expanduser("~/clp-json-x86_64-v0.2.0-dev"))
-SQL_PASSWORD = "IpNB5qdAm14"
+CLP_PRESTO_HOST_STORAGE = os.path.abspath(os.path.expanduser("~/clp-json-x86_64-v0.4.0-dev"))
+SQL_PASSWORD = "wqEGPyBdx_w"
 class clp_presto_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset, dataset_variation='mongod.log', timestamp_key=r't.\$date'):
@@ -46,14 +46,14 @@ class clp_presto_bench(Benchmark):
         """
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/stop-clp.sh -f")
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/start-clp.sh")
-        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
+        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
         self.wait_for_port(8080)
         self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
         self.wait_for_port(7777)
         time.sleep(60)  # this needs to be more than 10
 
     def presto_execute(self, query, check=True):
-        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog clp --execute "{query}"', check)
+        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-executable.jar --catalog clp --execute "{query}"', check)
 
     def sql_execute(self, query, check=True):
         if query[-1] != ';':
@@ -74,6 +74,7 @@ class clp_presto_bench(Benchmark):
         """
         #return (self.presto_execute(f"USE default; SELECT * from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
         res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip()
+        #res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, tags from default WHERE {query.strip()[1:-1]}").strip()
         if not res:
             return 0
         return res.count('\n') + 1

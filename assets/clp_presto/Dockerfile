@@ -1,5 +1,6 @@
 # FROM ghcr.io/y-scope/clp/clp-core-dependencies-x86-ubuntu-jammy:main
-FROM presto/prestissimo-dependency:ubuntu-22.04
+# FROM presto/prestissimo-dependency:ubuntu-22.04
+FROM presto/prestissimo-dependency:ubuntu-22.04-presto-0.293
 # FROM presto/prestissimo-dependency:latest
 # FROM prestodb/presto-native-dependency:latest
 
@@ -49,13 +50,15 @@ RUN pip3 install pyarrow;
 WORKDIR /home
 RUN git clone https://github.com/anlowee/presto.git;
 WORKDIR /home/presto
-RUN git checkout xwei/benchmark-test;
+# RUN git checkout xwei/benchmark-test;
+RUN git checkout xwei/e2e-test-07-08;
 WORKDIR /home/presto/presto-native-execution
 RUN mkdir build;
 RUN rm -rf velox;
 RUN git clone https://github.com/anlowee/velox.git;
 WORKDIR /home/presto/presto-native-execution/velox
-RUN git checkout xwei/benchmark-test;
+# RUN git checkout xwei/benchmark-test;
+RUN git checkout xwei/e2e-test-07-08;
 
 WORKDIR /home/presto
 RUN ./mvnw clean install -DskipTests -pl -presto-docs -T1C;

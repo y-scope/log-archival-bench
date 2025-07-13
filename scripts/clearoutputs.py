@@ -2,9 +2,14 @@
 
 import os
 import glob
+import sys
 from pathlib import Path
 
 current_dir = Path(os.getcwd())
+
+if input('Are you sure about deleting all files (y/n): ').strip() != 'y':
+    print('Exiting...')
+    sys.exit(0)
 
 if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
     raise Exception("Must be run in clp-bench-refactor directory, if it was renamed, comment this line out")

@@ -2,7 +2,7 @@
 
 ## Basics
 
-Presto Version: [presto-server-0.293-SNAPSHOT][presto]
+Presto Version: [presto-server-0.293][presto]
 
 Velox Version: [Velox][velox]
 
@@ -17,6 +17,8 @@ CLP Version: 0.4.0 (commit 5d4c6769c269a749e33679bc61974324dba612db)
 * copy the database password under clp-json/etc/credentials.yml and paste in:
 * * include/etc_coordinator/catalog/clp.properties (as clp.metadata-db-password)
 * * main.py (as SQL_PASSWORD)
+* run `curl -X GET http://localhost:8080/v1/info` after launching
+* * put version info in `include/etc_worker/config.properties` as `presto.version`
 
 ### Dataset and Ingestion
 * Renamed all keys within dataset that contained a ' ' or a '-' by encoding with base64
