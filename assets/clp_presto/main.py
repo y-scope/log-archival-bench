@@ -23,7 +23,7 @@ class clp_presto_bench(Benchmark):
         self.dataset_variation = dataset_variation
 
         self.properties['timestamp'] = timestamp_key
-        self.properties['note'] = "ingestion data unreliable"
+        self.properties['note'] = "ingestion data unreliable, no result counting"
         self.timestamp = timestamp_key
 
     @property
@@ -73,11 +73,13 @@ class clp_presto_bench(Benchmark):
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
         #return (self.presto_execute(f"USE default; SELECT * from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
-        res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip()
+        #res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip()
+        res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}")
         #res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, tags from default WHERE {query.strip()[1:-1]}").strip()
-        if not res:
-            return 0
-        return res.count('\n') + 1
+        #if not res:
+        #    return 0
+        #return res.count('\n') + 1
+        return 0
 
     def clear_cache(self):
         """
