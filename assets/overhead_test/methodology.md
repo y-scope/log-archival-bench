@@ -1,16 +1,6 @@
-# Tool name methodology
+# Overhead test methodology
 
 ## Basics
 
-Version: [1.0.0][download]
-
-## Setup
-
-Describe any manual set up steps necessary for the tool.
-
-## Specifics
-
-Describe any specific tuning, preprocessing or configuration that beyond the defaults you made for 
-benchmarking. If there is no specifics you can delete this section.
-
-[download]: https://via.placeholder.com/20
+This benchmark is made to test the overhead of the benchmarking process. Both ingestion and all queries
+should take exactly 15 seconds

@@ -21,8 +21,7 @@ datasets_path: /home/datasets/mongod.log
 hot_run_warm_up_times: 3
 # List of command substrings (the first substring of the entire command split by space from `ps
 # aux`) to track relevant memory usage
-related_processes:
-  - {Related Process Headers}
+related_processes: []
 # Array of queries for benchmarking. Ensure escape characters are carefully handled. Note that each
 # query should be wrapped with double quotes (or single quote, depends on whether the query contains
 # double quotes) as the query will first be passed as an argument of `docker exec` rather than
