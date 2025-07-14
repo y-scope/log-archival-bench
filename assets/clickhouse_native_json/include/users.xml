@@ -2,6 +2,7 @@
     <profiles>
         <default>
             <date_time_input_format>best_effort</date_time_input_format>
+            <enable_json_type>1</enable_json_type>
         </default>
     </profiles>
     <users>

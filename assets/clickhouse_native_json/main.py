@@ -3,6 +3,7 @@
 import sys
 import time
 import subprocess
+import shlex
 
 from src.template import Benchmark, logger
 """
@@ -35,18 +36,24 @@ class clickhouse_native_json_bench(Benchmark):
             f"{self.script_dir}/include/users.xml": "/etc/clickhouse-server/users.d/benchconfig.xml",
         }
 
+    def clickhouse_execute(self, query):
+        return self.docker_execute(['clickhouse-client', '--query', shlex.quote(query)])
+
     @property
     def compressed_size(self):
         """
         Returns the size of the compressed dataset
         """
-        return int(self.docker_execute([
-                'clickhouse-client',
-                f""" \
-                --query "SELECT SUM(bytes) from system.parts \
-                WHERE active AND table = '{CLICKHOUSE_COLLECTION_NAME}'" \
-                """
-                ]))
+        time.sleep(10)  # wait for old parts to die
+        a = int(self.clickhouse_execute(f"SELECT SUM(bytes) from system.parts \
+                WHERE active AND table = '{CLICKHOUSE_COLLECTION_NAME}'"))
+        print(a)
+        b = self.get_disk_usage(f"/var/lib/clickhouse/data/default/{CLICKHOUSE_COLLECTION_NAME}/*")
+        print(b)
+        c = int(self.clickhouse_execute(f"SELECT SUM(bytes) from system.parts \
+                WHERE table = '{CLICKHOUSE_COLLECTION_NAME}'"))
+        print(c)
+        return b
 
     def launch(self):
         """
@@ -63,43 +70,34 @@ class clickhouse_native_json_bench(Benchmark):
             except subprocess.CalledProcessError:
                 time.sleep(1)
 
-        self.docker_execute([
-            'clickhouse-client',
-            '--query "SET enable_json_type = 1;"'
-            ])
+        #self.docker_execute([
+        #    'clickhouse-client',
+        #    '--query "SET merge_tree.old_parts_lifetime = 1;"'
+        #    ])
 
     def ingest(self):
         """
         Ingests the dataset at self.datasets_path
         """
         format = "JSON" if self.manual_column_names else "JSONAsObject"
-        self.docker_execute([
-            'clickhouse-client',
-            f""" \
-            --query "INSERT INTO {CLICKHOUSE_COLLECTION_NAME} FROM INFILE '{self.datasets_path}' FORMAT {format}" \
-            """
-            ])
-        self.docker_execute(f'clickhouse-client --query "OPTIMIZE TABLE {CLICKHOUSE_COLLECTION_NAME} FINAL"')
+        self.clickhouse_execute(f"INSERT INTO {CLICKHOUSE_COLLECTION_NAME} FROM INFILE '{self.datasets_path}' FORMAT {format}")
+        self.clickhouse_execute(f"OPTIMIZE TABLE {CLICKHOUSE_COLLECTION_NAME} FINAL")
     
     def search(self, query):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        cmd = [
-            'clickhouse-client',
-            f""" \
-            --query "SELECT * FROM {CLICKHOUSE_COLLECTION_NAME} WHERE {query.strip()[1:-1]}" \
-            """,  # truncate double quotes and use single quotes for bash
-            "| wc -l",
-            ]
-        return self.docker_execute(cmd)
+        res = self.clickhouse_execute(f"SELECT * FROM {CLICKHOUSE_COLLECTION_NAME} WHERE {query.strip()[1:-1]}")
+        if not res:
+            return 0
+        return res.count('\n') + 1
 
     def clear_cache(self):
         """
         Clears the cache within the docker container for cold run
         """
-        self.docker_execute('clickhouse-client --query "SYSTEM DROP UNCOMPRESSED CACHE"')
-        self.docker_execute('clickhouse-client --query "SYSTEM DROP MARK CACHE"')
+        self.clickhouse_execute("SYSTEM DROP UNCOMPRESSED CACHE")
+        self.clickhouse_execute("SYSTEM DROP MARK CACHE")
         self.docker_execute("sync")
         self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
 
@@ -108,17 +106,14 @@ class clickhouse_native_json_bench(Benchmark):
         Removes a previously ingested dataset before ingesting a new one, must not throw error
         when no dataset was ingested
         """
-        self.docker_execute([
-            'clickhouse-client',
-            f'--query "DROP TABLE IF EXISTS {CLICKHOUSE_COLLECTION_NAME}"'
-            ])
+        self.clickhouse_execute(f"DROP TABLE IF EXISTS {CLICKHOUSE_COLLECTION_NAME}")
 
         # every newline here is escaped within python, the container sees this as one giant line
-        # \\$date escape for escpaing "$" in bash
+        # $date does not need escaping due to shlex.quote()
 
         if self.manual_column_names:
             table_fields = """ \
-            t Tuple(\\$date timestamp), \
+            t Tuple($date timestamp), \
             s String, \
             c String, \
             id int, \
@@ -147,16 +142,9 @@ class clickhouse_native_json_bench(Benchmark):
 
         if (not self.manual_column_names) and self.order_by:
             params.append("SETTINGS allow_nullable_key = 1")
+        params.append("SETTINGS old_parts_lifetime = 1")
 
-        self.docker_execute([
-            'clickhouse-client',
-            f"""\
-            --query " \
-            CREATE TABLE {CLICKHOUSE_COLLECTION_NAME}({table_fields}) \
-            {' '.join(params)} \
-            " \
-            """,
-            ])
+        self.clickhouse_execute(f"CREATE TABLE {CLICKHOUSE_COLLECTION_NAME}({table_fields}) {' '.join(params)}")
 
     def terminate(self):
         self.docker_execute("clickhouse-server stop >/dev/null 2>&1", check=False)

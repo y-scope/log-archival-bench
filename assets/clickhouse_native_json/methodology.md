@@ -13,6 +13,34 @@ We start the ClickHouse server in daemon mode.
 To store JSON records, we use [native json][native_json] in ClickHouse, eliminating the need
 for preprocessing.
 
+### Configuration
+include/config.xml:
+```xml
+<compression>
+    <case>
+        <method>zstd</method>  
+        <level>3</level>
+    </case>
+</compression>
+<yandex>
+    <merge_tree>
+        <old_parts_lifetime>1</old_parts_lifetime>
+    </merge_tree>
+</yandex>
+```
+* compression: set to zstd(3)
+* old_parts_lifetime: old parts last for 1 second to allow direct `du` calculation
+
+---------------------------------------------
+
+include/users.xml:
+```xml
+<date_time_input_format>best_effort</date_time_input_format>
+<enable_json_type>1</enable_json_type>
+```
+* date_time_input_format: read mongod datetime format flexilby
+* enable_json_type: enable native json
+
 ## Native JSON Changes
 * Queries use cleaner dot syntax instead of the original JSON_VALUE functions.
 * SQL command uses FORMAT JSON rather than FORMAT JSONAsString
