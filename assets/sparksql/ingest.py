@@ -6,7 +6,7 @@ from pyspark.sql import SparkSession
 spark = SparkSession \
     .builder \
     .appName("") \
-    .master("local[1]") \
+    .master("spark://localhost:7077") \
     .config("spark.sql.caseSensitive", True) \
     .getOrCreate()
     #.config("spark.io.compression.zstd.level", "3") \

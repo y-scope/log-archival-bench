@@ -15,7 +15,7 @@ class sparksql_bench(Benchmark):
     def __init__(self, dataset):
         super().__init__(dataset)
 
-        self.properties['note'] = "no cluster"  # information about passed parameters to output
+        self.properties['note'] = "cluster"  # information about passed parameters to output
 
     @property
     def compressed_size(self):
@@ -28,7 +28,11 @@ class sparksql_bench(Benchmark):
         """
         Runs the benchmarked tool
         """
-        pass
+        self.docker_execute("/opt/spark/sbin/start-master.sh -h 0.0.0.0")
+        self.docker_execute("/opt/spark/sbin/start-worker.sh 127.0.0.1:7077")
+        self.wait_for_port(7077)
+        self.wait_for_port(8080)
+        self.wait_for_port(8081)
 
     def ingest(self):
         """
@@ -61,13 +65,15 @@ class sparksql_bench(Benchmark):
         self.docker_execute(f"mkdir -p {SPARKSQL_STORAGE}")
         self.docker_execute(f"rm -r {SPARKSQL_STORAGE}")
 
-    @property
-    def terminate_procs(self):
+    def terminate(self):
         """
         Process names as shown on `ps -aux` to terminate, reverts the launch process
         Alternatively, override the terminate(self) function in Benchmark
         """
-        return []
+        self.docker_execute("pkill -f /opt/java/openjdk/bin/java")
+        self.wait_for_port(7077, waitclose=True)
+        self.wait_for_port(8080, waitclose=True)
+        self.wait_for_port(8081, waitclose=True)
 
 
 def main():
