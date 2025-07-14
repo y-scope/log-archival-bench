@@ -23,7 +23,7 @@ class clp_presto_bench(Benchmark):
         self.dataset_variation = dataset_variation
 
         self.properties['timestamp'] = timestamp_key
-        self.properties['note'] = "ingestion data unreliable, no result counting"
+        self.properties['note'] = "ingestion data unreliable; no result counting"
         self.timestamp = timestamp_key
 
     @property
@@ -46,14 +46,15 @@ class clp_presto_bench(Benchmark):
         """
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/stop-clp.sh -f")
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/start-clp.sh")
-        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
+        self.docker_execute('bash -c "python3 /home/presto/presto-server/target/presto-server-0.293/bin/launcher.py run --etc-dir=/home/include/etc_coordinator" &')
         self.wait_for_port(8080)
-        self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
+        #self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
+        self.docker_execute("nohup /home/presto/presto-native-execution/_build/release/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
         self.wait_for_port(7777)
         time.sleep(60)  # this needs to be more than 10
 
     def presto_execute(self, query, check=True):
-        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-executable.jar --catalog clp --execute "{query}"', check)
+        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-executable.jar --catalog clp --schema default --execute "{query}"', check)
 
     def sql_execute(self, query, check=True):
         if query[-1] != ';':
@@ -64,7 +65,7 @@ class clp_presto_bench(Benchmark):
         """
         Ingests the dataset at self.datasets_path
         """
-        os.system(f"mkdir -p {CLP_PRESTO_HOST_STORAGE}/var/data/baker21")
+        #os.system(f"mkdir -p {CLP_PRESTO_HOST_STORAGE}/var/data/baker21")
         os.system(f'{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key {self.timestamp} {self.dataset}/{self.dataset_variation}')
         self.sql_execute(f"UPDATE clp_datasets SET archive_storage_directory=\"{CLP_PRESTO_CONTAINER_STORAGE}/var/data/archives/default\" WHERE name=\"default\"")
     
@@ -73,13 +74,11 @@ class clp_presto_bench(Benchmark):
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
         #return (self.presto_execute(f"USE default; SELECT * from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
-        #res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip()
-        res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}")
+        res = self.presto_execute(f"SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip()
         #res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, tags from default WHERE {query.strip()[1:-1]}").strip()
-        #if not res:
-        #    return 0
-        #return res.count('\n') + 1
-        return 0
+        if not res:
+            return 0
+        return res.count('\n') + 1
 
     def clear_cache(self):
         """
@@ -93,14 +92,8 @@ class clp_presto_bench(Benchmark):
         Removes a previously ingested dataset before ingesting a new one, must not throw error
         when no dataset was ingested
         """
-        self.docker_execute(f'rm -r {CLP_PRESTO_CONTAINER_STORAGE}/var/data')
-        self.sql_execute('DELETE FROM clp_datasets', check=False)
-        self.sql_execute('DELETE FROM clp_default_archive_tags', check=False)
-        self.sql_execute('DELETE FROM clp_default_archives', check=False)
-        self.sql_execute('DELETE FROM clp_default_column_metadata', check=False)
-        self.sql_execute('DELETE FROM clp_default_files', check=False)
-        self.sql_execute('DELETE FROM clp_default_tags', check=False)
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/stop-clp.sh -f")
+        self.docker_execute(f'rm -r {CLP_PRESTO_CONTAINER_STORAGE}/var/data')
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/start-clp.sh")
 
     def terminate(self):

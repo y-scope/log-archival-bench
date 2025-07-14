@@ -24,6 +24,8 @@ if current_dir not in sys.path:
 
 from src.jsonsync import JsonItem
 
+def prettify_json(to_prettify, ignore=[]):
+    return ', '.join([f"{key}={val}" for key, val in json.loads(to_prettify).items() if key not in ignore])
 
 current_dir = Path(os.getcwd())
 
@@ -92,7 +94,7 @@ for output_dir in outputs:
         for dataset, dataset_val in output.items():
             for configuration, configuration_val in dataset_val.items():
                 
-                title = f"{tool} ({configuration})"
+                title = f"{tool} ({prettify_json(configuration, ['timestamp'])})"
                 if title not in columns:
                     column = JsonItem([])
                     columns[title] = column

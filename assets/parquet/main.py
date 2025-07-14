@@ -70,7 +70,7 @@ class parquet_bench(Benchmark):
         time.sleep(60)  # this needs to be more than 10
 
     def hive_execute(self, query, check=True):
-        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --execute "{query}"', check)
+        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --schema {PARQUET_SCHEMA_NAME} --execute "{query}"', check)
 
     def ingest(self):
         """
@@ -115,7 +115,7 @@ class parquet_bench(Benchmark):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        res = self.hive_execute(f"USE {PARQUET_SCHEMA_NAME}; SELECT * from {PARQUET_TABLE_NAME} WHERE {query.strip()[1:-1]}").strip()
+        res = self.hive_execute(f"SELECT * from {PARQUET_TABLE_NAME} WHERE {query.strip()[1:-1]}").strip()
         if not res:
             return 0
         return res.count('\n') + 1

@@ -3,6 +3,7 @@
 import sys
 import subprocess
 import datetime
+import json
 
 from src.template import ASSETS_DIR, WORK_DIR, Benchmark, logger
 """
@@ -48,7 +49,7 @@ class zstandard_bench(Benchmark):
         return 0
     def bench_search(self, cold=True):
         if not cold:
-            logger.info("hot run and cold run are the same, skipping")
+            logger.info("hot run and cold run are the same (decompression), skipping")
             return
 
         self.bench_start(ingest=False)
@@ -65,10 +66,12 @@ class zstandard_bench(Benchmark):
         if failed:
             logger.warning("Decompression failed")
 
-        self.output[self.dataset_name][self.properties]["ingest"]["decompress_time_taken_s"] = self.bench_info['time_taken']
-        self.output[self.dataset_name][self.properties]["ingest"]["decompress_memory_average_B"] = self.bench_info['memory_average']
-        self.output[self.dataset_name][self.properties]["ingest"]["decompress_failed"] = "yes" if failed else "no"
-        self.output[self.dataset_name][self.properties]["ingest"]["decompress_start_time"] = datetime.datetime.fromtimestamp(self.bench_info['start_time']).strftime('%Y-%m-%d %H:%M:%S')
+        ingestout = self.output[self.dataset_name][json.dumps(self.properties)]["ingest"]
+
+        ingestout["decompress_time_taken_s"] = self.bench_info['time_taken']
+        ingestout["decompress_memory_average_B"] = self.bench_info['memory_average']
+        ingestout["decompress_failed"] = "yes" if failed else "no"
+        ingestout["decompress_start_time"] = datetime.datetime.fromtimestamp(self.bench_info['start_time']).strftime('%Y-%m-%d %H:%M:%S')
 
         self.output.write()
 
@@ -95,6 +98,9 @@ class zstandard_bench(Benchmark):
         Alternatively, override the terminate(self) function in Benchmark
         """
         return []
+
+    def run_applicable(self, dataset_name):
+        self.run_everything()
 
 
 def main():

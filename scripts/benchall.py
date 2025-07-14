@@ -8,6 +8,7 @@ from assets.parquet.main import parquet_bench
 from assets.zstandard.main import zstandard_bench
 from assets.elasticsearch.main import elasticsearch_bench
 from assets.clp_presto.main import clp_presto_bench
+from assets.overhead_test.main import overhead_test_bench
 from src.jsonsync import JsonItem
 
 import os
@@ -97,13 +98,14 @@ benchmarks = [  # benchmark object, arguments
         #    'additional_order_by': [],
         #    }),
 
-        (sparksql_bench, {}),
-        (openobserve_bench, {}),
-        (parquet_bench, {'mode': 'json string'}),
-        (parquet_bench, {'mode': 'pairwise arrays'}),
-        (zstandard_bench, {}),
-        (elasticsearch_bench, {}),
-        #(clp_presto_bench, {}),
+        #(sparksql_bench, {}),
+        #(openobserve_bench, {}),
+        #(parquet_bench, {'mode': 'json string'}),
+        #(parquet_bench, {'mode': 'pairwise arrays'}),
+        #(elasticsearch_bench, {}),
+        #(overhead_test_bench, {}),
+        #(zstandard_bench, {}),
+        (clp_presto_bench, {}),
     ]
 
 def run(bencher, kwargs, bench_target):
@@ -132,8 +134,8 @@ for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        #if dataset_name != 'mongod':  # only use mongod for now
-        #    continue
+        if dataset_name != 'mongod':  # only use mongod for now
+            continue
         run(bencher, kwargs, bench_target)
 
 #run(zstandard_bench, {}, get_target_from_name('spark-event-logs'))

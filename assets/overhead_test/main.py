@@ -20,7 +20,7 @@ class overhead_test_bench(Benchmark):
         """
         Returns the size of the compressed dataset
         """
-        return self.get_disk_usage("path/to/storage")
+        return self.get_disk_usage("/home")
 
     def launch(self):
         """

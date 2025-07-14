@@ -18,6 +18,9 @@ if current_dir not in sys.path:
 from src.jsonsync import JsonItem
 
 
+def prettify_json(to_prettify):
+    return ', '.join([f"{key}={val}" for key, val in json.loads(to_prettify).items()])
+
 current_dir = Path(os.getcwd())
 
 if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
@@ -38,7 +41,7 @@ for output_dir in outputs:
         for dataset, dataset_val in output.items():
             for configuration, configuration_val in dataset_val.items():
 
-                methodology = f"{tool} ({configuration})"
+                methodology = f"{tool} ({prettify_json(configuration)})"
 
 
                 for key, value in configuration_val["ingest"].items():
