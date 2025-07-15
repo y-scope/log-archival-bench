@@ -94,14 +94,7 @@ class Benchmark:
         #return pathlib.Path(sys.argv[0]).parent.resolve()
 
     def get_disk_usage(self, path):
-        return int(self.docker_execute([
-            'du',
-            path,
-            '-bc',
-
-            '|',
-            r'awk "END {print\$1}"',
-            ]))
+        return int(self.docker_execute(f'du {path} -bc').split('\n')[-1].split('\t')[0])
 
     def check_results(self, ind, res):
         return (int(res) == [38611, 336293, 1, 122, 52421, 38611][ind])
@@ -237,12 +230,13 @@ class Benchmark:
             statement = ' '.join(statement)
         
         result = subprocess.run(
-                f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
+                #f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
+                ['docker', 'exec', self.container_name, *shlex.split(statement)],
                 stdout=subprocess.PIPE,
-                shell = True,
+                #shell = True,
                 check = check
                 )
-        logger.debug(result)
+        #logger.debug(result)
         return result.stdout.decode("utf-8").strip()
 
     def ingest(self):

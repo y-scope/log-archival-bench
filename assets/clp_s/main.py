@@ -36,14 +36,16 @@ class clp_s_bench(Benchmark):
             ])
     
     def search(self, query):
-        return self.docker_execute([
+        res = self.docker_execute([
             CLP_S_BINARY,
             's',
             CLP_OUT_PATH,
             query,
-
-            "| wc -l"
             ])
+        if not res:
+            return 0
+        return res.count('\n') + 1
+        
 
     def clear_cache(self):
         self.docker_execute("sync")
