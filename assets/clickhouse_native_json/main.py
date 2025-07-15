@@ -47,13 +47,13 @@ class clickhouse_native_json_bench(Benchmark):
         time.sleep(10)  # wait for old parts to die
         a = int(self.clickhouse_execute(f"SELECT SUM(bytes) from system.parts \
                 WHERE active AND table = '{CLICKHOUSE_COLLECTION_NAME}'"))
-        print(a)
-        b = self.get_disk_usage(f"/var/lib/clickhouse/data/default/{CLICKHOUSE_COLLECTION_NAME}/*")
-        print(b)
-        c = int(self.clickhouse_execute(f"SELECT SUM(bytes) from system.parts \
-                WHERE table = '{CLICKHOUSE_COLLECTION_NAME}'"))
-        print(c)
-        return b
+        #print(a)
+        #b = self.get_disk_usage(f"/var/lib/clickhouse/data/default/{CLICKHOUSE_COLLECTION_NAME}/*")
+        #print(b)
+        #c = int(self.clickhouse_execute(f"SELECT SUM(bytes) from system.parts \
+        #        WHERE table = '{CLICKHOUSE_COLLECTION_NAME}'"))
+        #print(c)
+        return a
 
     def launch(self):
         """

@@ -98,17 +98,17 @@ benchmarks = [  # benchmark object, arguments
         #    'additional_order_by': [],
         #    }),
 
-        #(sparksql_bench, {}),
         #(openobserve_bench, {}),
         #(parquet_bench, {'mode': 'json string'}),
         #(parquet_bench, {'mode': 'pairwise arrays'}),
         #(elasticsearch_bench, {}),
         #(overhead_test_bench, {}),
         #(zstandard_bench, {}),
-        (clp_presto_bench, {}),
+        #(clp_presto_bench, {}),
+        #(sparksql_bench, {}),
     ]
 
-def run(bencher, kwargs, bench_target):
+def run(bencher, kwargs, bench_target, attach=False):
     dataset_name = 'error when finding dataset name'
     try:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
@@ -123,6 +123,7 @@ def run(bencher, kwargs, bench_target):
         print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
 
         bench = bencher(bench_target, **kwargs)
+        bench.attach = attach
         bench.run_applicable(dataset_name)
         #bench.run_everything(['ingest', 'cold'])
     except Exception as e:
@@ -134,10 +135,9 @@ for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        if dataset_name != 'mongod':  # only use mongod for now
-            continue
+        #if dataset_name != 'mongod':  # only use mongod for now
+        #    continue
         run(bencher, kwargs, bench_target)
 
-#run(zstandard_bench, {}, get_target_from_name('spark-event-logs'))
-#run(parquet_bench, {'mode': 'columns values'}, get_target_from_name('mongod'))
-#run(clp_s_bench, {}, get_target_from_name('mongod'))  # rerun mongod because it was using id
+#run(openobserve_bench, {}, get_target_from_name('mongod'))
+run(openobserve_bench, {}, get_target_from_name('postgresql'), attach=True)

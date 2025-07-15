@@ -25,6 +25,7 @@ while True:
     data = {
             "query": {
                 "sql": f"SELECT id FROM {stream} WHERE {query}",
+                #"sql": f"SELECT count(*) FROM {stream}",
                 "start_time": int((time.time()-365*24*60*60)*1000000),
                 "end_time": int(time.time()*1000000),
                 "from": pagesize*i,
@@ -32,6 +33,8 @@ while True:
                 }
             }
     res = requests.post(openobserve_url, headers=headers, data=json.dumps(data))
+
+    #print(res.text)
 
     found = json.loads(res.text)["total"]
 

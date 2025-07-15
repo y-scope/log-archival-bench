@@ -22,13 +22,15 @@ class openobserve_bench(Benchmark):
         """
         Returns the size of the compressed dataset
         """
-        return self.get_disk_usage(f"{OPENOBSERVE_DATA_DIR}/openobserve/stream/files/default/logs")
+        self.terminate()
+        self.get_disk_usage(f"{OPENOBSERVE_DATA_DIR}/openobserve/stream/files/default")
+        self.launch()
 
     def launch(self):
         """
         Runs the benchmarked tool
         """
-        self.docker_execute("/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
+        self.docker_execute(f"/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
         self.docker_execute("nohup /openobserve &")
         self.wait_for_port(5080)
 

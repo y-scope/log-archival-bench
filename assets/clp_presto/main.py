@@ -23,7 +23,7 @@ class clp_presto_bench(Benchmark):
         self.dataset_variation = dataset_variation
 
         self.properties['timestamp'] = timestamp_key
-        self.properties['note'] = "ingestion data unreliable; no result counting"
+        self.properties['note'] = "ingestion data unreliable"
         self.timestamp = timestamp_key
 
     @property

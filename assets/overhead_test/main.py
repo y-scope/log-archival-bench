@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import time
 
 from src.template import ASSETS_DIR, WORK_DIR, Benchmark, logger
 """
@@ -32,14 +33,14 @@ class overhead_test_bench(Benchmark):
         """
         Ingests the dataset at self.datasets_path
         """
-        print(self.datasets_path)
+        #print(self.datasets_path)
         self.docker_execute('sleep 15')
     
     def search(self, query):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        print(query)
+        #print(query)
         self.docker_execute('sleep 15')
         return 15
 
@@ -64,6 +65,12 @@ class overhead_test_bench(Benchmark):
         Alternatively, override the terminate(self) function in Benchmark
         """
         return []
+    
+    def run_applicable(self, dataset_name):
+        if dataset_name == 'mongod':
+            self.run_everything()
+        else:
+            logger.info('overhead test only runs on mongod, does not interact with dataset')
 
 
 def main():

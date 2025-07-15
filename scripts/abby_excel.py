@@ -94,7 +94,7 @@ for output_dir in outputs:
         for dataset, dataset_val in output.items():
             for configuration, configuration_val in dataset_val.items():
                 
-                title = f"{tool} ({prettify_json(configuration, ['timestamp'])})"
+                title = f"{tool} ({prettify_json(configuration, ['timestamp', 'dataset_variation'])})"
                 if title not in columns:
                     column = JsonItem([])
                     columns[title] = column
@@ -134,8 +134,8 @@ for output_dir in outputs:
                     compression_ratio.append(uncompressed_size / compressed_size)
 
                 if uncompressed_size is not None  and time_taken is not None and time_taken != 0:
-                    column[dataset_y[dataset] + 5] = uncompressed_size / time_taken * 1000 * 1000  # Ingestion Speed (MB/s)
-                    ingestion_speed.append(uncompressed_size / time_taken * 1000 * 1000)
+                    column[dataset_y[dataset] + 5] = uncompressed_size / time_taken / 1024 / 1024 # Ingestion Speed (MB/s)
+                    ingestion_speed.append(uncompressed_size / time_taken / 1024 / 1024 )
 
                 memory_cold = []
                 memory_hot = []

@@ -26,6 +26,32 @@ logging_formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 logging_console_handler.setFormatter(logging_formatter)
 logger.addHandler(logging_console_handler)
 
+def append_memory(self):
+    kb_to_b = 1024
+    output = self.docker_execute("ps aux").split('\n')
+    metric_sample = 0
+    for line in output:
+        process = line.strip().split()[10].strip()
+        for related_process in self.config["related_processes"]:
+            if related_process.startswith(process):
+                metric_sample += int(line.strip().split()[5]) * kb_to_b
+                break
+    logger.info(f"Memory used: {metric_sample//(1024*1024)} MB")
+    self.bench_info['memory'].append(metric_sample)
+
+def poll_memory(self, bench_uuid):
+    while True:
+        if self.bench_info['ingest'] is True:
+            interval = self.config["system_metric"]["memory"]["ingest_polling_interval"]
+        else:
+            interval = self.config["system_metric"]["memory"]["run_query_benchmark_polling_interval"]
+        time.sleep(interval - (time.time() % interval))  # wait for next "5 second interval"
+
+        if self.bench_info['running'] == bench_uuid:
+            append_memory(self)
+        else:
+            break
+
 class Benchmark:
     def __init__(self, dataset_dir, dataset_variation='mongod.log'):
         with open(f"{self.script_dir}/config.yaml") as file:
@@ -42,6 +68,7 @@ class Benchmark:
         self.output = JsonItem.read(self.outputjson)
 
         self.bench_info = {}
+        self.attach = False
 
         self.datasets_path = f"{DATASETS_DIR}/{dataset_variation}"  # inside container
 
@@ -238,49 +265,24 @@ class Benchmark:
             self.docker_execute(f"pkill -f {procname}", check=False)
 
     def bench_start(self, ingest=True):
-        self.bench_info['start_time'] = time.time()
         self.bench_info['ingest'] = ingest
         self.bench_info['memory'] = []
 
-        bench_uuid = uuid.uuid4()
+        bench_uuid = str(time.time())
         self.bench_info['running'] = bench_uuid
-
-        def append_memory():
-            kb_to_b = 1024
-            output = self.docker_execute("ps aux").split('\n')
-            metric_sample = 0
-            for line in output:
-                process = line.strip().split()[10].strip()
-                for related_process in self.config["related_processes"]:
-                    if related_process.startswith(process):
-                        metric_sample += int(line.strip().split()[5]) * kb_to_b
-                        break
-            logger.info(f"Memory used: {metric_sample//(1024*1024)} MB")
-            self.bench_info['memory'].append(metric_sample)
-
-        def poll_memory(bench_uuid):
-            while True:
-                if self.bench_info['ingest'] is True:
-                    interval = self.config["system_metric"]["memory"]["ingest_polling_interval"]
-                else:
-                    interval = self.config["system_metric"]["memory"]["run_query_benchmark_polling_interval"]
-                time.sleep(interval - (time.time() % interval))  # wait for next "5 second interval"
-
-                if self.bench_info['running'] == bench_uuid:
-                    append_memory()
-                else:
-                    break
 
         self.bench_thread = threading.Thread(
                 target = poll_memory,
-                args = (bench_uuid,),
-                daemon = True
+                args = (self, bench_uuid)
                 )
+
         self.bench_thread.start()
+        self.bench_info['start_time'] = time.time()
 
     def bench_stop(self):
-        self.bench_info['running'] = None
         self.bench_info['end_time'] = time.time()
+        self.bench_info['running'] = None
+        self.bench_thread.join(timeout=0.01)
 
         try:
             self.bench_info['memory_average'] = sum(self.bench_info['memory']) / len(self.bench_info['memory'])
@@ -312,6 +314,9 @@ class Benchmark:
 
     def bench_search(self, cold=True):
         self.launch()
+
+        if self.compressed_size == 0:
+            raise Exception("compressed size is 0: nothing to search")
 
         mode = "query_" + ("cold" if cold else "hot")
         for ind, query in enumerate(self.queries):
@@ -363,8 +368,18 @@ class Benchmark:
             elif i == 'hot':
                 logger.info("Benchmarking hot search...")
                 self.bench_search(cold=False)
-        logger.info("Removing container...")
-        self.docker_remove()
+        if self.attach:
+            logger.info("Launching for attach...")
+            self.launch()
+            logger.info("Attaching to container...")
+            self.docker_attach()
+            logger.info("Terminating after attach...")
+            self.terminate()
+            logger.info("Removing container...")
+            self.docker_remove()
+        else:
+            logger.info("Removing container...")
+            self.docker_remove()
 
     def run_ingest(self):
         self.run_everything(['ingest'])
