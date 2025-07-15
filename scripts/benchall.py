@@ -98,7 +98,7 @@ benchmarks = [  # benchmark object, arguments
         #    'additional_order_by': [],
         #    }),
 
-        #(openobserve_bench, {}),
+        (openobserve_bench, {}),
         #(parquet_bench, {'mode': 'json string'}),
         #(parquet_bench, {'mode': 'pairwise arrays'}),
         #(elasticsearch_bench, {}),
@@ -140,4 +140,4 @@ for bencher, kwargs in benchmarks:
         run(bencher, kwargs, bench_target)
 
 #run(openobserve_bench, {}, get_target_from_name('mongod'))
-run(openobserve_bench, {}, get_target_from_name('postgresql'), attach=True)
+#run(openobserve_bench, {}, get_target_from_name('postgresql'), attach=True)

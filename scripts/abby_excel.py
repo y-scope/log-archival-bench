@@ -7,8 +7,10 @@ import numpy as np
 import pandas as pd
 import sys
 from openpyxl.utils import get_column_letter
+import collections
 
-def avg(data):
+def avg(data_original):
+    data = [i for i in data_original if i > 0]
     if not data:
         return 0
     else:
@@ -84,6 +86,12 @@ for temp in ('cold', 'hot'):
 
 columns = {}
 
+# to average
+ingestion_time = collections.defaultdict(list)
+ingestion_memory = collections.defaultdict(list)
+compression_ratio = collections.defaultdict(list)
+ingestion_speed = collections.defaultdict(list)
+
 for output_dir in outputs:
     tool = os.path.basename(output_dir.resolve())
     filename = (output_dir / "output.json").resolve()
@@ -93,6 +101,7 @@ for output_dir in outputs:
         output = json.load(file)
         for dataset, dataset_val in output.items():
             for configuration, configuration_val in dataset_val.items():
+                # multiple iterations write to the same column
                 
                 title = f"{tool} ({prettify_json(configuration, ['timestamp', 'dataset_variation'])})"
                 if title not in columns:
@@ -106,18 +115,13 @@ for output_dir in outputs:
                 column[2] = 2  # type
                 # color
 
-                ingestion_time = []
-                ingestion_memory = []
-                compression_ratio = []
-                ingestion_speed = []
-
                 compressed_size = None
                 uncompressed_size = None
                 time_taken = None
                 for key, value in configuration_val["ingest"].items():
                     if key == "memory_average_B":
                         column[dataset_y[dataset] + 2] = value # ingestion memory usage (B)
-                        ingestion_memory.append(value)
+                        ingestion_memory[title].append(value)
                     elif key == "compressed_size_B":
                         compressed_size = value
                         column[dataset_y[dataset] + 1] = value # compressed size (B)
@@ -127,26 +131,27 @@ for output_dir in outputs:
                     elif key == "time_taken_s":
                         time_taken = value
                         column[dataset_y[dataset] + 0] = value * 1000 # ingestion time (ms)
-                        ingestion_time.append(value)
+                        ingestion_time[title].append(value * 1000)
 
                 if compressed_size is not None and uncompressed_size is not None and compressed_size != 0:
                     column[dataset_y[dataset] + 4] = uncompressed_size / compressed_size  # Compression Ratio
-                    compression_ratio.append(uncompressed_size / compressed_size)
+                    compression_ratio[title].append(uncompressed_size / compressed_size)
 
                 if uncompressed_size is not None  and time_taken is not None and time_taken != 0:
                     column[dataset_y[dataset] + 5] = uncompressed_size / time_taken / 1024 / 1024 # Ingestion Speed (MB/s)
-                    ingestion_speed.append(uncompressed_size / time_taken / 1024 / 1024 )
+                    ingestion_speed[title].append(uncompressed_size / time_taken / 1024 / 1024 )
 
+                # only one set of queries in the same configuration_val iteration, so we can do this
                 memory_cold = []
                 memory_hot = []
                 if "query_cold" in configuration_val and "query_hot" in configuration_val:
                     for key, value in enumerate(configuration_val["query_cold"]):
-                        column[query_y['cold'] + key] = value["time_taken_s"]
+                        column[query_y['cold'] + key] = value["time_taken_s"] * 1000 # Qx time (ms) (cold)
                         if value["memory_average_B"] != -1:
                             memory_cold.append(value["memory_average_B"])
 
                     for key, value in enumerate(configuration_val["query_hot"]):
-                        column[query_y['hot'] + key] = value["time_taken_s"]
+                        column[query_y['hot'] + key] = value["time_taken_s"] * 1000 # Qx time (ms) (hot)
                         if value["memory_average_B"] != -1:
                             memory_hot.append(value["memory_average_B"])
 
@@ -159,10 +164,10 @@ for output_dir in outputs:
                     column[query_y['hot'] + 6] = memory_hot_val  # Query memory usage (B)
 
 
-                column[averages_y] = avg(ingestion_time)
-                column[averages_y + 1] = avg(ingestion_memory)
-                column[averages_y + 2] = avg(compression_ratio)
-                column[averages_y + 3] = avg(ingestion_speed)
+                column[averages_y] = avg(ingestion_time[title])
+                column[averages_y + 1] = avg(ingestion_memory[title])
+                column[averages_y + 2] = avg(compression_ratio[title])
+                column[averages_y + 3] = avg(ingestion_speed[title])
 
 x = 3
 for column in columns.values():
