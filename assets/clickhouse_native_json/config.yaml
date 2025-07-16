@@ -1,8 +1,8 @@
 system_metric:
   enable: true
   memory:
-    ingest_polling_interval: 5
-    run_query_benchmark_polling_interval: 1
+    ingest_polling_interval: 0.5
+    run_query_benchmark_polling_interval: 0.1
 
 container_id: clickhouse-native-json-clp-bench
 assets_path: /home/assets

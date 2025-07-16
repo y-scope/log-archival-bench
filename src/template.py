@@ -36,7 +36,7 @@ def append_memory(self):
             if related_process.startswith(process):
                 metric_sample += int(line.strip().split()[5]) * kb_to_b
                 break
-    logger.info(f"Memory used: {metric_sample//(1024*1024)} MB")
+    #logger.info(f"Memory used: {metric_sample//(1024*1024)} MB")
     self.bench_info['memory'].append(metric_sample)
 
 def poll_memory(self, bench_uuid):
@@ -223,21 +223,35 @@ class Benchmark:
                 )
         time.sleep(10)
 
-    def docker_execute(self, statement, check=True):
+    def docker_execute(self, statement, check=True, background=False, output_stderr=True):
+        if output_stderr:
+            stderr_redirect = subprocess.STDOUT
+        else:
+            stderr_redirect = subprocess.DEVNULL
+
         if type(statement) is str:
             pass
         if type(statement) is list:
             statement = ' '.join(statement)
+        cmd = ['docker', 'exec', self.container_name, *shlex.split(statement)]
         
-        result = subprocess.run(
-                #f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
-                ['docker', 'exec', self.container_name, *shlex.split(statement)],
-                stdout=subprocess.PIPE,
-                #shell = True,
-                check = check
-                )
-        #logger.debug(result)
-        return result.stdout.decode("utf-8").strip()
+        if background:
+            subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=stderr_redirect
+                    )
+        else:
+            result = subprocess.run(
+                    cmd,
+                    #f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
+                    stdout=subprocess.PIPE,
+                    stderr=stderr_redirect,
+                    #shell = True,
+                    check = check
+                    )
+            #logger.debug(result)
+            return result.stdout.decode("utf-8").strip()
 
     def ingest(self):
         raise NotImplementedError

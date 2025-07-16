@@ -35,25 +35,21 @@ clp_s_timestamp_keys = {
         "elasticsearch": "@timestamp",
         "postgresql": "timestamp",
         "spark-event-logs": "Timestamp",
-        "mongod": r"t.\$date"
-        #"mongod": "id"
+        "mongod": r"t.$date"
+        }
+clickhouse_keys = {
+        "cockroachdb": "timestamp",
+        "elasticsearch": '"@timestamp"',  # @ is a special character in clickhouse
+        "postgresql": "timestamp",
+        "spark-event-logs": "Timestamp",
+        "mongod": r"t.$date"
         }
 
 benchmarks = [  # benchmark object, arguments
-        (clp_s_bench, {}),
-        #(clickhouse_native_json_bench, {  # give column names, don't order
-        #    'manual_column_names': True,
-        #    'keys': [],
-        #    'additional_order_by': [],
-        #    }),
+        #(clp_s_bench, {}),
         #(clickhouse_native_json_bench, {  # give column names, order and primary key
         #    'manual_column_names': True,
         #    'keys': ['id'],
-        #    'additional_order_by': [],
-        #    }),
-        #(clickhouse_native_json_bench, {  # give column names, order and primary key
-        #    'manual_column_names': True,
-        #    'keys': ['c'],
         #    'additional_order_by': [],
         #    }),
         #(clickhouse_native_json_bench, {  # give column names, order and primary key
@@ -66,38 +62,11 @@ benchmarks = [  # benchmark object, arguments
         #    'keys': ['t.\\$date'],
         #    'additional_order_by': [],
         #    }),
-        ## can even try to use json values with a default as primary or sorting
-        #(clickhouse_native_json_bench, {  # give column names, order only
-        #    'manual_column_names': True,
-        #    'keys': [],
-        #    'additional_order_by': ['id'],
-        #    }),
-        #(clickhouse_native_json_bench, {  # no column names
-        #    'manual_column_names': False,
-        #    'keys': [],
-        #    'additional_order_by': [],
-        #    }),
-        #(clickhouse_native_json_bench, {
-        #    'manual_column_names': False,
-        #    'keys': ['json.id.:Int64'],
-        #    'additional_order_by': [],
-        #    }),
-        #(clickhouse_native_json_bench, {
-        #    'manual_column_names': False,
-        #    'keys': [],
-        #    'additional_order_by': ['json.id.:Int64'],
-        #    }),
-        #(clickhouse_native_json_bench, {
-        #    'manual_column_names': False,
-        #    'keys': ['json.c.:String'],
-        #    'additional_order_by': [],
-        #    }),
-        #(clickhouse_native_json_bench, {
-        #    'manual_column_names': False,
-        #    'keys': ['json.t.\\$date.:timestamp'],
-        #    'additional_order_by': [],
-        #    }),
-
+        (clickhouse_native_json_bench, {
+            'manual_column_names': False,
+            'keys': None,  # will be filled with timestamp
+            'additional_order_by': [],
+            }),
         #(openobserve_bench, {}),
         #(parquet_bench, {'mode': 'json string'}),
         #(parquet_bench, {'mode': 'pairwise arrays'}),
@@ -105,16 +74,20 @@ benchmarks = [  # benchmark object, arguments
         #(overhead_test_bench, {}),
         #(zstandard_bench, {}),
         #(clp_presto_bench, {}),
-        #(sparksql_bench, {}),
+        (sparksql_bench, {}),
     ]
 
 def run(bencher, kwargs, bench_target, attach=False):
     dataset_name = 'error when finding dataset name'
+    bench = None
     try:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
         if bencher == clp_s_bench or bencher == clp_presto_bench:  # give additional parameters according to dataset name
             kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
+
+        if bencher == clickhouse_native_json_bench and (not kwargs["manual_column_names"]):  # additional parameters for clickhouse too
+            kwargs["keys"] = [f"json.{clickhouse_keys[dataset_name]}.:timestamp"]
 
         # benchmark clp_presto on the cleaned (no spaces) mongod dataset
         if bencher == clp_presto_bench and dataset_name == 'mongod':
@@ -127,17 +100,22 @@ def run(bencher, kwargs, bench_target, attach=False):
         bench.run_applicable(dataset_name)
         #bench.run_everything(['ingest', 'cold'])
     except Exception as e:
+        statement = f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {type(e).__name__}: {str(e)}"
         with open((current_dir / 'exceptions.log').resolve(), 'a') as file:
-            file.write(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {type(e).__name__}: {str(e)}\n")
-        print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {type(e).__name__}: {str(e)}")
+            file.write(f"{statement}\n")
+        print(statement)
+        if attach:
+            if bench is not None:
+                bench.docker_attach()
 
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        if dataset_name != 'mongod':  # only use mongod for now
-            continue
+        #if dataset_name != 'mongod':  # only use mongod for now
+        #    continue
         run(bencher, kwargs, bench_target)
+        #run(bencher, kwargs, bench_target, attach=True)
 
 #run(openobserve_bench, {}, get_target_from_name('mongod'))
 #run(openobserve_bench, {}, get_target_from_name('postgresql'), attach=True)

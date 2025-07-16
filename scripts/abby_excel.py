@@ -103,7 +103,7 @@ for output_dir in outputs:
             for configuration, configuration_val in dataset_val.items():
                 # multiple iterations write to the same column
                 
-                title = f"{tool} ({prettify_json(configuration, ['timestamp', 'dataset_variation'])})"
+                title = f"{tool} ({prettify_json(configuration, ['timestamp', 'dataset_variation', 'keys', 'order_by'])})"
                 if title not in columns:
                     column = JsonItem([])
                     columns[title] = column

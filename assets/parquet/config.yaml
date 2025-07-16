@@ -5,9 +5,9 @@ system_metric:
   enable: true
   memory:
     # Time interval (in seconds) for polling memory during data ingestion
-    ingest_polling_interval: 5
+    ingest_polling_interval: 0.5
     # Time interval (in seconds) for polling memory during query benchmarking
-    run_query_benchmark_polling_interval: 1
+    run_query_benchmark_polling_interval: 0.1
 
 # Identifier for the benchmark container. Usually `${tool}-clp-bench`
 container_id: parquet-clp-bench
