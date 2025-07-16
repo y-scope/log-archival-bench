@@ -298,7 +298,7 @@ class Benchmark:
         except ZeroDivisionError:
             self.bench_info['memory_average'] = -1  # not even 5 seconds: no benchmark
 
-        logger.info(f"Memory average: {self.bench_info['memory_average']}")
+        logger.info(f"Memory average: {self.bench_info['memory_average'] / 1024 / 1024} MiB")
 
         self.bench_info['time_taken'] = self.bench_info['end_time'] - self.bench_info['start_time']
 
