@@ -48,7 +48,7 @@ class sparksql_bench(Benchmark):
         """
         return self.docker_execute([
             f"python3 {ASSETS_DIR}/search.py {query} {SPARKSQL_STORAGE}"
-            ])
+            ]).split('\n')[-1]
 
     def clear_cache(self):
         """

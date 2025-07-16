@@ -62,11 +62,11 @@ benchmarks = [  # benchmark object, arguments
         #    'keys': ['t.\\$date'],
         #    'additional_order_by': [],
         #    }),
-        (clickhouse_native_json_bench, {
-            'manual_column_names': False,
-            'keys': None,  # will be filled with timestamp
-            'additional_order_by': [],
-            }),
+        #(clickhouse_native_json_bench, {
+        #    'manual_column_names': False,
+        #    'keys': None,  # will be filled with timestamp
+        #    'additional_order_by': [],
+        #    }),
         #(openobserve_bench, {}),
         #(parquet_bench, {'mode': 'json string'}),
         #(parquet_bench, {'mode': 'pairwise arrays'}),
@@ -74,7 +74,7 @@ benchmarks = [  # benchmark object, arguments
         #(overhead_test_bench, {}),
         #(zstandard_bench, {}),
         #(clp_presto_bench, {}),
-        (sparksql_bench, {}),
+        #(sparksql_bench, {}),
     ]
 
 def run(bencher, kwargs, bench_target, attach=False):
@@ -119,3 +119,4 @@ for bencher, kwargs in benchmarks:
 
 #run(openobserve_bench, {}, get_target_from_name('mongod'))
 #run(openobserve_bench, {}, get_target_from_name('postgresql'), attach=True)
+run(sparksql_bench, {}, get_target_from_name('mongod'))

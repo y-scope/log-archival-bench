@@ -241,6 +241,7 @@ class Benchmark:
                     stdout=subprocess.PIPE,
                     stderr=stderr_redirect
                     )
+            return "no output for background"
         else:
             result = subprocess.run(
                     cmd,
@@ -296,6 +297,8 @@ class Benchmark:
             self.bench_info['memory_average'] = sum(self.bench_info['memory']) / len(self.bench_info['memory'])
         except ZeroDivisionError:
             self.bench_info['memory_average'] = -1  # not even 5 seconds: no benchmark
+
+        logger.info(f"Memory average: {self.bench_info['memory_average']}")
 
         self.bench_info['time_taken'] = self.bench_info['end_time'] - self.bench_info['start_time']
 
