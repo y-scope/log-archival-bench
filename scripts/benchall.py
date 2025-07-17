@@ -35,18 +35,18 @@ clp_s_timestamp_keys = {
         "elasticsearch": "@timestamp",
         "postgresql": "timestamp",
         "spark-event-logs": "Timestamp",
-        "mongod": r"t.$date"
+        "mongod": r"t.\$date"
         }
 clickhouse_keys = {
         "cockroachdb": "timestamp",
         "elasticsearch": '"@timestamp"',  # @ is a special character in clickhouse
         "postgresql": "timestamp",
         "spark-event-logs": "Timestamp",
-        "mongod": r"t.$date"
+        "mongod": "t.$date"
         }
 
 benchmarks = [  # benchmark object, arguments
-        #(clp_s_bench, {}),
+        (clp_s_bench, {}),
         #(clickhouse_native_json_bench, {  # give column names, order and primary key
         #    'manual_column_names': True,
         #    'keys': ['id'],
@@ -62,19 +62,19 @@ benchmarks = [  # benchmark object, arguments
         #    'keys': ['t.\\$date'],
         #    'additional_order_by': [],
         #    }),
-        #(clickhouse_native_json_bench, {
-        #    'manual_column_names': False,
-        #    'keys': None,  # will be filled with timestamp
-        #    'additional_order_by': [],
-        #    }),
-        #(openobserve_bench, {}),
-        #(parquet_bench, {'mode': 'json string'}),
-        #(parquet_bench, {'mode': 'pairwise arrays'}),
-        #(elasticsearch_bench, {}),
-        #(overhead_test_bench, {}),
-        #(zstandard_bench, {}),
-        #(clp_presto_bench, {}),
-        #(sparksql_bench, {}),
+        (clickhouse_native_json_bench, {
+            'manual_column_names': False,
+            'keys': None,  # will be filled with timestamp
+            'additional_order_by': [],
+            }),
+        (parquet_bench, {'mode': 'json string'}),
+        (parquet_bench, {'mode': 'pairwise arrays'}),
+        (elasticsearch_bench, {}),
+        (overhead_test_bench, {}),
+        (zstandard_bench, {}),
+        (clp_presto_bench, {}),
+        (sparksql_bench, {}),
+        (openobserve_bench, {}),
     ]
 
 def run(bencher, kwargs, bench_target, attach=False):
@@ -89,8 +89,9 @@ def run(bencher, kwargs, bench_target, attach=False):
         if bencher == clickhouse_native_json_bench and (not kwargs["manual_column_names"]):  # additional parameters for clickhouse too
             kwargs["keys"] = [f"json.{clickhouse_keys[dataset_name]}.:timestamp"]
 
-        # benchmark clp_presto on the cleaned (no spaces) mongod dataset
-        if bencher == clp_presto_bench and dataset_name == 'mongod':
+        # benchmark clp_presto on the cleaned (no spaces) datasets
+        #if bencher == clp_presto_bench and dataset_name == 'mongod':
+        if bencher == clp_presto_bench:
             kwargs["dataset_variation"] = "mongod.log.clean"
 
         print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
@@ -107,16 +108,21 @@ def run(bencher, kwargs, bench_target, attach=False):
         if attach:
             if bench is not None:
                 bench.docker_attach()
+        else:
+            raise e
 
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        #if dataset_name != 'mongod':  # only use mongod for now
-        #    continue
+        if dataset_name != 'mongod':  # only use mongod for now
+            continue
         run(bencher, kwargs, bench_target)
         #run(bencher, kwargs, bench_target, attach=True)
 
+#run(openobserve_bench, {}, get_target_from_name('elasticsearch'), attach=True)
 #run(openobserve_bench, {}, get_target_from_name('mongod'))
-#run(openobserve_bench, {}, get_target_from_name('postgresql'), attach=True)
-run(sparksql_bench, {}, get_target_from_name('mongod'))
+#run(openobserve_bench, {}, get_target_from_name('spark-event-logs'), attach=True)
+#run(openobserve_bench, {}, get_target_from_name('cockroachdb'))
+#run(openobserve_bench, {}, get_target_from_name('postgresql'))
+#run(sparksql_bench, {}, get_target_from_name('mongod'))

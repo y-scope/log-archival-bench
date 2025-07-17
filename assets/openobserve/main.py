@@ -32,7 +32,7 @@ class openobserve_bench(Benchmark):
         Runs the benchmarked tool
         """
         self.docker_execute(f"/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
-        self.docker_execute("nohup /openobserve &")
+        self.docker_execute("/openobserve", background=True)
         self.wait_for_port(5080)
 
     def ingest(self):
@@ -85,7 +85,12 @@ class openobserve_bench(Benchmark):
 
 def main():
     bench = openobserve_bench(sys.argv[1])
-    bench.run_everything()
+    bench.attach = True
+    try:
+        bench.run_everything()
+    except Exception as e:
+        print(e)
+        bench.docker_attach()
 
 if __name__ == "__main__":
     main()

@@ -63,9 +63,9 @@ class parquet_bench(Benchmark):
         """
         Runs the benchmarked tool
         """
-        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\" &")
+        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\"", background=True)
         self.wait_for_port(8080)
-        self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
+        self.docker_execute("/home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker", background=True)
         self.wait_for_port(7777)
         time.sleep(60)  # this needs to be more than 10
 

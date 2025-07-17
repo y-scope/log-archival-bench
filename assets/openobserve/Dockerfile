@@ -21,4 +21,4 @@ RUN apt-get update \
     python3-requests \
     netcat
 
-ENV ZO_FILE_DOWNLOAD_ENABLE_PRIORITY_QUEUE=false
+# ENV ZO_FILE_DOWNLOAD_ENABLE_PRIORITY_QUEUE=false

@@ -94,7 +94,10 @@ class Benchmark:
         #return pathlib.Path(sys.argv[0]).parent.resolve()
 
     def get_disk_usage(self, path):
-        return int(self.docker_execute(f'du {path} -bc').split('\n')[-1].split('\t')[0])
+        try:
+            return int(self.docker_execute(f'du {path} -bc').split('\n')[-1].split('\t')[0])
+        except subprocess.CalledProcessError:
+            return 0
 
     def check_results(self, ind, res):
         return (int(res) == [38611, 336293, 1, 122, 52421, 38611][ind])
@@ -111,7 +114,9 @@ class Benchmark:
     def mount_points(self):
         return {}
 
-    def wait_for_port(self, port_num, waitclose=False):
+    def wait_for_port(self, port_num, waitclose=False, timeout=180):
+        starttime = time.time()
+
         try:
             self.docker_execute("which nc")
         except subprocess.CalledProcessError:
@@ -129,6 +134,8 @@ class Benchmark:
                     break
                 else:
                     time.sleep(1)
+            if time.time() - starttime > timeout:
+                raise Exception('timeout')
 
     def docker_build(self):
         result = subprocess.run(
@@ -150,8 +157,8 @@ class Benchmark:
     def limits_param(self):
         return [
                 '--cpus=4',
-                '--memory=8g',
-                '--memory-swap=8g'
+                #'--memory=8g',
+                #'--memory-swap=8g'
                 ]
 
     def docker_run(self, background=True):
@@ -178,6 +185,7 @@ class Benchmark:
                     'run',
                     '--privileged',
                     '--rm',
+                    '--init',
                     '-it',
                     '--network host',
                     f'--workdir {WORK_DIR}',

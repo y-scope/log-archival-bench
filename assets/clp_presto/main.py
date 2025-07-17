@@ -46,10 +46,10 @@ class clp_presto_bench(Benchmark):
         """
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/stop-clp.sh -f")
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/start-clp.sh")
-        self.docker_execute('bash -c "python3 /home/presto/presto-server/target/presto-server-0.293/bin/launcher.py run --etc-dir=/home/include/etc_coordinator" &')
+        self.docker_execute('bash -c "python3 /home/presto/presto-server/target/presto-server-0.293/bin/launcher.py run --etc-dir=/home/include/etc_coordinator"', background=True)  # needs to be run with bash -c
         self.wait_for_port(8080)
         #self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
-        self.docker_execute("nohup /home/presto/presto-native-execution/_build/release/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
+        self.docker_execute("/home/presto/presto-native-execution/_build/release/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker", background=True)
         self.wait_for_port(7777)
         time.sleep(60)  # this needs to be more than 10
 
