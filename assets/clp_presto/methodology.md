@@ -29,7 +29,6 @@ sbin/compress.sh --timestamp-key 't.\$date' ~/clp-bench/mongodb/mongod.log
 ```
 > Caveat: ingestion data for this tool is still collected, although done in a unconstrained
 environment, and therefore does not serve as a valid comparision
-* assets/ingest.sh must still be called to correct metadata in sql
 
 ## Specifics
 
