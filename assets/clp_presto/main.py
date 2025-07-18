@@ -15,6 +15,7 @@ logger: A logging.Logger
 CLP_PRESTO_CONTAINER_STORAGE = "/home/clp-json-x86_64"
 CLP_PRESTO_HOST_STORAGE = os.path.abspath(os.path.expanduser("~/clp-json-x86_64-v0.4.0-dev"))
 SQL_PASSWORD = "wqEGPyBdx_w"
+HOST_IP = "127.0.0.1"
 class clp_presto_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset, dataset_variation='cleaned_log'):
@@ -59,7 +60,7 @@ class clp_presto_bench(Benchmark):
     def sql_execute(self, query, check=True):
         if query[-1] != ';':
             query = query+';'
-        return self.docker_execute(f"mysql -h 10.1.0.21 -P 6001 -u clp-user -p{SQL_PASSWORD} -e '{query}' clp-db", check)
+        return self.docker_execute(f"mysql -h {HOST_IP} -P 6001 -u clp-user -p{SQL_PASSWORD} -e '{query}' clp-db", check)
 
     def ingest(self):
         """
