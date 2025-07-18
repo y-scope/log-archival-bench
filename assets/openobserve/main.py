@@ -22,9 +22,9 @@ class openobserve_bench(Benchmark):
         """
         Returns the size of the compressed dataset
         """
-        self.terminate()
+        #self.terminate()
         compressed_size = self.get_disk_usage(f"{OPENOBSERVE_DATA_DIR}/openobserve/stream/files/default")
-        self.launch()
+        #self.launch()
         return compressed_size
 
     def launch(self):
