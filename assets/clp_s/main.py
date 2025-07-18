@@ -6,16 +6,18 @@ from src.template import WORK_DIR, Benchmark, logger
 CLP_OUT_PATH = f"{WORK_DIR}/archives"
 CLP_S_BINARY = "/clp/clp-s"
 class clp_s_bench(Benchmark):
-    def __init__(self, dataset, dataset_variation='mongod.log', timestamp_key=r"t.\$date", target_encoded_size=268435456):
-        super().__init__(dataset, dataset_variation)
+    def __init__(self, dataset, target_encoded_size=268435456):
+        super().__init__(dataset)
+
+        timestamp_key = self.dataset_meta['timestamp'].replace("$", r"\$")
 
         logger.info(f"target_encoded_size: {target_encoded_size//(1024*1024)} MB, timestamp_key: {timestamp_key}")
 
         self.timestamp = timestamp_key
         self.target_encoded_size = target_encoded_size
 
-        self.properties["timestamp"] = timestamp_key
-        self.properties["target_encoded_size"] = target_encoded_size
+        #self.properties["timestamp"] = timestamp_key
+        self.properties["target_encoded_size"] = str(target_encoded_size)
         #self.properties = f"target_encoded_size={target_encoded_size}"
 
     @property

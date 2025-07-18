@@ -2,7 +2,9 @@ __pycache__
 output.json
 /venv
 /mongod
-/data
+/data/**
+!/data/*
+!/data/*/metadata.yaml
 /clp_bench.xlsx
 /clp_bench_abby.xlsx
 /exceptions.log

@@ -15,8 +15,12 @@ logger: A logging.Logger
 CLICKHOUSE_COLLECTION_NAME = "clickhouse_clp_bench"
 class clickhouse_native_json_bench(Benchmark):
     # add any parameters to the tool here
-    def __init__(self, dataset, manual_column_names=True, keys=[], additional_order_by=[]):
+    def __init__(self, dataset, manual_column_names=True, keys=[], additional_order_by=[], timestamp_key=False):
         super().__init__(dataset)
+
+        if timestamp_key:
+            quoted = '.'.join([f'"{i}"' for i in self.dataset_meta['timestamp'].split('.')])
+            keys.append(f'json.{quoted}.:timestamp')
 
         self.manual_column_names = manual_column_names
         self.keys = keys

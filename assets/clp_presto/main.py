@@ -17,12 +17,12 @@ CLP_PRESTO_HOST_STORAGE = os.path.abspath(os.path.expanduser("~/clp-json-x86_64-
 SQL_PASSWORD = "wqEGPyBdx_w"
 class clp_presto_bench(Benchmark):
     # add any parameters to the tool here
-    def __init__(self, dataset, dataset_variation='mongod.log', timestamp_key=r't.\$date'):
-        super().__init__(dataset, dataset_variation)
+    def __init__(self, dataset, dataset_variation='cleaned_log'):
+        super().__init__(dataset, dataset_variation=dataset_variation)
 
-        self.dataset_variation = dataset_variation
+        timestamp_key = self.dataset_meta['timestamp'].replace("$", r"\$")
 
-        self.properties['timestamp'] = timestamp_key
+        #self.properties['timestamp'] = timestamp_key
         self.properties['note'] = "ingestion data unreliable"
         self.timestamp = timestamp_key
 
@@ -66,7 +66,7 @@ class clp_presto_bench(Benchmark):
         Ingests the dataset at self.datasets_path
         """
         #os.system(f"mkdir -p {CLP_PRESTO_HOST_STORAGE}/var/data/baker21")
-        os.system(f'{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key {self.timestamp} {self.dataset}/{self.dataset_variation}')
+        os.system(f'{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key {self.timestamp} {self.datasets_path_in_host}')
         self.sql_execute(f"UPDATE clp_datasets SET archive_storage_directory=\"{CLP_PRESTO_CONTAINER_STORAGE}/var/data/archives/default\" WHERE name=\"default\"")
     
     def search(self, query):

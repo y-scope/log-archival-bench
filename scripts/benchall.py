@@ -30,23 +30,23 @@ def get_target_from_name(name):
             return bench_target
     raise Exception(f'{name} not found in {bench_target_dirs}')
 
-clp_s_timestamp_keys = {
-        "cockroachdb": "timestamp",
-        "elasticsearch": "@timestamp",
-        "postgresql": "timestamp",
-        "spark-event-logs": "Timestamp",
-        "mongod": r"t.\$date"
-        }
-clickhouse_keys = {
-        "cockroachdb": "timestamp",
-        "elasticsearch": '"@timestamp"',  # @ is a special character in clickhouse
-        "postgresql": "timestamp",
-        "spark-event-logs": "Timestamp",
-        "mongod": "t.$date"
-        }
+#clp_s_timestamp_keys = {
+#        "cockroachdb": "timestamp",
+#        "elasticsearch": "@timestamp",
+#        "postgresql": "timestamp",
+#        "spark-event-logs": "Timestamp",
+#        "mongod": r"t.\$date"
+#        }
+#clickhouse_keys = {
+#        "cockroachdb": "timestamp",
+#        "elasticsearch": '"@timestamp"',  # @ is a special character in clickhouse
+#        "postgresql": "timestamp",
+#        "spark-event-logs": "Timestamp",
+#        "mongod": "t.$date"
+#        }
 
 benchmarks = [  # benchmark object, arguments
-        (clp_s_bench, {}),
+        #(clp_s_bench, {}),
         #(clickhouse_native_json_bench, {  # give column names, order and primary key
         #    'manual_column_names': True,
         #    'keys': ['id'],
@@ -62,17 +62,20 @@ benchmarks = [  # benchmark object, arguments
         #    'keys': ['t.\\$date'],
         #    'additional_order_by': [],
         #    }),
-        (clickhouse_native_json_bench, {
-            'manual_column_names': False,
-            'keys': None,  # will be filled with timestamp
-            'additional_order_by': [],
-            }),
+        #(clickhouse_native_json_bench, {
+        #    'manual_column_names': False,
+        #    'keys': [],
+        #    'additional_order_by': [],
+        #    'timestamp_key': True
+        #    }),
+        #(clp_presto_bench, {
+        #    'dataset_variation': "cleaned_log"
+        #    }),
         (parquet_bench, {'mode': 'json string'}),
         (parquet_bench, {'mode': 'pairwise arrays'}),
         (elasticsearch_bench, {}),
         (overhead_test_bench, {}),
         (zstandard_bench, {}),
-        (clp_presto_bench, {}),
         (sparksql_bench, {}),
         (openobserve_bench, {}),
     ]
@@ -83,16 +86,17 @@ def run(bencher, kwargs, bench_target, attach=False):
     try:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        if bencher == clp_s_bench or bencher == clp_presto_bench:  # give additional parameters according to dataset name
-            kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
+        #if bencher == clp_s_bench or bencher == clp_presto_bench:  # give additional parameters according to dataset name
+        #    kwargs["timestamp_key"] = clp_s_timestamp_keys[dataset_name]
+        #
+        #if bencher == clickhouse_native_json_bench and (not kwargs["manual_column_names"]):  # additional parameters for clickhouse too
+        #    kwargs["keys"] = [f"json.{clickhouse_keys[dataset_name]}.:timestamp"]
 
-        if bencher == clickhouse_native_json_bench and (not kwargs["manual_column_names"]):  # additional parameters for clickhouse too
-            kwargs["keys"] = [f"json.{clickhouse_keys[dataset_name]}.:timestamp"]
 
         # benchmark clp_presto on the cleaned (no spaces) datasets
         #if bencher == clp_presto_bench and dataset_name == 'mongod':
         if bencher == clp_presto_bench:
-            kwargs["dataset_variation"] = "mongod.log.clean"
+            kwargs["dataset_variation"] = "cleaned_log"
 
         print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
 

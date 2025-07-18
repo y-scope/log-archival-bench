@@ -53,9 +53,13 @@ def poll_memory(self, bench_uuid):
             break
 
 class Benchmark:
-    def __init__(self, dataset_dir, dataset_variation='mongod.log'):
+    def __init__(self, dataset_dir, dataset_variation='normal_log'):
         with open(f"{self.script_dir}/config.yaml") as file:
             self.config = yaml.safe_load(file)
+
+        with open(f"{dataset_dir}/metadata.yaml") as file:
+            self.dataset_meta = yaml.safe_load(file)
+
         self.queries = self.config["queries"]
 
         self.dataset = os.path.abspath(dataset_dir)
@@ -70,9 +74,10 @@ class Benchmark:
         self.bench_info = {}
         self.attach = False
 
-        self.datasets_path = f"{DATASETS_DIR}/{dataset_variation}"  # inside container
+        self.datasets_path = f"{DATASETS_DIR}/{self.dataset_meta[dataset_variation]}"  # inside container
+        self.datasets_path_in_host = f"{self.dataset}/{self.dataset_meta[dataset_variation]}"  # outside container
 
-        if self.datasets_path.endswith("mongod.log"):
+        if self.datasets_path.endswith("normal_log"):
             self.properties = {}
         else:
             self.properties = {"dataset_variation": dataset_variation}

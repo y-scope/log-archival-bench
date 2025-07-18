@@ -1,0 +1,5 @@
+source: https://zenodo.org/records/10516346
+number_of_lines: 1011651
+timestamp: "Timestamp"
+normal_log: "mongod.log"
+cleaned_log: "mongod.log.clean"
