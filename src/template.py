@@ -139,8 +139,9 @@ class Benchmark:
                     break
                 else:
                     time.sleep(1)
-            if time.time() - starttime > timeout:
-                raise Exception('timeout')
+            if timeout is not None and timeout > 0:
+                if time.time() - starttime > timeout:
+                    raise Exception('timeout')
 
     def docker_build(self):
         result = subprocess.run(
@@ -246,7 +247,8 @@ class Benchmark:
             pass
         if type(statement) is list:
             statement = ' '.join(statement)
-        cmd = ['docker', 'exec', self.container_name, *shlex.split(statement)]
+        #cmd = ['docker', 'exec', self.container_name, 'bash', '-c', *shlex.split(statement)]
+        cmd = ['docker', 'exec', self.container_name, 'bash', '-c', statement]
         
         if background:
             subprocess.Popen(

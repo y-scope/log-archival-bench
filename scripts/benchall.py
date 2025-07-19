@@ -9,6 +9,7 @@ from assets.zstandard.main import zstandard_bench
 from assets.elasticsearch.main import elasticsearch_bench
 from assets.clp_presto.main import clp_presto_bench
 from assets.overhead_test.main import overhead_test_bench
+from assets.gzip.main import gzip_bench
 from src.jsonsync import JsonItem
 
 import os
@@ -68,16 +69,17 @@ benchmarks = [  # benchmark object, arguments
         #    'additional_order_by': [],
         #    'timestamp_key': True
         #    }),
-        #(clp_presto_bench, {
-        #    'dataset_variation': "cleaned_log"
-        #    }),
-        (parquet_bench, {'mode': 'json string'}),
-        (parquet_bench, {'mode': 'pairwise arrays'}),
-        (elasticsearch_bench, {}),
-        (overhead_test_bench, {}),
-        (zstandard_bench, {}),
+        (clp_presto_bench, {
+            'dataset_variation': "cleaned_log"
+            }),
+        #(parquet_bench, {'mode': 'json string'}),
+        #(parquet_bench, {'mode': 'pairwise arrays'}),
+        #(elasticsearch_bench, {}),
+        #(overhead_test_bench, {}),
+        #(zstandard_bench, {}),
         (sparksql_bench, {}),
         (openobserve_bench, {}),
+        #(gzip_bench, {}),
     ]
 
 def run(bencher, kwargs, bench_target, attach=False):
@@ -113,14 +115,15 @@ def run(bencher, kwargs, bench_target, attach=False):
             if bench is not None:
                 bench.docker_attach()
         else:
-            raise e
+            pass
+            #raise e
 
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        if dataset_name != 'mongod':  # only use mongod for now
-            continue
+        #if dataset_name != 'mongod':  # only use mongod for now
+        #    continue
         run(bencher, kwargs, bench_target)
         #run(bencher, kwargs, bench_target, attach=True)
 

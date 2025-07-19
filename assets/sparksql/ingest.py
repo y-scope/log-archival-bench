@@ -8,8 +8,8 @@ spark = SparkSession \
     .appName("") \
     .master("spark://localhost:7077") \
     .config("spark.sql.caseSensitive", True) \
+    .config("spark.io.compression.zstd.level", "3") \
     .getOrCreate()
-    #.config("spark.io.compression.zstd.level", "3") \
 
 df = spark.read.json(sys.argv[1])
 df.write.parquet(sys.argv[2], mode="overwrite", compression="zstd")  # need to set zstd(3)

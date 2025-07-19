@@ -18,16 +18,16 @@ class clickhouse_native_json_bench(Benchmark):
     def __init__(self, dataset, manual_column_names=True, keys=[], additional_order_by=[], timestamp_key=False):
         super().__init__(dataset)
 
+        self.keys = keys[:]  # copy passed keys, don't modify
         if timestamp_key:
             quoted = '.'.join([f'"{i}"' for i in self.dataset_meta['timestamp'].split('.')])
-            keys.append(f'json.{quoted}.:timestamp')
+            self.keys.append(f'json.{quoted}.:timestamp')
 
         self.manual_column_names = manual_column_names
-        self.keys = keys
-        self.order_by = self.keys + [i for i in additional_order_by if i not in keys]
+        self.order_by = self.keys + [i for i in additional_order_by if i not in self.keys]
 
         self.properties['manual_columns'] = str(manual_column_names)
-        self.properties['keys'] = str(keys)
+        self.properties['keys'] = str(self.keys)
         self.properties['order_by'] = str(self.order_by)
 
         if not manual_column_names:

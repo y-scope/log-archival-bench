@@ -1,0 +1,32 @@
+# This config file contains essential benchmarking configurations
+
+system_metric:
+  # Toggle to enable system metric monitoring (e.g., memory usage). Set to `true` to activate
+  enable: true
+  memory:
+    # Time interval (in seconds) for polling memory during data ingestion
+    ingest_polling_interval: 0.5
+    # Time interval (in seconds) for polling memory during query benchmarking
+    run_query_benchmark_polling_interval: 0.1
+
+# Identifier for the benchmark container. Usually `${tool}-clp-bench`
+container_id: gzip-clp-bench
+# Path to the assets directory in the container. Leave as default unless modifying `docker-run.sh`
+assets_path: /home/assets
+# Path for datasets in the container; may refer to a file, directory, or file pattern. clp-bench
+# does not validate the dataset's presence
+datasets_path: /home/datasets/mongod.log
+# Number of repetitions for query warm-up in hot-run mode before measuring latency. This may be
+# automated in the future
+hot_run_warm_up_times: 3
+# List of command substrings (the first substring of the entire command split by space from `ps
+# aux`) to track relevant memory usage
+related_processes: ["gzip", "gunzip"]
+# Array of queries for benchmarking. Ensure escape characters are carefully handled. Note that each
+# query should be wrapped with double quotes (or single quote, depends on whether the query contains
+# double quotes) as the query will first be passed as an argument of `docker exec` rather than
+# directly to the scripts
+queries:
+  # empty query for decompress
+  - 'notasearch'
+

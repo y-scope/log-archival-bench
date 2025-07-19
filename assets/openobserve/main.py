@@ -33,6 +33,7 @@ class openobserve_bench(Benchmark):
         """
         self.docker_execute(f"/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
         self.docker_execute("/openobserve", background=True)
+        time.sleep(180)
         self.wait_for_port(5080)
 
     def ingest(self):
