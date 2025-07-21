@@ -6,13 +6,14 @@ import sys
 from pathlib import Path
 
 current_dir = Path(os.getcwd())
+parent_dir = Path(os.path.realpath(__file__)).parent.parent
+
+if current_dir != parent_dir:
+    raise Exception(f"Script can only be run in {parent_dir}")
 
 if input('Are you sure about deleting all files (y/n): ').strip() != 'y':
     print('Exiting...')
     sys.exit(0)
-
-if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
-    raise Exception("Must be run in clp-bench-refactor directory, if it was renamed, comment this line out")
 
 # Use glob to find all matching files
 files_to_remove = glob.glob('assets/*/output.json')

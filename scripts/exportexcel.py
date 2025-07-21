@@ -15,16 +15,17 @@ current_dir = os.getcwd()
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
-from src.jsonsync import JsonItem
-
 
 def prettify_json(to_prettify):
     return ', '.join([f"{key}={val}" for key, val in json.loads(to_prettify).items()])
 
 current_dir = Path(os.getcwd())
+parent_dir = Path(os.path.realpath(__file__)).parent.parent
 
-if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
-    raise Exception("Must be run in clp-bench-refactor directory, if it was renamed, comment this line out")
+if current_dir != parent_dir:
+    raise Exception(f"Script can only be run in {parent_dir}")
+
+from src.jsonsync import JsonItem
 
 assets_dir = current_dir / "assets"
 outputs = [p for p in assets_dir.iterdir() if p.is_dir() if os.path.basename(str(p)) != "__pycache__"]

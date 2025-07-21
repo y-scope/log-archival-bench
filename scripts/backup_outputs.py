@@ -14,9 +14,10 @@ if current_dir not in sys.path:
     sys.path.append(current_dir)
 
 current_dir = Path(os.getcwd())
+parent_dir = Path(os.path.realpath(__file__)).parent.parent
 
-if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
-    raise Exception("Must be run in clp-bench-refactor directory, if it was renamed, comment this line out")
+if current_dir != parent_dir:
+    raise Exception(f"Script can only be run in {parent_dir}")
 
 def backup_outputs():
     assets_dir = "assets"

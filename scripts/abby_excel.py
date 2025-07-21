@@ -8,15 +8,6 @@ import pandas as pd
 import sys
 from openpyxl.utils import get_column_letter
 import collections
-
-def avg(data_original):
-    data = [i for i in data_original if i > 0]
-    if not data:
-        return 0
-    else:
-        return sum(data) / len(data)
-
-
 # Get the current working directory
 current_dir = os.getcwd()
 
@@ -24,16 +15,23 @@ current_dir = os.getcwd()
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
-from src.jsonsync import JsonItem
-
 def prettify_json(to_prettify, ignore=[]):
     return ', '.join([f"{key}={val}" for key, val in json.loads(to_prettify).items() if key not in ignore])
 
 current_dir = Path(os.getcwd())
+parent_dir = Path(os.path.realpath(__file__)).parent.parent
 
-if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
-    raise Exception("Must be run in clp-bench-refactor directory, if it was renamed, comment this line out")
+if current_dir != parent_dir:
+    raise Exception(f"Script can only be run in {parent_dir}")
 
+from src.jsonsync import JsonItem
+
+def avg(data_original):
+    data = [i for i in data_original if i > 0]
+    if not data:
+        return 0
+    else:
+        return sum(data) / len(data)
 
 dataset_sizes = {
         'mongod': 69582861765,

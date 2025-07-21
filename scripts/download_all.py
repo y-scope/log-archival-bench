@@ -5,10 +5,10 @@ import yaml
 from pathlib import Path
 
 current_dir = Path(os.getcwd())
-data_dir = current_dir / "data"
+parent_dir = Path(os.path.realpath(__file__)).parent.parent
 
-if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
-    raise Exception("Must be run in clp-bench-refactor directory, if it was renamed, comment this line out")
+if current_dir != parent_dir:
+    raise Exception(f"Script can only be run in {parent_dir}")
 
 data_dir = current_dir / "data"
 bench_target_dirs = [p for p in data_dir.iterdir() if p.is_dir()]
