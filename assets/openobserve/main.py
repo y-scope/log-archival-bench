@@ -14,8 +14,8 @@ logger: A logging.Logger
 OPENOBSERVE_DATA_DIR = f"{WORK_DIR}/data"
 class openobserve_bench(Benchmark):
     # add any parameters to the tool here
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self, dataset, dataset_variation='cleaned_log'):
+        super().__init__(dataset, dataset_variation=dataset_variation)
 
     @property
     def compressed_size(self):

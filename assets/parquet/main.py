@@ -76,7 +76,7 @@ class parquet_bench(Benchmark):
         """
         Ingests the dataset at self.datasets_path
         """
-        self.hive_execute(f"CREATE SCHEMA IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME};")
+        self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --schema {PARQUET_SCHEMA_NAME} --execute "CREATE SCHEMA IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME};"')
 
         if self.pairwise_arrays:
             self.hive_execute(f""" \

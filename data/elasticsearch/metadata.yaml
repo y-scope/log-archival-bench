@@ -3,3 +3,4 @@ number_of_lines: 14001234
 timestamp: "@timestamp"
 normal_log: "elasticsearch.log"
 cleaned_log: "elasticsearch.log.clean"
+base32_log: "elasticsearch.log.base32"

@@ -3,3 +3,4 @@ number_of_lines: 186287600
 timestamp: "t.$date"
 normal_log: "mongod.log"
 cleaned_log: "mongod.log.clean"
+base32_log: "mongod.log"

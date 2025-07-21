@@ -79,7 +79,10 @@ benchmarks = [  # benchmark object, arguments
         #(overhead_test_bench, {}),
         #(zstandard_bench, {}),
         #(sparksql_bench, {}),
-        (openobserve_bench, {}),
+        (openobserve_bench, {
+            #'dataset_variation': "cleaned_log"
+            'dataset_variation': "base32_log"
+            }),
         #(gzip_bench, {}),
     ]
 
@@ -97,9 +100,6 @@ def run(bencher, kwargs, bench_target, attach=False):
 
 
         # benchmark clp_presto on the cleaned (no spaces) datasets
-        #if bencher == clp_presto_bench and dataset_name == 'mongod':
-        if bencher == clp_presto_bench:
-            kwargs["dataset_variation"] = "cleaned_log"
 
         print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
 
@@ -125,7 +125,7 @@ for bencher, kwargs in benchmarks:
 
         #if dataset_name != 'mongod':  # only use mongod for now
         #    continue
-        if bencher == openobserve_bench and dataset_name != 'mongod':  # only use mongod for now
+        if dataset_name != 'spark-event-logs':  # only use mongod for now
             continue
         run(bencher, kwargs, bench_target)
         #run(bencher, kwargs, bench_target, attach=True)

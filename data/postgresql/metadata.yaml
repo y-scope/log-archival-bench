@@ -3,3 +3,4 @@ number_of_lines: 1000000
 timestamp: "timestamp"
 normal_log: "postgresql.log"
 cleaned_log: "postgresql.log.clean"
+base32_log: "postgresql.log.base32"

@@ -4,10 +4,15 @@ import os
 import sys
 import base64
 
+# cleankeys.py input output: clean
+# cleankeys.py input output base32: base32 encode all
+
 def encode_key(key):
+    if len(sys.argv) > 3 and sys.argv[3] == "base32":
+        return base64.b16encode(key.encode('utf-8')).decode('utf-8')
+
     if ' ' in key or '-' in key:
         return base64.b64encode(key.encode('utf-8')).decode('utf-8')
-        #return binascii.hexlify(key.encode('utf-8')).decode('utf-8')
     return key
 
 def encode_keys_recursive(obj):
@@ -21,7 +26,7 @@ def encode_keys_recursive(obj):
     else:
         return obj
 
-def encode_selected_keys_base16(input_file, output_file):
+def encode_selected_keys(input_file, output_file):
     if not os.path.exists(input_file):
         print(f"Error: Input file '{input_file}' does not exist.")
         sys.exit(1)
@@ -49,5 +54,5 @@ def encode_selected_keys_base16(input_file, output_file):
 if __name__ == "__main__":
     input_path = os.path.abspath(sys.argv[1])
     output_path = os.path.abspath(sys.argv[2])
-    encode_selected_keys_base16(input_path, output_path)
+    encode_selected_keys(input_path, output_path)
 

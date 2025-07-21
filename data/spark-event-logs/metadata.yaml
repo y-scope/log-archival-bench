@@ -3,3 +3,4 @@ number_of_lines: 1011651
 timestamp: "Timestamp"
 normal_log: "spark.log"
 cleaned_log: "spark.log.clean"
+base32_log: "spark.log.base32"
