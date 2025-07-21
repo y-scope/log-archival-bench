@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-CA"
+reviews:
+  path_instructions:
+    - path: "**/*.{cpp,h,hpp,java,js,jsx,tpp,ts,tsx}"
+      instructions: >-
+        - Prefer `false == <expression>` rather than `!<expression>`.
+  profile: "assertive"
+  poem: false
