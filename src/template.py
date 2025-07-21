@@ -237,7 +237,7 @@ class Benchmark:
                 )
         time.sleep(10)
 
-    def docker_execute(self, statement, check=True, background=False, output_stderr=True):
+    def docker_execute(self, statement, check=True, background=False, output_stderr=True, shell=False):
         if output_stderr:
             stderr_redirect = subprocess.STDOUT
         else:
@@ -253,11 +253,13 @@ class Benchmark:
         if type(statement) is list:
             statement = ' '.join(statement)
         #cmd = ['docker', 'exec', self.container_name, 'bash', '-c', *shlex.split(statement)]
-        cmd = ['docker', 'exec', *background_flags, self.container_name, 'bash', '-c', statement]
+        if shell:
+            cmd = ['docker', 'exec', *background_flags, self.container_name, 'bash', '-c', statement]
+        else:
+            cmd = ['docker', 'exec', *background_flags, self.container_name, *shlex.split(statement)]
         
         result = subprocess.run(
                 cmd,
-                #f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
                 stdout=subprocess.PIPE,
                 stderr=stderr_redirect,
                 #shell = True,

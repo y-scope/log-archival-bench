@@ -51,7 +51,7 @@ class clp_s_bench(Benchmark):
 
     def clear_cache(self):
         self.docker_execute("sync")
-        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
+        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False, shell=True)
 
     def reset(self):
         self.docker_execute(f"rm -rf {CLP_OUT_PATH}")

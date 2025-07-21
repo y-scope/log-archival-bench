@@ -105,7 +105,7 @@ class clickhouse_native_json_bench(Benchmark):
         self.clickhouse_execute("SYSTEM DROP UNCOMPRESSED CACHE")
         self.clickhouse_execute("SYSTEM DROP MARK CACHE")
         self.docker_execute("sync")
-        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
+        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False, shell=True)
 
     def reset(self):
         """

@@ -125,7 +125,7 @@ class parquet_bench(Benchmark):
         Clears the cache within the docker container for cold run
         """
         self.docker_execute("sync")
-        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
+        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False, shell=True)
         self.docker_execute('curl -X GET "http://localhost:7777/v1/operation/server/clearCache?type=memory"')
         self.docker_execute('curl -X GET "http://localhost:7777/v1/operation/server/clearCache?type=ssd"')
 

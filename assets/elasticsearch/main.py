@@ -58,7 +58,7 @@ class elasticsearch_bench(Benchmark):
             f"python3 {ASSETS_DIR}/clear-cache.py"
             ])
         self.docker_execute("sync")
-        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
+        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False, shell=True)
 
     def reset(self):
         """

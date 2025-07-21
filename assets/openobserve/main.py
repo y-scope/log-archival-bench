@@ -17,27 +17,22 @@ class openobserve_bench(Benchmark):
     def __init__(self, dataset):
         super().__init__(dataset)
 
-        self.ingested = False
-
     @property
     def compressed_size(self):
         """
         Returns the size of the compressed dataset
         """
-        #self.terminate()
+        self.terminate()
         compressed_size = self.get_disk_usage(f"{OPENOBSERVE_DATA_DIR}/openobserve/stream/files/default")
-        #self.launch()
+        self.launch()
         return compressed_size
 
     def launch(self):
         """
         Runs the benchmarked tool
         """
-        #self.docker_execute(f"/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
-        if self.ingested:
-            self.docker_execute("/openobserve")
-        else:
-            self.docker_execute("/openobserve", background=True)
+        self.docker_execute(f"/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
+        self.docker_execute("/openobserve", background=True)
         time.sleep(10)
         self.wait_for_port(5080)
 
@@ -46,7 +41,6 @@ class openobserve_bench(Benchmark):
         Ingests the dataset at self.datasets_path
         """
         self.docker_execute(f"python3 {ASSETS_DIR}/ingest.py {self.datasets_path}")
-        #self.ingested = True
     
     def search(self, query):
         """
@@ -59,8 +53,8 @@ class openobserve_bench(Benchmark):
         Clears the cache within the docker container for cold run
         """
         self.docker_execute("sync")
-        #self.docker_execute(f"rm -rf {OPENOBSERVE_DATA_DIR}/openobserve/cache")
-        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
+        self.docker_execute(f"rm -rf {OPENOBSERVE_DATA_DIR}/openobserve/cache")
+        self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False, shell=True)
 
     def reset(self):
         """
@@ -82,17 +76,11 @@ class openobserve_bench(Benchmark):
         Alternatively, override the terminate(self) function in Benchmark
         """
         return ["/openobserve"]
-        #return []
 
 
 def main():
     bench = openobserve_bench(sys.argv[1])
-    bench.attach = True
-    try:
-        bench.run_everything()
-    except Exception as e:
-        print(e)
-        bench.docker_attach()
+    bench.run_everything()
 
 if __name__ == "__main__":
     main()

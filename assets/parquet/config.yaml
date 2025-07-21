@@ -32,7 +32,7 @@ queries:
   # field that starts with "log_release" and a "session_name" field that is "connection"
   - '"json_extract_scalar(json_parse(line), ''$.attr.message.msg'') LIKE ''log_release%'' AND json_extract_scalar(json_parse(line), ''$.attr.message.session_name'') = ''connection'';"'
   # Query all JSON log lines where "ctx" is "initandlisten" and either "msg" does not equal to
-  # "WiredTigermessage" or "attr.message.msg" starts with "log_remove"
+  # "WiredTiger message" or "attr.message.msg" starts with "log_remove"
   - '"json_extract_scalar(json_parse(line), ''$.ctx'') = ''initandlisten'' AND (json_extract_scalar(json_parse(line), ''$.msg'') != ''WiredTiger message'' OR json_extract_scalar(json_parse(line), ''$.attr.message.msg'') LIKE ''log_remove%'')"'
   # Query all JSON log lines where "c" is "WTWRTLOG" and "attr.message.ts_sec" is greater than
   # 1679490000
