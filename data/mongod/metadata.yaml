@@ -1,4 +1,4 @@
-source: https://zenodo.org/records/11075361
+source: https://zenodo.org/records/11075361/files/mongodb.tar.gz?download=1
 number_of_lines: 186287600
 timestamp: "t.$date"
 normal_log: "mongod.log"

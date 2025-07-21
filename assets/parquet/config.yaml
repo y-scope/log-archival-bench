@@ -13,9 +13,6 @@ system_metric:
 container_id: parquet-clp-bench
 # Path to the assets directory in the container. Leave as default unless modifying `docker-run.sh`
 assets_path: /home/assets
-# Path for datasets in the container; may refer to a file, directory, or file pattern. clp-bench
-# does not validate the dataset's presence
-datasets_path: /home/datasets/mongod.log
 # Number of repetitions for query warm-up in hot-run mode before measuring latency. This may be
 # automated in the future
 hot_run_warm_up_times: 3

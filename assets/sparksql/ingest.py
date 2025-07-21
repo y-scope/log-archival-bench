@@ -8,7 +8,6 @@ spark = SparkSession \
     .appName("") \
     .master("spark://localhost:7077") \
     .config("spark.sql.caseSensitive", True) \
-    .config("spark.io.compression.zstd.level", "3") \
     .getOrCreate()
 
 df = spark.read.json(sys.argv[1])

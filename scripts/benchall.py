@@ -69,15 +69,15 @@ benchmarks = [  # benchmark object, arguments
         #    'additional_order_by': [],
         #    'timestamp_key': True
         #    }),
-        (clp_presto_bench, {
-            'dataset_variation': "cleaned_log"
-            }),
+        #(clp_presto_bench, {
+        #    'dataset_variation': "cleaned_log"
+        #    }),
         #(parquet_bench, {'mode': 'json string'}),
         #(parquet_bench, {'mode': 'pairwise arrays'}),
         #(elasticsearch_bench, {}),
         #(overhead_test_bench, {}),
         #(zstandard_bench, {}),
-        (sparksql_bench, {}),
+        #(sparksql_bench, {}),
         (openobserve_bench, {}),
         #(gzip_bench, {}),
     ]
@@ -124,6 +124,8 @@ for bencher, kwargs in benchmarks:
 
         #if dataset_name != 'mongod':  # only use mongod for now
         #    continue
+        if bencher == openobserve_bench and dataset_name != 'mongod':  # only use mongod for now
+            continue
         run(bencher, kwargs, bench_target)
         #run(bencher, kwargs, bench_target, attach=True)
 

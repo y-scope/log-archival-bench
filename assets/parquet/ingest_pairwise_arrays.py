@@ -7,8 +7,7 @@ import time
 sys.setrecursionlimit(1000)
 
 INPUT_FILE = sys.argv[1]
-OUTPUT_FILE = "/home/hive-data/bench_schema/bench_table/mongod.parquet"
-#OUTPUT_FILE = "mongod.parquet"
+OUTPUT_FILE = "/home/hive-data/bench_schema/bench_table/output.parquet"
 BATCH_SIZE = 1000
 
 def extract_fields_and_values(obj, prefix=""):

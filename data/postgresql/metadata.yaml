@@ -1,5 +1,5 @@
-source: https://zenodo.org/records/10516402
+source: https://zenodo.org/records/10516402/files/postgresql.tar.gz?download=1
 number_of_lines: 1000000
 timestamp: "timestamp"
-normal_log: "mongod.log"
-cleaned_log: "mongod.log.clean"
+normal_log: "postgresql.log"
+cleaned_log: "postgresql.log.clean"

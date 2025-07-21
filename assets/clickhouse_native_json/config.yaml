@@ -6,7 +6,6 @@ system_metric:
 
 container_id: clickhouse-native-json-clp-bench
 assets_path: /home/assets
-datasets_path: /home/datasets/mongod.log
 hot_run_warm_up_times: 3
 related_processes:
   - clickhouse-server

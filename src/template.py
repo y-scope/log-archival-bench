@@ -77,7 +77,7 @@ class Benchmark:
         self.datasets_path = f"{DATASETS_DIR}/{self.dataset_meta[dataset_variation]}"  # inside container
         self.datasets_path_in_host = f"{self.dataset}/{self.dataset_meta[dataset_variation]}"  # outside container
 
-        if self.datasets_path.endswith("normal_log"):
+        if dataset_variation == "normal_log":
             self.properties = {}
         else:
             self.properties = {"dataset_variation": dataset_variation}
@@ -243,30 +243,30 @@ class Benchmark:
         else:
             stderr_redirect = subprocess.DEVNULL
 
+        if background:
+            background_flags = ['-d']
+        else:
+            background_flags = []
+
         if type(statement) is str:
             pass
         if type(statement) is list:
             statement = ' '.join(statement)
         #cmd = ['docker', 'exec', self.container_name, 'bash', '-c', *shlex.split(statement)]
-        cmd = ['docker', 'exec', self.container_name, 'bash', '-c', statement]
+        cmd = ['docker', 'exec', *background_flags, self.container_name, 'bash', '-c', statement]
         
+        result = subprocess.run(
+                cmd,
+                #f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
+                stdout=subprocess.PIPE,
+                stderr=stderr_redirect,
+                #shell = True,
+                check = check
+                )
+        #logger.debug(result)
         if background:
-            subprocess.Popen(
-                    cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=stderr_redirect
-                    )
-            return "no output for background"
+            return "nothing"
         else:
-            result = subprocess.run(
-                    cmd,
-                    #f"docker exec {self.container_name} bash -c {shlex.quote(statement)}",
-                    stdout=subprocess.PIPE,
-                    stderr=stderr_redirect,
-                    #shell = True,
-                    check = check
-                    )
-            #logger.debug(result)
             return result.stdout.decode("utf-8").strip()
 
     def ingest(self):
@@ -299,6 +299,7 @@ class Benchmark:
                 target = poll_memory,
                 args = (self, bench_uuid)
                 )
+        self.bench_thread.daemon = True
 
         self.bench_thread.start()
         self.bench_info['start_time'] = time.time()

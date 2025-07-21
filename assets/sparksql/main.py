@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import re
 
 from src.template import ASSETS_DIR, WORK_DIR, Benchmark, logger
 """
@@ -9,7 +10,7 @@ Benchmark: Base class for benchmarks, has docker_execute to execute command with
 logger: A logging.Logger
 """
 
-SPARKSQL_STORAGE = "/data/mongod"
+SPARKSQL_STORAGE = "/data/sparkdata"
 class sparksql_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset):
@@ -46,9 +47,10 @@ class sparksql_bench(Benchmark):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        return self.docker_execute([
+        returned = self.docker_execute([
             f"python3 {ASSETS_DIR}/search.py {query} {SPARKSQL_STORAGE}"
-            ]).split('\r')[-1]
+            ])
+        return [i for i in re.split(r'\r\n|\r|\n', returned) if i.isdigit()][-1]
 
     def clear_cache(self):
         """

@@ -9,9 +9,6 @@ from elasticsearch.helpers import streaming_bulk  # type: ignore
 collection_name = "elasticsearch_clp_bench"
 
 log_path = sys.argv[1]
-# log_path = '/home/muslope/mongodb-test/mongod.log.2023-03-22T03-45-46'
-# log_path = '/home/muslope/collection_names/mongod.log'
-
 
 def traverse_data(collection_name):
     with open(log_path, encoding="utf-8") as f:

@@ -1,5 +1,5 @@
-source: https://zenodo.org/records/10516387
+source: https://zenodo.org/records/10516387/files/cockroachdb.tar.gz?download=1
 number_of_lines: 16520377
 timestamp: "timestamp"
-normal_log: "mongod.log"
-cleaned_log: "mongod.log.clean"
+normal_log: "cockroachdb.log"
+cleaned_log: "cockroachdb.log.clean"

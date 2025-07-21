@@ -17,6 +17,8 @@ class openobserve_bench(Benchmark):
     def __init__(self, dataset):
         super().__init__(dataset)
 
+        self.ingested = False
+
     @property
     def compressed_size(self):
         """
@@ -31,33 +33,33 @@ class openobserve_bench(Benchmark):
         """
         Runs the benchmarked tool
         """
-        self.docker_execute(f"/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
-        self.docker_execute("/openobserve", background=True)
-        time.sleep(180)
+        #self.docker_execute(f"/openobserve init-dir -p {OPENOBSERVE_DATA_DIR}")
+        if self.ingested:
+            self.docker_execute("/openobserve")
+        else:
+            self.docker_execute("/openobserve", background=True)
+        time.sleep(10)
         self.wait_for_port(5080)
 
     def ingest(self):
         """
         Ingests the dataset at self.datasets_path
         """
-        self.docker_execute([
-            f"python3 {ASSETS_DIR}/ingest.py {self.datasets_path}"
-            ])
+        self.docker_execute(f"python3 {ASSETS_DIR}/ingest.py {self.datasets_path}")
+        #self.ingested = True
     
     def search(self, query):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        return self.docker_execute([
-            f"python3 {ASSETS_DIR}/search.py {query}"
-            ])
+        return self.docker_execute(f"python3 {ASSETS_DIR}/search.py {query}")
 
     def clear_cache(self):
         """
         Clears the cache within the docker container for cold run
         """
         self.docker_execute("sync")
-        self.docker_execute(f"rm -rf {OPENOBSERVE_DATA_DIR}/openobserve/cache")
+        #self.docker_execute(f"rm -rf {OPENOBSERVE_DATA_DIR}/openobserve/cache")
         self.docker_execute("echo 1 >/proc/sys/vm/drop_caches", check=False)
 
     def reset(self):
@@ -67,9 +69,7 @@ class openobserve_bench(Benchmark):
         """
         self.docker_execute("curl -X DELETE -u 'root@clpbench.com:password' localhost:5080/api/default/streams/clpbench1")
         while True:
-            status = self.docker_execute("""\
-                    curl http://localhost:5080/api/default/clpbench1/_json -i -u 'root@clpbench.com:password' -d '[]' -w "%{http_code}" -s -o /dev/null\
-                    """)
+            status = self.docker_execute("curl http://localhost:5080/api/default/clpbench1/_json -i -u 'root@clpbench.com:password' -d '[]' -w \"%{http_code}\" -s -o /dev/null")
             if status != "400":
                 break
             else:
@@ -82,6 +82,7 @@ class openobserve_bench(Benchmark):
         Alternatively, override the terminate(self) function in Benchmark
         """
         return ["/openobserve"]
+        #return []
 
 
 def main():

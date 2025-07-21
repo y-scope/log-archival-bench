@@ -3,7 +3,7 @@ import pyarrow.parquet as pq
 import sys
 
 INPUT_FILE = sys.argv[1]
-OUTPUT_FILE = "/home/hive-data/bench_schema/bench_table/mongod.parquet"
+OUTPUT_FILE = "/home/hive-data/bench_schema/bench_table/output.parquet"
 BATCH_SIZE = 10000
 
 schema = pa.schema([("line", pa.string())])
