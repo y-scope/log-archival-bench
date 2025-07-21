@@ -13,18 +13,31 @@ if os.path.basename(current_dir.resolve()) != "clp-bench-refactor":
 data_dir = current_dir / "data"
 bench_target_dirs = [p for p in data_dir.iterdir() if p.is_dir()]
 
+
+def chdir(path):
+    print(f'cd {path}')
+    os.chdir(str(path))
+
+def system(command):
+    print(command)
+    os.system(command)
+
 for bench_target in bench_target_dirs:
     with open(str(bench_target / "metadata.yaml")) as file:
         bench_meta = yaml.safe_load(file)
 
-    os.chdir(str(bench_target))
-    os.system(f"curl -o output.tar.gz {bench_meta['source']}")
-    os.system("tar -xvzf output.tar.gz -C output")
+    chdir(bench_target)
+    system(f"curl -o output.tar.gz {bench_meta['source']}")
+    system("mkdir output")
+    system("tar -xvzf output.tar.gz -C output --strip-components=1")
 
     outputdir = bench_target / "output"
 
-    os.system("awk 'FNR==1 && NR!=1 { print \"\" } { print }' " + ' '.join([str(p) for p in outputdir.iterdir() if p.is_file()]) + " > " + bench_meta['normal_log'])
-    os.rmdir(str(outputdir))
+    system("awk 'FNR==1 && NR!=1 { print \"\" } { print }' " + str(outputdir) + "/* > " + bench_meta['normal_log'])
+    system("rm -r output.tar.gz")
+    system("rm -r output")
 
-    os.chdir(str(data_dir))
-    os.system(f"python3 cleankeys.py {str(bench_target / bench_meta['normal_log'])} {str(bench_target / bench_meta['cleaned_log'])}")
+    system(f"sed -i '/^$/d' {bench_meta['normal_log']}")
+
+    chdir(str(data_dir))
+    system(f"python3 cleankeys.py {str(bench_target / bench_meta['normal_log'])} {str(bench_target / bench_meta['cleaned_log'])}")
