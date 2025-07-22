@@ -1,0 +1,6 @@
+source: https://zenodo.org/records/10516402/files/postgresql.tar.gz?download=1
+number_of_lines: 1000000
+timestamp: "timestamp"
+normal_log: "postgresql.log"
+cleaned_log: "postgresql.log.clean"
+base32_log: "postgresql.log.base32"

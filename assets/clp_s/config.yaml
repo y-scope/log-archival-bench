@@ -1,0 +1,17 @@
+system_metric:
+  enable: true
+  memory:
+    ingest_polling_interval: 0.5
+    run_query_benchmark_polling_interval: 0.1
+
+container_id: clp-clp-bench
+hot_run_warm_up_times: 3
+related_processes:
+  - /clp/clp-s
+queries:
+  - '"attr.tickets:*"'
+  - '"id: 22419"'
+  - '"attr.message.msg: log_release* AND attr.message.session_name: connection"'
+  - '''ctx: initandlisten AND (NOT msg: "WiredTiger message" OR attr.message.msg: log_remove*)'''
+  - '"c: WTWRTLOG AND attr.message.ts_sec > 1679490000"'
+  - '"ctx: FlowControlRefresher AND attr.numTrimmed: 0"'

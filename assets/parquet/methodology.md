@@ -1,0 +1,90 @@
+# Parquet (PyArrow+Presto+Hive) methodology
+
+## Basics
+
+pyarrow 20.0.0
+Presto Version: [presto-server-0.293-SNAPSHOT][presto]
+Velox Version: [Velox][velox]
+
+## Setup
+
+### Json String
+* Ingested every JSON log into single varchar column, and parsed them during search
+* zstd(3) compression used
+* This ingestion was done solely with PyArrow generating a parquet file
+
+### Pairwise Arrays
+* Parsed every JSON log recusively into array columns <variable type>_columns and
+<variable type>_values
+* Dot syntax used for child objects
+* zstd(3) compression used
+* This ingestion was done solely with PyArrow generating a parquet file
+
+
+### Coordinator configuration
+```
+native-execution-enabled = true
+```
+
+## Data Structure
+
+Original data:
+```
+{
+ "msg": {
+   "ts": 0,
+   "status": "ok"
+ }
+}
+
+{
+ "msg": {
+   "ts": 1,
+   "status": "error",
+   "thread_num": 4,
+   "backtrace": ""
+ }
+}
+```
+
+
+### Json String
+
+| line |
+|------|
+| {"msg": { "ts": 0, "status": "ok" }} |
+| {"msg": { "ts": 1, "status": "error", "thread_num": 4, "backtrace": "" }} |
+| ... |
+
+### Pairwise Arrays
+Compressed data structure:
+| string_columns | string_values | int_columns | int_values |
+|-|-|-|-|
+| ["msg.status"] | ["ok"] | ["msg.ts"] | [0] |
+| ["msg.status", "msg.backtrace"] | ["error", ""] | ["msg.ts", "msg.thread_num"] | [1, 4] |
+
+
+
+
+## Searching
+
+### Json String
+
+```
+SELECT * FROM table WHERE
+json_extract_scalar(json_parse(line), 'msg.status') = "error";
+```
+
+### Pairwise Arrays
+
+```
+SELECT * FROM table WHERE
+array_position(string_columns, 'msg.status') > 0 
+AND element_at(
+  string_values, 
+  array_position(string_columns, 'msg.status')
+) = 'error';
+```
+
+[presto]: https://github.com/anlowee/presto/tree/faae543ae318f0289f5d0b537c5724e1b085a2fc
+[velox]: https://github.com/anlowee/velox/tree/5a55969d5fd21bb4bcb53645b832344ff6bbd634

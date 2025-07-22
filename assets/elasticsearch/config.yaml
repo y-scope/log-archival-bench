@@ -1,0 +1,29 @@
+system_metric:
+  enable: true
+  memory:
+    ingest_polling_interval: 0.5
+    run_query_benchmark_polling_interval: 0.1
+
+container_id: elasticsearch-clp-bench
+assets_path: /home/assets
+hot_run_warm_up_times: 3
+related_processes:
+  - /usr/share/elasticsearch/jdk/bin/java
+  - /usr/share/elasticsearch/modules/x-pack-ml/platform/linux-x86_64/bin/controller
+queries:
+  - '''{"query": {"exists": {"field": "attr.tickets"}}, "size": 10000}'''
+  - '''{"query": {"term": {"id": 22419}}, "size": 10000}'''
+  - >
+    '{"query": {"bool": {"must": [{"wildcard": {"attr.message.msg": "log_release*"}}, {"match": {
+    "attr.message.session_name": "connection"}}]}}, "size": 10000}'
+  - >
+    '{"query": {"bool": {"must": [{"match": {"ctx": "initandlisten"}}], "should": [{"wildcard": {
+    "attr.message.msg": "log_remove*"}}, {"bool": {"must_not": [{"match_phrase": {"msg": 
+    "WiredTiger message"}}]}}], "minimum_should_match": 1}}, "size": 10000}'
+  - >
+    '{"query": {"bool": {"must": [{"match": {"c": "WTWRTLOG"}}, {"range": {"attr.message.ts_sec": {
+    "gt": 1679490000}}}]}}, "size": 10000}'
+  - >
+    '{"query": {"bool": {"must": [{"match": {"ctx": "FlowControlRefresher"}}, {
+    "match": {"attr.numTrimmed": 0}}]}}, "size": 10000}'
+  
