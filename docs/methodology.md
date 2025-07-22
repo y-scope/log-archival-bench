@@ -1,16 +1,6 @@
 # Methodology
 
 We developed LogArchivalBench to compare various log management tools. The benchmark focuses on two key aspects: Ingestion performance, including data compression ratio, and search performance. Below, we describe our testing process, which metrics we gather, the datasets and queries we use, and the tools we test.
-
-[Testing process](#testing-process)
-- [Ingestion](#ingestion)
-- [Search](#search)
-    - [Runtime scenarios](#runtime-scenarios)
-- [Benchmark Machine Specs](#benchmark-machine-specs)
-
-[Tested tools](#tested-tools)
-
-[Metrics](#metrics)
 - [Methodology](#methodology)
   - [Testing process](#testing-process)
     - [Ingestion](#ingestion)
@@ -30,14 +20,9 @@ We developed LogArchivalBench to compare various log management tools. The bench
   - [Queries](#queries)
     - [MongoDB](#mongodb)
 
-[Datasets](#datasets)
-
-[Queries](#queries)
-- [MongoDB](#mongodb)
-
 ## Testing process
 
-The benchmark is divided into two parts: **ingestion** and **search**. You can read more about the metrics we gather in each portion of the workflow below in the Metrics section. To learn about how to set up and run the benchmarking tool, and how to add a dataset or another tool, please check out the [README.md](/README.md).
+The benchmark is divided into two parts: **ingestion** and **search**. You can read more about the metrics we gather in each portion of the workflow below in the Metrics section. To learn about how to set up and run the benchmarking tool checkout the [README.md](/README.md). To learn how to modify the benchmark checkout [add_a_tool.md](/docs/add_a_tool.md) and [add_a_dataset.md](/docs/add_a_dataset.md).
 
 ### Ingestion
 
@@ -102,11 +87,11 @@ The tables below list the current set of benchmarked tools, as well as the speci
 
 | Tool | Methodology |
 | ----- | ----- |
-| [CLP](/assets/clp_s/) | 📐[Methodology](/assets/clp_s/methodology.md) |
-| [Presto \+ CLP](/assets/clp_presto/) | 📐[Methodology](/assets/clp_presto/methodology.md) |
-| [ClickHouse](/assets/clickhouse_native_json/) | 📐[Methodology](/assets/clickhouse_native_json/methodology.md) |
+| [CLP](/assets/clp/) | 📐[Methodology](/assets/clp/methodology.md) |
+| [Presto \+ CLP](/assets/presto_clp/) | 📐[Methodology](/assets/presto_clp/methodology.md) |
+| [ClickHouse](/assets/clickhouse/) | 📐[Methodology](/assets/clickhouse/methodology.md) |
 | [SparkSQL \+ Parquet](/assets/sparksql/) | 📐[Methodology](/assets/sparksql/methodology.md) |
-| [Presto \+ Parquet](/assets/parquet/)  | JSON String & Pairwise Array<br> 📐[Methodology](/assets/parquet/methodology.md) |
+| [Presto \+ Parquet](/assets/presto_parquet/)  | JSON String & Pairwise Array<br> 📐[Methodology](/assets/presto_parquet/methodology.md) |
 | [Elasticsearch](/assets/elasticsearch/) | 📐[Methodology](/assets/elasticsearch/methodology.md) |
 | [Zstandard](/assets/zstandard/) | (Ingestion Only)<br> 📐[Methodology](/assets/zstandard/methodology.md) |
 | [Gzip](/assets/gzip) | (Ingestion Only)<br> 📐[Methodology](/assets/gzip/methodology.md) |
@@ -292,9 +277,9 @@ AND attr.numTrimmed = 0;
 
 | Tool | Query File |
 | ----- | ----- |
-| [CLP](/assets/clp_s/) | 📐[CLP Config File](/assets/clp_s/config.yaml) |
-| [Presto \+ CLP](/assets/clp_presto/) | 📐[Presto \+ CLP Config File](/assets/clp_presto/config.yaml) |
-| [ClickHouse](/assets/clickhouse_native_json/) | 📐[ClickHouse Config File](/assets/clickhouse_native_json/config.yaml) |
+| [CLP](/assets/clp/) | 📐[CLP Config File](/assets/clp/config.yaml) |
+| [Presto \+ CLP](/assets/presto_clp/) | 📐[Presto \+ CLP Config File](/assets/presto_clp/config.yaml) |
+| [ClickHouse](/assets/clickhouse/) | 📐[ClickHouse Config File](/assets/clickhouse/config.yaml) |
 | [SparkSQL \+ Parquet](/assets/sparksql/) | 📐[SparkSQL Config File](/assets/sparksql/config.yaml) |
-| [Presto \+ Parquet](/assets/parquet/)  | JSON String & Pairwise Array<br> 📐[Parquet Config File](/assets/parquet/config.yaml) |
+| [Presto \+ Parquet](/assets/presto_parquet/)  | JSON String & Pairwise Array<br> 📐[Presto \+ Parquet Config File](/assets/presto_parquet/config.yaml) |
 | [Elasticsearch](/assets/elasticsearch/) | 📐[Elasticsearch Config File](/assets/elasticsearch/config.yaml) |

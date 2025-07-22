@@ -2,7 +2,7 @@
 
 **Version: [23.3.1.2823](https://hub.docker.com/layers/clickhouse/clickhouse-server/23.3.1.2823/images/sha256-b88fd8c71b64d3158751337557ff089ff7b0d1ebf81d9c4c7aa1f0b37a31ee64?context=explore)**
 
-**File with Formatted Queries:** [Config File](/assets/clickhouse_native_json/config.yaml)
+**File with Formatted Queries:** [Config File](/assets/clickhouse/config.yaml)
 
 ## Setup
 
@@ -20,7 +20,7 @@ We start the ClickHouse server in daemon mode.
 
 **Two key configuration files:**
 
-[include/config.xml](/assets/clickhouse_native_json/include/config.xml)
+[include/config.xml](/assets/clickhouse/include/config.xml)
 
 ```xml
 <compression>  
@@ -38,7 +38,7 @@ We start the ClickHouse server in daemon mode.
 * compression: set to zstd(3)  
 * old_parts_lifetime: old parts last for 1 second to allow direct `du` calculation
 
-[include/users.xml](/assets/clickhouse_native_json/include/users.xml)
+[include/users.xml](/assets/clickhouse/include/users.xml)
 
 ```xml
 <date_time_input_format>best_effort</date_time_input_format>  

@@ -36,7 +36,7 @@ We used a similar setup to the one described here, [link](https://prestodb.io/bl
 ```
 
 When configuring the Presto coordinator we set the following option in 
-* [include/etc_coordinator/config.properties](/assets/parquet/include/etc_coordinator/config.properties)  
+* [include/etc_coordinator/config.properties](/assets/presto_parquet/include/etc_coordinator/config.properties)  
   * `native-execution-enabled = true`
 
 #### JSON String
