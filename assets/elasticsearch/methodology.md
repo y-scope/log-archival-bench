@@ -12,14 +12,14 @@ We use a publicly available docker image we provide for CLP as the base docker i
 ### Configuration  
 We deploy [Elasticsearch](https://www.elastic.co/downloads/elasticsearch) in a single-node configuration.
 
-We disabled the security feature of [xpack](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html). We use Elasticsearch's Python package for data ingestion and search operations.
+We disable the [xpack](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html) security feature. We use Elasticsearch's Python package for data ingestion and search operations.
 
 Some preprocessing is necessary to make the dataset searchable in Elasticsearch. For more details, refer to the `traverse_data` function in [ingest.py](/assets/elasticsearch/ingest.py). This process generally involves reorganizing specific fields, moving them into outer or inner objects to ensure proper query functionality.
 
 ### Launch & Shutdown 
 On launch the benchmark framework calls the [launch.sh](/assets/elasticsearch/launch.sh) script. This script automates the configuration of an Elasticsearch instance by modifying its settings to change the HTTP port, disable security features, and ensure it runs in single-node mode. It also updates the `elasticsearch` user settings to allow login and starts the Elasticsearch service in the background.
 
-On shutdown we `pkill` all java processes.
+On shutdown, we `pkill` all Java processes.
 
 ### Clearing Caches  
 Before starting any of the querying benchmarks, we use elasticsearch's built in function to clear its indice cache. We also flush the file system buffers and clear the filesystem caches. 

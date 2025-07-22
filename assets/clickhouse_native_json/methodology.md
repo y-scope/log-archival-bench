@@ -51,14 +51,14 @@ We start the ClickHouse server in daemon mode.
 We discuss below some of the configuration choices you have while using ClickHouse. We chose to use automatic columns and to use the timestamp in the various datasets as keys and ordered by that key. We chose to use timestamp because CLP utilizes the timestamp as a parameter and thought it might make the best comparison.
 
 **Manual / automatic columns**  
-Manual columns has a specialized schema for the MongoDB dataset, classifying each field into a "static" field (one in every json line) and a "dynamic" field (one that is not in every json line), and gives a data type and a column to each static field
+Manual columns have a specialized schema for the MongoDB dataset, classifying each field into a *static* field (present in every JSON line) and a *dynamic* field (present only in some lines), and assigning a data type and column to each static field.
 
 Automatic columns has one 'json' column of type JSON that every log is ingested into, and works for all datasets unless keys or order_by is passed
 
 **Keys**  
-The primary key used for sorting. Is concatenated to order_by because ClickHouse databases must be ordered by the primary key. They are passed during table creation to `PRIMARY KEY`
+The *keys* form the primary key used for sorting. They are concatenated with the *order_by* columns because ClickHouse tables must be ordered by the primary key. Both are supplied in the `PRIMARY KEY` clause during table creation.
 
-**Order\_by**  
+**Order_by**  
 Additional columns to order by, passed during table creation to `ORDER BY`
 
 **Launch & Shutdown:**  

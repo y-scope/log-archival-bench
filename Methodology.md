@@ -122,9 +122,7 @@ This is how compact a dataset is, once ingested, which indicates the efficiency 
 
 <div style="text-align: center;">
 
-$
-\frac{Dataset's\ Uncompressed\ Size}{Dataset's\ Size\ After\ Ingestion}  
-$
+$\frac{Dataset's\ Uncompressed\ Size}{Dataset's\ Size\ After\ Ingestion}$
 
 </div>
 
@@ -136,9 +134,7 @@ This is how fast the tool is at ingesting a dataset. Ingestion speed is calculat
 
 <div style="text-align: center;">
 
-$
-\frac{Dataset's\ Uncompressed\ Size}{Time\ to\ Ingest}  
-$
+$\frac{Dataset's\ Uncompressed\ Size}{Time\ to\ Ingest}$
 
 </div>
 
@@ -164,7 +160,7 @@ See the Ingestion Memory Usage section above to see how we capture memory usage.
 
 ## Datasets
 
-**Structured logs** follow a predefined format, making them parseable, but their schema is not rigid. There log events usually have a few consistent fields (e.g., the event's timestamp and log level) but the rest may appear and disappear across each event. For example, the `isInternalClient` and `timeoutMillis` fields are dynamic.
+**Structured logs** follow a predefined format, making them parseable, but their schema is not rigid. Their log events usually have a few consistent fields (e.g., the event's timestamp and log level) but the rest may appear and disappear across each event. For example, the `isInternalClient` and `timeoutMillis` fields are dynamic.
 
 Example:
 
@@ -206,7 +202,7 @@ For this benchmark we use multiple structured datasets.
 
 ## Queries
 
-For our search performance use the following sets of queries. At the moment we only query the MongoDB dataset, but we plan to do further benchmarking of queries on the other datasets. For each dataset that we query you’ll find a table with English explanations of each query and an example of the query in SQL. Since each tool may use a different query language you can find a table containing a link to the queries formatted for use in each tool. 
+For search performance, we use the following query set. Currently, only the MongoDB dataset is queried, but we plan to benchmark the other datasets in the future. For each dataset that we query you’ll find a table with English explanations of each query and an example of the query in SQL. Since each tool may use a different query language you can find a table containing a link to the queries formatted for use in each tool. 
 
 ### MongoDB
 

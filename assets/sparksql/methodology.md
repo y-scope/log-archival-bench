@@ -7,13 +7,13 @@
 ## Setup
 
 ### Docker  
-We use SparkSQL’s public `spark:4.0.0` base docker image and use the python `pyspark` library to interact with SparkSQL.
+We use SparkSQL’s public `spark:4.0.0` base Docker image and interact via the Python `pyspark` library.
 
 ### Configuration 
-Set "spark.sql.caseSensitive" to True
+Set `spark.sql.caseSensitive` to `True`
 
 ### Launch & Shutdown 
-For this benchmark we ran SparkSQL as a cluster. On launch we start the master and 1 worker and wait for response on the correct ports before starting the benchmark. 
+For this benchmark, we ran SparkSQL as a cluster. On launch we start the master and 1 worker and wait for response on the correct ports before starting the benchmark. 
 
 To shutdown SparkSQL we kill all running java processes with path `/opt/java/openjdk/bin/java` and wait for confirmation of closure on the correct ports.
 

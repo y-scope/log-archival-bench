@@ -12,7 +12,7 @@ Velox \- [Velox](https://github.com/anlowee/velox/tree/5a55969d5fd21bb4bcb53645b
 We build on top of one of Presto’s provided docker images, `presto/prestissimo-dependency: ubuntu-22.04`. We install the version of `Presto`, `Velox`, and `Pyarrow` linked above.
 
 ### Configuration
-We test Parquet in two configurations which differ from each other mainly by the format JSON objects are processed into. One methodology keeps the JSON object whole and treats it as a string. The other methodology breaks the JSON object into a table of column values. Below we’ll show an example of the JSON processing based on the following example JSON objects as well as examples of how the queries change with the format of the JSON.
+We test Parquet in two configurations, which differ mainly by the format JSON objects are processed into. One methodology keeps the JSON object whole and treats it as a string. The other methodology breaks the JSON object into a table of column values. Below we’ll show an example of the JSON processing based on the following example JSON objects as well as examples of how the queries change with the format of the JSON.
 
 We used a similar setup to the one described here, [link](https://prestodb.io/blog/2024/06/24/diving-into-the-presto-native-c-query-engine-presto-2-0/). We made some changes, choosing to use only one Prestissimo instance and connecting to a local database instead of utilizing S3.
 

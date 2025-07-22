@@ -6,9 +6,9 @@
 
 ## Setup
 
-We use a publicly available docker image we provide for CLP as the base docker image ([clp core ubuntu-jammy docker image](http://ghcr.io/y-scope/clp/clp-core-dependencies-x86-ubuntu-jammy)).
+The benchmark builds on the public [**CLP core Ubuntu-Jammy**](http://ghcr.io/y-scope/clp/clp-core-dependencies-x86-ubuntu-jammy) docker image.
 
-We use the clp-s binary, which is a variant of CLP designed for semi-structured logs like JSON. We run clp-s with a target encoded size of 256MB to balance compression ratio with search speed. You can obtain even higher compression ratios by using larger target encoded sizes. You can look through more ways to configure clp-s in our user guide, [here.](https://docs.yscope.com/clp/v0.4.0/user-guide/core-clp-s)
+We use the clp-s binary, which is a variant of CLP optimised for semi-structured logs like JSON. We run clp-s with a target encoded size of 256MB, balancing compression ratio with search speed. Increasing the target encoded size can yield even better compression. Additional tuning options are documented in the user guide, [here.](https://docs.yscope.com/clp/v0.4.0/user-guide/core-clp-s)
 
 There is no need to launch clp-s, once built it can just be called on the command line and will be just shut down when it’s completed its command execution. The only thing we do before calling clp-s is to make a directory for its output files. We provide this as one of the parameters to the ingestion and search commands.
 

@@ -39,7 +39,7 @@ You’ll need to unzip the subsequent `clp-json-{version}-dev.tar.gz file`. This
   * We provide [data/cleankeys.py](/data/cleankeys.py) that you can use to clean the datasets. You can read how to manage the datasets in [README.md](/README.md). 
 * Note unlike other tools, [main.py](/assets/clp_presto/main.py) launches `clp-s` with `clp-json/sbin/start-clp.sh` outside of container and dataset is ingested using `clp-json/sbin/compress.sh` outside of container.
 
-**Caveat**: Ingestion data for this tool is still collected, although unlike other tools our methodology doesn’t allow for it to be successfully constrained to 4 cores of memory. This is because the CLP package starts multiple docker containers, although we could restrict each container to 4 cores, we could constrain them all to the same 4 cores. For fairness we don’t display the values in our interactive graphs. The compression ratio will be the same as running CLP, but the ingestion speed and memory usage will differ.
+**Caveat**: Ingestion data for this tool is still collected, although, unlike other tools, our methodology doesn’t allow it to be constrained to four CPU cores. This is because the CLP package starts multiple docker containers, although we could restrict each container to 4 cores, we could constrain them all to the same 4 cores. For fairness we don’t display the values in our interactive graphs. The compression ratio will be the same as running CLP, but the ingestion speed and memory usage will differ.
 
 #### Presto Coordinator configuration
 

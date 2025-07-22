@@ -6,14 +6,11 @@ import path, then run the venv
 
 ```
 python3 -m venv venv
-```
-```
+
 echo "$(pwd)" > $(find venv/lib -maxdepth 1 -mindepth 1 -type d)/site-packages/project_root.pth
-```
-```
+
 . venv/bin/activate
-```
-```
+
 pip3 install -r requirements.txt
 ```
 
@@ -29,7 +26,7 @@ The simplest way to add a new dataset is to,
 2) Copy a metadata.yaml file from any other dataset directory under data and fill in the correct information. The number of lines doesn’t matter for the downloading process.You can fill that value in after it is downloaded.  
 3) Run the [download\_all.py](scripts/download_all.py) script.
 
-The [download\_all.py](scripts/download_all.py) script will download all datasets into the correct directories the specified names, concentrate multi-file datasets together into a single file, and generate any modified version of the dataset needed for tools like Presto \+ CLP.
+The [download\_all.py](scripts/download_all.py) script will download all datasets into the correct directories **with** the specified names, concentrate multi-file datasets together into a single file, and generate any modified version of the dataset needed for tools like Presto \+ CLP.
 
 ## Run Everything
 

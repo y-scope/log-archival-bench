@@ -1,16 +1,20 @@
 # Tool name methodology
 
-## Basics
+**Version:** [1.0.0](link)
 
-Version: [1.0.0][download]
+**File with Formatted Queries:** [Config File](path)
 
 ## Setup
 
-Describe any manual set up steps necessary for the tool.
+### Docker  
+Describe what docker image we use and additional configuration or software installations.
 
-## Specifics
-
+### Configuration 
 Describe any specific tuning, preprocessing or configuration that beyond the defaults you made for 
-benchmarking. If there is no specifics you can delete this section.
+benchmarking.
 
-[download]: https://via.placeholder.com/20
+### Launch & Shutdown 
+Describe how the tool is launched and shutdown
+
+### Clearing Caches  
+Describe the caches you clear prior to executing a query.
