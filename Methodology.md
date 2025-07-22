@@ -105,7 +105,7 @@ The tables below list the current set of benchmarked tools, as well as the speci
 | [CLP](/assets/clp_s/) | 📐[Methodology](/assets/clp_s/methodology.md) |
 | [Presto \+ CLP](/assets/clp_presto/) | 📐[Methodology](/assets/clp_presto/methodology.md) |
 | [ClickHouse](/assets/clickhouse_native_json/) | 📐[Methodology](/assets/clickhouse_native_json/methodology.md) |
-| [SparkSQL \+ Parquet (normalized)](/assets/sparksql/) | 📐[Methodology](/assets/sparksql/methodology.md) |
+| [SparkSQL \+ Parquet](/assets/sparksql/) | 📐[Methodology](/assets/sparksql/methodology.md) |
 | [Presto \+ Parquet](/assets/parquet/)  | JSON String & Pairwise Array<br> 📐[Methodology](/assets/parquet/methodology.md) |
 | [Elasticsearch](/assets/elasticsearch/) | 📐[Methodology](/assets/elasticsearch/methodology.md) |
 | [Zstandard](/assets/zstandard/) | (Ingestion Only)<br> 📐[Methodology](/assets/zstandard/methodology.md) |
@@ -295,6 +295,6 @@ AND attr.numTrimmed = 0;
 | [CLP](/assets/clp_s/) | 📐[CLP Config File](/assets/clp_s/config.yaml) |
 | [Presto \+ CLP](/assets/clp_presto/) | 📐[Presto \+ CLP Config File](/assets/clp_presto/config.yaml) |
 | [ClickHouse](/assets/clickhouse_native_json/) | 📐[ClickHouse Config File](/assets/clickhouse_native_json/config.yaml) |
-| [SparkSQL \+ Parquet (normalized)](/assets/sparksql/) | 📐[SparkSQL Config File](/assets/sparksql/config.yaml) |
+| [SparkSQL \+ Parquet](/assets/sparksql/) | 📐[SparkSQL Config File](/assets/sparksql/config.yaml) |
 | [Presto \+ Parquet](/assets/parquet/)  | JSON String & Pairwise Array<br> 📐[Parquet Config File](/assets/parquet/config.yaml) |
 | [Elasticsearch](/assets/elasticsearch/) | 📐[Elasticsearch Config File](/assets/elasticsearch/config.yaml) |
