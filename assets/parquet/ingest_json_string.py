@@ -8,7 +8,6 @@ BATCH_SIZE = 10000
 
 schema = pa.schema([("line", pa.string())])
 
-#with pq.ParquetWriter(OUTPUT_FILE, schema) as writer:
 with pq.ParquetWriter(OUTPUT_FILE, schema, compression="ZSTD", compression_level=3) as writer:
     batch = []
     with open(INPUT_FILE, "r") as f:

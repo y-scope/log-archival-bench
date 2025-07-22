@@ -7,8 +7,8 @@ system_metric:
     # Time interval (in seconds) for polling memory during query benchmarking
     run_query_benchmark_polling_interval: 0.1
 
-# Identifier for the benchmark container. Usually `${tool}-clp-bench`
-container_id: tool-clp-bench
+# Identifier for the benchmark container. Usually `${tool}-bench`
+container_id: tool-bench
 # Number of repetitions for query warm-up in hot-run mode before measuring latency. This may be
 # automated in the future
 hot_run_warm_up_times: 3

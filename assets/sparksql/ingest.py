@@ -5,7 +5,7 @@ from pyspark.sql import SparkSession
 
 spark = SparkSession \
     .builder \
-    .appName("") \
+    .appName("spark-bench") \
     .master("spark://localhost:7077") \
     .config("spark.sql.caseSensitive", True) \
     .getOrCreate()

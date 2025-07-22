@@ -4,7 +4,7 @@ system_metric:
     ingest_polling_interval: 0.5
     run_query_benchmark_polling_interval: 0.1
 
-container_id: clp-clp-bench
+container_id: clp-bench
 hot_run_warm_up_times: 3
 related_processes:
   - /clp/clp-s

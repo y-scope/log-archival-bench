@@ -143,8 +143,6 @@ class parquet_bench(Benchmark):
         self.wait_for_port(8080, waitclose=True)
         self.wait_for_port(7777, waitclose=True)
         time.sleep(10)
-        #self.docker_execute("ps -aux")
-        #print('asdf\n'*10)
 
 def main():
     bench = parquet_bench(sys.argv[1])

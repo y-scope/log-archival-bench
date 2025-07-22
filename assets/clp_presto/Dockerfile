@@ -1,8 +1,4 @@
-# FROM ghcr.io/y-scope/clp/clp-core-dependencies-x86-ubuntu-jammy:main
-# FROM presto/prestissimo-dependency:ubuntu-22.04
 FROM presto/prestissimo-dependency:ubuntu-22.04-presto-0.293
-# FROM presto/prestissimo-dependency:latest
-# FROM prestodb/presto-native-dependency:latest
 
 # Install necessary packages
 RUN apt-get update;
@@ -32,15 +28,6 @@ RUN apt-get install -y \
     zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*;
-
-# RUN apt-get install -y \
-#     tmux \
-#     vim \
-#     libsnappy-dev \
-#     libdouble-conversion-dev \
-#     libre2-dev \
-#     libgflags-dev \
-#     libboost-all-dev;
 
 # Install Task
 RUN cd /usr/local && sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d;

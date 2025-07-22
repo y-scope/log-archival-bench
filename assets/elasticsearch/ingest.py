@@ -6,7 +6,7 @@ import requests
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk  # type: ignore
 
-collection_name = "elasticsearch_clp_bench"
+collection_name = "elasticsearch_bench"
 
 log_path = sys.argv[1]
 

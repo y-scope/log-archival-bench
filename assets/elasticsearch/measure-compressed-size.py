@@ -2,7 +2,7 @@ import time
 
 import requests
 
-collection_name = "elasticsearch_clp_bench"
+collection_name = "elasticsearch_bench"
 
 time.sleep(5)
 response = requests.get(f"http://localhost:9202/{collection_name}/_stats").json()

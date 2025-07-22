@@ -12,7 +12,7 @@ Benchmark: Base class for benchmarks, has docker_execute to execute command with
 logger: A logging.Logger
 """
 
-CLICKHOUSE_COLLECTION_NAME = "clickhouse_clp_bench"
+CLICKHOUSE_COLLECTION_NAME = "clickhouse_bench"
 class clickhouse_native_json_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset, manual_column_names=True, keys=[], additional_order_by=[], timestamp_key=False):
@@ -52,15 +52,9 @@ class clickhouse_native_json_bench(Benchmark):
         Returns the size of the compressed dataset
         """
         time.sleep(10)  # wait for old parts to die
-        a = int(self.clickhouse_execute(f"SELECT SUM(bytes) from system.parts \
+        res = int(self.clickhouse_execute(f"SELECT SUM(bytes) from system.parts \
                 WHERE active AND table = '{CLICKHOUSE_COLLECTION_NAME}'"))
-        #print(a)
-        #b = self.get_disk_usage(f"/var/lib/clickhouse/data/default/{CLICKHOUSE_COLLECTION_NAME}/*")
-        #print(b)
-        #c = int(self.clickhouse_execute(f"SELECT SUM(bytes) from system.parts \
-        #        WHERE table = '{CLICKHOUSE_COLLECTION_NAME}'"))
-        #print(c)
-        return a
+        return res
 
     def launch(self):
         """
@@ -76,11 +70,6 @@ class clickhouse_native_json_bench(Benchmark):
                     break
             except subprocess.CalledProcessError:
                 time.sleep(1)
-
-        #self.docker_execute([
-        #    'clickhouse-client',
-        #    '--query "SET merge_tree.old_parts_lifetime = 1;"'
-        #    ])
 
     def ingest(self):
         """
@@ -147,7 +136,6 @@ class clickhouse_native_json_bench(Benchmark):
             params.append(f"ORDER BY ({','.join(self.order_by)})")
 
         params.append("SETTINGS old_parts_lifetime = 1, allow_nullable_key = 1")
-        #params.append("SETTINGS old_parts_lifetime = 1")
 
         self.clickhouse_execute(f"CREATE TABLE {CLICKHOUSE_COLLECTION_NAME}({table_fields}) {' '.join(params)}")
 

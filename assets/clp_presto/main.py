@@ -23,7 +23,6 @@ class clp_presto_bench(Benchmark):
 
         timestamp_key = self.dataset_meta['timestamp'].replace("$", r"\$")
 
-        #self.properties['timestamp'] = timestamp_key
         self.properties['note'] = "ingestion data unreliable"
         self.timestamp = timestamp_key
 
@@ -49,7 +48,6 @@ class clp_presto_bench(Benchmark):
         os.system(f"{CLP_PRESTO_HOST_STORAGE}/sbin/start-clp.sh")
         self.docker_execute('bash -c "python3 /home/presto/presto-server/target/presto-server-0.293/bin/launcher.py run --etc-dir=/home/include/etc_coordinator"', background=True)  # needs to be run with bash -c
         self.wait_for_port(8080)
-        #self.docker_execute("nohup /home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker > /tmp/presto_server.log 2>&1 &")
         self.docker_execute("/home/presto/presto-native-execution/_build/release/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker", background=True)
         self.wait_for_port(7777)
         time.sleep(60)  # this needs to be more than 10
@@ -66,7 +64,6 @@ class clp_presto_bench(Benchmark):
         """
         Ingests the dataset at self.datasets_path
         """
-        #os.system(f"mkdir -p {CLP_PRESTO_HOST_STORAGE}/var/data/baker21")
         os.system(f'{CLP_PRESTO_HOST_STORAGE}/sbin/compress.sh --timestamp-key {self.timestamp} {self.datasets_path_in_host}')
         self.sql_execute(f"UPDATE clp_datasets SET archive_storage_directory=\"{CLP_PRESTO_CONTAINER_STORAGE}/var/data/archives/default\" WHERE name=\"default\"")
     
@@ -74,9 +71,7 @@ class clp_presto_bench(Benchmark):
         """
         Searches an already-ingested dataset with query, which is populated within config.yaml
         """
-        #return (self.presto_execute(f"USE default; SELECT * from default WHERE {query.strip()[1:-1]}").strip().count('\n') + 1)
         res = self.presto_execute(f"SELECT msg, c, s, t[1], ctx, id, CAST(attr AS JSON), tags from default WHERE {query.strip()[1:-1]}").strip()
-        #res = self.presto_execute(f"USE default; SELECT msg, c, s, t[1], ctx, id, tags from default WHERE {query.strip()[1:-1]}").strip()
         if not res:
             return 0
         return res.count('\n') + 1
