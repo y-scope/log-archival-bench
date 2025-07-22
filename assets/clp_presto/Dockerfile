@@ -48,17 +48,15 @@ RUN cd /usr/local && sh -c "$(curl --location https://taskfile.dev/install.sh)" 
 RUN pip3 install pyarrow;
 
 WORKDIR /home
-RUN git clone https://github.com/anlowee/presto.git;
+RUN git clone https://github.com/y-scope/presto.git;
 WORKDIR /home/presto
-# RUN git checkout xwei/benchmark-test;
-RUN git checkout xwei/e2e-test-07-08;
+RUN git checkout 89ce0f3b4ec713d658f3544e75aeb92fbd3a397d;
 WORKDIR /home/presto/presto-native-execution
 RUN mkdir build;
 RUN rm -rf velox;
-RUN git clone https://github.com/anlowee/velox.git;
+RUN git clone https://github.com/y-scope/velox.git;
 WORKDIR /home/presto/presto-native-execution/velox
-# RUN git checkout xwei/benchmark-test;
-RUN git checkout xwei/e2e-test-07-08;
+RUN git checkout 27ee4bcaad449fd1c8b90c48787f4eaf8e92395f;
 
 WORKDIR /home/presto
 RUN ./mvnw clean install -DskipTests -pl -presto-docs -T1C;
