@@ -1,26 +1,25 @@
 # Elasticsearch methodology
 
-## Basics
+**Version:** [8.6.2](https://www.elastic.co/downloads/past-releases/elasticsearch-8-6-2)
 
-Version: [8.6.2][download]
+**File with Formatted Queries:** [Config File](/assets/elasticsearch/config.yaml)
 
 ## Setup
 
-We deploy [elasticsearch] in a single-node configuration.
+### Docker   
+We use a publicly available docker image we provide for CLP as the base docker image to build on top of ([clp core ubuntu-jammy docker image](https://github.com/y-scope/clp/pkgs/container/clp%2Fclp-core-dependencies-x86-ubuntu-jammy)). We install `Elasticsearch` in this docker container using `apt-get` and install the corresponding version of the elasticsearch python library using `pip3`.
 
-## Specifics
+### Configuration  
+We deploy [Elasticsearch](https://www.elastic.co/downloads/elasticsearch) in a single-node configuration.
 
-We disable the security feature of [xpack][disabling-xpack]. We use Elasticsearch's Python package for data ingestion 
-and search operations.
+We disabled the security feature of [xpack](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html). We use Elasticsearch's Python package for data ingestion and search operations.
 
-Some preprocessing is necessary to make the dataset searchable in Elasticsearch. For more details,
-refer to the `traverse_data` function in `ingest_script` . This process generally involves
-reorganizing specific fields, moving them into outer or inner objects to ensure proper query
-functionality.
+Some preprocessing is necessary to make the dataset searchable in Elasticsearch. For more details, refer to the `traverse_data` function in [ingest.py](/assets/elasticsearch/ingest.py). This process generally involves reorganizing specific fields, moving them into outer or inner objects to ensure proper query functionality.
 
-> Caveat: if over 98% of the benchmarking machine storage is full, this will not work
-due to a temporary workaround in launch.sh setting disk allocation high watermark to 98%
+### Launch & Shutdown 
+On launch the benchmark framework calls the [launch.sh](/assets/elasticsearch/launch.sh) script. This script automates the configuration of an Elasticsearch instance by modifying its settings to change the HTTP port, disable security features, and ensure it runs in single-node mode. It also updates the `elasticsearch` user settings to allow login and starts the Elasticsearch service in the background.
 
-[download]: https://www.elastic.co/downloads/past-releases/elasticsearch-8-6-2
-[disabling-xpack]: https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html
-[elasticsearch]: https://www.elastic.co/downloads/elasticsearch
+On shutdown we `pkill` all java processes.
+
+### Clearing Caches  
+Before starting any of the querying benchmarks, we use elasticsearch's built in function to clear its indice cache. We also flush the file system buffers and clear the filesystem caches. 
