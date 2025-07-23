@@ -1,6 +1,6 @@
 # Methodology
 
-We developed LogArchivalBench to compare various log management tools. The benchmark focuses on two key aspects: Ingestion performance, including data compression ratio, and search performance. Below, we describe our testing process, which metrics we gather, the datasets and queries we use, and the tools we test.
+We developed Log Archival Bench to compare various log management tools. The benchmark focuses on two key aspects: Ingestion performance, including data compression ratio, and search performance. Below, we describe our testing process, which metrics we gather, the datasets and queries we use, and the tools we test.
 - [Methodology](#methodology)
   - [Testing process](#testing-process)
     - [Ingestion](#ingestion)
@@ -26,7 +26,7 @@ The benchmark is divided into two parts: **ingestion** and **search**. You can r
 
 ### Ingestion
 
-1. **Launch**: After building and running the docker image, LogArchivalBench launches the tool being tested inside the docker container.   
+1. **Launch**: After building and running the docker image, Log Archival Bench launches the tool being tested inside the docker container.   
 2. **Reset**: Before ingesting new data we clear any existing archives or temporary files from previous runs.  
 3. **Measure raw dataset size**  
 4. **Start Polling System Metric**: Before ingesting the data we start polling for memory usage of the tool. You can read more details of how we poll down in the Metrics section.  
