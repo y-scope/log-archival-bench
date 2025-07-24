@@ -5,7 +5,7 @@ from src.template import WORK_DIR, Benchmark, logger
 
 CLP_OUT_PATH = f"{WORK_DIR}/archives"
 CLP_S_BINARY = "/clp/clp-s"
-class clp_s_bench(Benchmark):
+class clp_bench(Benchmark):
     def __init__(self, dataset, target_encoded_size=268435456):
         super().__init__(dataset)
 
@@ -61,7 +61,7 @@ class clp_s_bench(Benchmark):
 
 
 def main():
-    bench = clp_s_bench(sys.argv[1])
+    bench = clp_bench(sys.argv[1])
     bench.run_everything()
 
 if __name__ == "__main__":
