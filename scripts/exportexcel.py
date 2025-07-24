@@ -85,7 +85,7 @@ for output_dir in outputs:
                     sheets[f"{dataset} (search)"][methodology]["memory_average_hot_MB"] = memory_hot_val
 
 
-with pd.ExcelWriter("clp_bench.xlsx") as writer:
+with pd.ExcelWriter("log-archival-bench.xlsx") as writer:
     for sheet_name, data in sheets.items():
         df = pd.DataFrame(data.compile())
         df.sort_index()

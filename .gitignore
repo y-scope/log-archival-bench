@@ -5,6 +5,6 @@ output.json
 /data/**
 !/data/*
 !/data/*/metadata.yaml
-/clp_bench.xlsx
 /exceptions.log
+/log-archival-bench.xlsx
 /outputs
