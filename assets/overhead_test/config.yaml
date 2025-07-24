@@ -1,0 +1,42 @@
+# This config file contains essential benchmarking configurations
+
+system_metric:
+  # Toggle to enable system metric monitoring (e.g., memory usage). Set to `true` to activate
+  enable: true
+  memory:
+    # Time interval (in seconds) for polling memory during data ingestion
+    ingest_polling_interval: 0.5
+    # Time interval (in seconds) for polling memory during query benchmarking
+    run_query_benchmark_polling_interval: 0.1
+
+# Identifier for the benchmark container. Usually `${tool}-bench`
+container_id: overhead-test-bench
+# Path to the assets directory in the container. Leave as default unless modifying `docker-run.sh`
+assets_path: /home/assets
+# Number of repetitions for query warm-up in hot-run mode before measuring latency. This may be
+# automated in the future
+hot_run_warm_up_times: 3
+# List of command substrings (the first substring of the entire command split by space from `ps
+# aux`) to track relevant memory usage
+related_processes: []
+# Array of queries for benchmarking. Ensure escape characters are carefully handled. Note that each
+# query should be wrapped with double quotes (or single quote, depends on whether the query contains
+# double quotes) as the query will first be passed as an argument of `docker exec` rather than
+# directly to the scripts
+queries:
+  # Query all JSON log lines containing "attr" object with "tickets" field
+  - '"attr.tickets:*"'
+  # Query all JSON log lines containing "id" field that equals to 22419
+  - '"id: 22419"'
+  # Query all JSON log lines containing "attr" object with a nested "message" object with a "msg"
+  # field that starts with "log_release" and a "session_name" field that is "connection"
+  - '"attr.message.msg: log_release* AND attr.message.session_name: connection"'
+  # Query all JSON log lines where "ctx" is "initandlisten" and either "msg" does not equal to
+  # "WiredTiger message" or "attr.message.msg" starts with "log_remove"
+  - '''ctx: initandlisten AND (NOT msg: "WiredTiger message" OR attr.message.msg: log_remove*)'''
+  # Query all JSON log lines where "c" is "WTWRTLOG" and "attr.message.ts_sec" is greater than
+  # 1679490000
+  - '"c: WTWRTLOG AND attr.message.ts_sec > 1679490000"'
+  # Query all JSON log lines where "ctx" is "FlowControlRefresher" and "attr.numTrimmed" equals 0
+  - '"ctx: FlowControlRefresher AND attr.numTrimmed: 0"'
+

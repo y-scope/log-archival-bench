@@ -1,0 +1,10 @@
+__pycache__
+output.json
+/venv
+/mongod
+/data/**
+!/data/*
+!/data/*/metadata.yaml
+/exceptions.log
+/log-archival-bench.xlsx
+/outputs

@@ -1,0 +1,35 @@
+system_metric:
+  enable: true
+  memory:
+    ingest_polling_interval: 0.5
+    run_query_benchmark_polling_interval: 0.1
+
+container_id: clickhouse-bench
+assets_path: /home/assets
+hot_run_warm_up_times: 3
+related_processes:
+  - clickhouse-server
+  - clickhouse-client
+  - clickhouse-watchd
+queries:
+  - '"not(isNull(attr.tickets))"'
+  - '"id = 22419"'
+  - >
+    "attr.message.msg like 'log_release%' AND attr.message.session_name = 'connection'"
+  - >
+    "ctx = 'initandlisten' AND (attr.message.msg like 'log_remove%' OR msg != 'WiredTiger message')"
+  - >
+    "c = 'WTWRTLOG' and attr.message.ts_sec > 1679490000"
+  - >
+    "ctx = 'FlowControlRefresher' AND attr.numTrimmed = 0 "
+queries_automatic_json:
+  - '"not(isNull(json.attr.tickets))"'
+  - '"json.id = 22419"'
+  - >
+    "json.attr.message.msg like 'log_release%' AND json.attr.message.session_name = 'connection'"
+  - >
+    "json.ctx = 'initandlisten' AND (json.attr.message.msg like 'log_remove%' OR json.msg != 'WiredTiger message')"
+  - >
+    "json.c = 'WTWRTLOG' and json.attr.message.ts_sec > 1679490000"
+  - >
+    "json.ctx = 'FlowControlRefresher' AND json.attr.numTrimmed = 0"

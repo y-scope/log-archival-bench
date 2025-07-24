@@ -1,0 +1,11 @@
+<clickhouse>
+    <compression>
+        <case>
+            <method>zstd</method>  
+            <level>3</level>
+        </case>
+    </compression>
+    <merge_tree>
+        <old_parts_lifetime>1</old_parts_lifetime>
+    </merge_tree>
+</clickhouse>

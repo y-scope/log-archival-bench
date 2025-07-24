@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+
+import os
+import shutil
+from datetime import datetime
+import sys
+from pathlib import Path
+
+# Get the current working directory
+current_dir = os.getcwd()
+
+# Add it to sys.path
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+
+current_dir = Path(os.getcwd())
+parent_dir = Path(os.path.realpath(__file__)).parent.parent
+
+if current_dir != parent_dir:
+    raise Exception(f"Script can only be run in {parent_dir}")
+
+def backup_outputs():
+    assets_dir = "assets"
+    output_base = "outputs"
+
+    # Generate timestamp only once per run
+    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_dir = os.path.join(output_base, timestamp_str)
+    os.makedirs(backup_dir, exist_ok=True)
+
+    for tool_name in os.listdir(assets_dir):
+        tool_path = os.path.join(assets_dir, tool_name)
+        output_file = os.path.join(tool_path, "output.json")
+
+        if os.path.isdir(tool_path) and os.path.isfile(output_file):
+            dest_file = os.path.join(backup_dir, f"{tool_name}.json")
+            shutil.copy2(output_file, dest_file)
+            print(f"Copied {output_file} → {dest_file}")
+
+if __name__ == "__main__":
+    backup_outputs()
+
