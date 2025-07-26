@@ -63,20 +63,20 @@ class parquet_bench(Benchmark):
         """
         Runs the benchmarked tool
         """
-        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293-SNAPSHOT/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\"", background=True)
+        self.docker_execute("bash -c \"python3 /home/presto/presto-server/target/presto-server-0.293/bin/launcher.py run --etc-dir=/home/include/etc_coordinator\"", background=True)
         self.wait_for_port(8080)
-        self.docker_execute("/home/presto/presto-native-execution/build/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker", background=True)
+        self.docker_execute("/home/presto/presto-native-execution/_build/release/presto_cpp/main/presto_server --logtostderr=1 --etc_dir=/home/include/etc_worker", background=True)
         self.wait_for_port(7777)
         time.sleep(60)  # this needs to be more than 10
 
     def hive_execute(self, query, check=True):
-        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --schema {PARQUET_SCHEMA_NAME} --execute "{query}"', check)
+        return self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-executable.jar --catalog hive --schema {PARQUET_SCHEMA_NAME} --execute "{query}"', check)
 
     def ingest(self):
         """
         Ingests the dataset at self.datasets_path
         """
-        self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-SNAPSHOT-executable.jar --catalog hive --schema {PARQUET_SCHEMA_NAME} --execute "CREATE SCHEMA IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME};"')
+        self.docker_execute(f'/home/presto/presto-cli/target/presto-cli-0.293-executable.jar --catalog hive --schema {PARQUET_SCHEMA_NAME} --execute "CREATE SCHEMA IF NOT EXISTS hive.{PARQUET_SCHEMA_NAME};"')
 
         if self.pairwise_arrays:
             self.hive_execute(f""" \
