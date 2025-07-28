@@ -12,6 +12,7 @@ from assets.gzip.main import gzip_bench
 from src.jsonsync import JsonItem
 
 import os
+import sys
 import datetime
 from pathlib import Path
 
@@ -79,9 +80,10 @@ def run(bencher, kwargs, bench_target, attach=False, attach_on_error=False):
 for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
-
-        if dataset_name != 'mongod': # only use mongod for now
-            continue
+        
+        if len(sys.argv) > 1:
+            if dataset_name != sys.argv[1].strip():
+                continue
         #run(bencher, kwargs, bench_target)
         run(bencher, kwargs, bench_target, attach_on_error=True)
         #run(bencher, kwargs, bench_target, attach=True)
