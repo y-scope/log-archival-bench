@@ -1,6 +1,6 @@
 # ClickHouse methodology
 
-**Version: [23.3.1.2823](https://hub.docker.com/layers/clickhouse/clickhouse-server/23.3.1.2823/images/sha256-b88fd8c71b64d3158751337557ff089ff7b0d1ebf81d9c4c7aa1f0b37a31ee64?context=explore)**
+**Version: [25.6](https://hub.docker.com/layers/clickhouse/clickhouse-server/25.6/images/sha256-77ff1f2054e27bec1b4c5eccbf701b63f8409831fea71f162ae2f25872dee1f4)**
 
 **File with Formatted Queries:** [Config File](/assets/clickhouse/config.yaml)
 
