@@ -64,6 +64,25 @@ def traverse_data(collection_name):
 def ingest_dataset():
     es = Elasticsearch("http://localhost:9202", request_timeout=1200, retry_on_timeout=True)
 
+    template_body = {
+        #"index_patterns": ["logs-*"],
+        "template": {
+            "settings": {
+                "index": {
+                    "mode": "logsdb"
+                }
+            },
+            #"mappings": {
+            #    "properties": {
+            #        "message": {"type": "text"},
+            #        "timestamp": {"type": "date"}
+            #    }
+            #}
+        }
+    }
+
+    es.indices.put_index_template(name=collection_name, body=template_body)
+
     count = 0
     for success, info in streaming_bulk(
         es,

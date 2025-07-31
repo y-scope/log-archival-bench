@@ -34,23 +34,23 @@ def get_target_from_name(name):
 
 
 benchmarks = [  # benchmark object, arguments
-        (clp_bench, {}),
-        (clickhouse_bench, {
-            'manual_column_names': False,
-            'keys': [],
-            'additional_order_by': [],
-            'timestamp_key': True
-            }),
-        (presto_clp_bench, {
-            'dataset_variation': "cleaned_log"
-            }),
-        (parquet_bench, {'mode': 'json string'}),
-        (parquet_bench, {'mode': 'pairwise arrays'}),
+        #(clp_bench, {}),
+        #(clickhouse_bench, {
+        #    'manual_column_names': False,
+        #    'keys': [],
+        #    'additional_order_by': [],
+        #    'timestamp_key': True
+        #    }),
+        #(presto_clp_bench, {
+        #    'dataset_variation': "cleaned_log"
+        #    }),
+        #(parquet_bench, {'mode': 'json string'}),
+        #(parquet_bench, {'mode': 'pairwise arrays'}),
         (elasticsearch_bench, {}),
-        (overhead_test_bench, {}),
-        (zstandard_bench, {}),
-        (sparksql_bench, {}),
-        (gzip_bench, {}),
+        #(overhead_test_bench, {}),
+        #(zstandard_bench, {}),
+        #(sparksql_bench, {}),
+        #(gzip_bench, {}),
     ]
 
 def run(bencher, kwargs, bench_target, attach=False, attach_on_error=False):

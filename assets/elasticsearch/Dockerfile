@@ -8,12 +8,12 @@ RUN apt-get update \
 RUN curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch \
     | gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg]" \
-    "https://artifacts.elastic.co/packages/8.x/apt stable main" \
-    | tee /etc/apt/sources.list.d/elastic-8.x.list;
+    "https://artifacts.elastic.co/packages/9.x/apt stable main" \
+    | tee /etc/apt/sources.list.d/elastic-9.x.list;
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    elasticsearch=8.6.2 \
+    elasticsearch=9.0.3 \
     libcurl4 \
     libcurl4-openssl-dev \
     python3-pip \
@@ -21,4 +21,4 @@ RUN apt-get update \
     tmux \
     vim;
 
-RUN pip3 install elasticsearch==8.6.2 requests;
+RUN pip3 install elasticsearch==9.0.3 requests;
