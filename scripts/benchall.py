@@ -3,7 +3,7 @@
 from assets.clp.main import clp_bench
 from assets.clickhouse.main import clickhouse_bench
 from assets.sparksql.main import sparksql_bench
-from assets.presto_parquet.main import parquet_bench
+from assets.presto_parquet.main import presto_parquet_bench
 from assets.zstandard.main import zstandard_bench
 from assets.elasticsearch.main import elasticsearch_bench
 from assets.presto_clp.main import presto_clp_bench
@@ -43,8 +43,8 @@ benchmarks = [  # benchmark object, arguments
         (presto_clp_bench, {
             'dataset_variation': "cleaned_log"
             }),
-        (parquet_bench, {'mode': 'json string'}),
-        (parquet_bench, {'mode': 'pairwise arrays'}),
+        (presto_parquet_bench, {'mode': 'json string'}),
+        (presto_parquet_bench, {'mode': 'pairwise arrays'}),
         (elasticsearch_bench, {}),
         (overhead_test_bench, {}),
         (zstandard_bench, {}),
@@ -57,7 +57,6 @@ def run(bencher, kwargs, bench_target, attach=False, attach_on_error=False):
     bench = None
     try:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
-        # benchmark clp_presto on the cleaned (no spaces) datasets
 
         print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
 
@@ -80,8 +79,8 @@ for bencher, kwargs in benchmarks:
     for bench_target in bench_target_dirs:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
 
-        if dataset_name != 'mongod': # only use mongod for now
-            continue
+        #if dataset_name != 'mongod': # only use mongod for now
+        #    continue
         #run(bencher, kwargs, bench_target)
         run(bencher, kwargs, bench_target, attach_on_error=True)
         #run(bencher, kwargs, bench_target, attach=True)
