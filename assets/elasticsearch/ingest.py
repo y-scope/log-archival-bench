@@ -65,19 +65,13 @@ def ingest_dataset():
     es = Elasticsearch("http://localhost:9202", request_timeout=1200, retry_on_timeout=True)
 
     template_body = {
-        #"index_patterns": ["logs-*"],
+        "index_patterns": [collection_name],
         "template": {
             "settings": {
                 "index": {
                     "mode": "logsdb"
                 }
-            },
-            #"mappings": {
-            #    "properties": {
-            #        "message": {"type": "text"},
-            #        "timestamp": {"type": "date"}
-            #    }
-            #}
+            }
         }
     }
 
