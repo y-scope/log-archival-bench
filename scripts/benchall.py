@@ -46,7 +46,8 @@ benchmarks = [  # benchmark object, arguments
         #    }),
         #(parquet_bench, {'mode': 'json string'}),
         #(parquet_bench, {'mode': 'pairwise arrays'}),
-        (elasticsearch_bench, {}),
+        (elasticsearch_bench, {'logsdb': False}),
+        (elasticsearch_bench, {'logsdb': True}),
         #(overhead_test_bench, {}),
         #(zstandard_bench, {}),
         #(sparksql_bench, {}),
@@ -85,8 +86,8 @@ for bencher, kwargs in benchmarks:
         if len(sys.argv) > 1:
             if dataset_name != sys.argv[1].strip():
                 continue
-        #run(bencher, kwargs, bench_target)
-        run(bencher, kwargs, bench_target, attach_on_error=True)
+        run(bencher, kwargs, bench_target)
+        #run(bencher, kwargs, bench_target, attach_on_error=True)
         #run(bencher, kwargs, bench_target, attach=True)
 
 #run(sparksql_bench, {}, get_target_from_name('mongod'))
