@@ -65,6 +65,7 @@ def run(bencher, kwargs, bench_target, attach=False, attach_on_error=False):
         bench = bencher(bench_target, **kwargs)
         bench.attach = attach
         bench.run_applicable(dataset_name)
+        #bench.run_everything([])
         #bench.run_everything(['ingest', 'cold'])
     except Exception as e:
         statement = f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {bencher.__name__} with argument {kwargs} failed on dataset {dataset_name}: {type(e).__name__}: {str(e)}"

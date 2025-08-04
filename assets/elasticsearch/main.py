@@ -36,7 +36,7 @@ class elasticsearch_bench(Benchmark):
         Ingests the dataset at self.datasets_path
         """
         self.docker_execute([
-            f"python3 {ASSETS_DIR}/ingest.py {self.datasets_path}"
+            f"python3 {ASSETS_DIR}/ingest.py {self.datasets_path} {self.dataset_meta['timestamp']}"
             ])
     
     def search(self, query):
