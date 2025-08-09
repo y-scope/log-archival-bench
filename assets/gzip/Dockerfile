@@ -2,7 +2,7 @@
 # dependencies
 
 # If there is any dedicated image available, you should build the benchmarking image on top of that
-FROM ubuntu:jammy
+FROM ubuntu@sha256:1ec65b2719518e27d4d25f104d93f9fac60dc437f81452302406825c46fcc9cb
 
 # Install necessary packages
 RUN apt-get update \
