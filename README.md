@@ -4,7 +4,7 @@
 Initialize and update submodules:
 
 ```shell
-./tools/scripts/deps-download/init.sh
+git submodule update --init --recursive
 ```
 
 Run the following code to setup the virtual environment, add the python files in src to python's
@@ -28,7 +28,7 @@ The [download\_all.py](/scripts/download_all.py) script will download all datase
 
 ## Run Everything
 
-Follow the instructions in above to set up your virtual environment.
+Follow the instructions above to set up your virtual environment.
 
 Stay in the [Log Archival Bench](/) directory and run [scripts/benchall.py](/scripts/benchall.py). This script runs the tools \+ parameters in its "benchmarks" variable across all datasets under [data/](/data).
 
