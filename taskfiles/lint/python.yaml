@@ -1,0 +1,36 @@
+version: "3"
+
+tasks:
+  check-py:
+    cmds:
+      - task: "py"
+        vars:
+          RUFF_CHECK_FLAGS: ""
+          RUFF_FORMAT_FLAGS: "--diff"
+
+  fix-py:
+    cmds:
+      - task: "py"
+        vars:
+          RUFF_CHECK_FLAGS: "--fix"
+          RUFF_FORMAT_FLAGS: ""
+
+  py:
+    internal: true
+    vars:
+      PY_LINT_DIRS:
+        - "src/log_archival_bench"
+        - "tests"
+    requires:
+      vars:
+        - "RUFF_CHECK_FLAGS"
+        - "RUFF_FORMAT_FLAGS"
+    deps: ["venv"]
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - for:
+          var: "PY_LINT_DIRS"
+        cmd: |-
+          uv run --directory . ruff format {{.RUFF_FORMAT_FLAGS}} {{.ITEM}}
+          uv run --directory . ruff check {{.RUFF_CHECK_FLAGS}} {{.ITEM}}
+          uv run --directory . mypy {{.ITEM}}

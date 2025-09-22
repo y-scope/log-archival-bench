@@ -1,6 +1,9 @@
 version: "3"
 
 includes:
+  py:
+    flatten: true
+    taskfile: "./python.yaml"
   utils:
     internal: true
     taskfile: "../../tools/yscope-dev-utils/exports/taskfiles/utils/utils.yaml"
@@ -15,10 +18,12 @@ vars:
 tasks:
   check:
     cmds:
+      - task: "check-py"
       - task: "check-yaml"
 
   fix:
     cmds:
+      - task: "fix-py"
       - task: "fix-yaml"
 
   venv:
