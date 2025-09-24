@@ -6,10 +6,10 @@
 
 ## Setup
 
-The benchmark builds on the public [CLP core Ubuntu-Jammy] docker image.
+The benchmark builds on the public [CLP core Ubuntu-Jammy] Docker image.
 
 We use the `clp-s` binary, which is a variant of CLP optimized for semi-structured logs like JSON.
-We run `clp-s` with a target encoded size of 256MB, balancing compression ratio with search speed.
+We run `clp-s` with a target encoded size of 256 MB, balancing compression ratio with search speed.
 Increasing the target encoded size can yield even better compression results. Additional tuning
 options are documented in the [user docs].
 
