@@ -37,7 +37,7 @@ class gzip_bench(Benchmark):
         """
         Ingests the dataset at self.datasets_path
         """
-        self.docker_execute(f"gzip -c {self.datasets_path} > {GZIP_FILE_PATH} ")
+        self.docker_execute(f"gzip -c {self.datasets_path} > {GZIP_FILE_PATH} ", shell=True)
     
     def search(self, query):
         """
@@ -45,7 +45,7 @@ class gzip_bench(Benchmark):
         """
         assert query == "notasearch"
 
-        self.docker_execute(f"gunzip -c {GZIP_FILE_PATH} > {DECOMPRESSED_FILE_PATH}")
+        self.docker_execute(f"gunzip -c {GZIP_FILE_PATH} > {DECOMPRESSED_FILE_PATH}", shell=True)
         return 0
     def bench_search(self, cold=True):
         if not cold:
@@ -53,7 +53,7 @@ class gzip_bench(Benchmark):
             return
 
         self.bench_start(ingest=False)
-        self.docker_execute(f"gunzip -c {GZIP_FILE_PATH} > {DECOMPRESSED_FILE_PATH}")
+        self.docker_execute(f"gunzip -c {GZIP_FILE_PATH} > {DECOMPRESSED_FILE_PATH}", shell=True)
         self.bench_stop()
 
         logger.info("Decompression done")

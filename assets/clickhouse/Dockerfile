@@ -1,2 +1,1 @@
-FROM clickhouse/clickhouse-server:latest
-
+FROM clickhouse/clickhouse-server:25.6@sha256:7566eea413755c8fc43a7b39078b05f16ed350bb33c98f2f087c5f66b0e8163f
