@@ -1,7 +1,5 @@
-# FROM ghcr.io/y-scope/clp/clp-core-x86-ubuntu-jammy:main
-
-FROM ghcr.io/y-scope/clp/clp-core-x86-ubuntu-jammy@sha256:67c34b94fe1bdbf81846a20ebcf3920c5e26f8ba6ae392747a4cd36b47fc05e4
-# this is commit bb8244c32b6649bc92901c2cadb6be4e3bf48607
+# TODO: use the latest version until the clp core deps images are properly tagged with versions.
+FROM ghcr.io/y-scope/clp/clp-core-x86-ubuntu-jammy:main
 
 FROM ghcr.io/y-scope/clp/clp-core-dependencies-x86-ubuntu-jammy:main
 
