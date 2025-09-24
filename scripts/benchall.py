@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-from assets.clp_s.main import clp_s_bench
-from assets.clickhouse_native_json.main import clickhouse_native_json_bench
+from assets.clp.main import clp_bench
+from assets.clickhouse.main import clickhouse_bench
 from assets.sparksql.main import sparksql_bench
-from assets.parquet.main import parquet_bench
+from assets.presto_parquet.main import presto_parquet_bench
 from assets.zstandard.main import zstandard_bench
 from assets.elasticsearch.main import elasticsearch_bench
-from assets.clp_presto.main import clp_presto_bench
+from assets.presto_clp.main import presto_clp_bench
 from assets.overhead_test.main import overhead_test_bench
 from assets.gzip.main import gzip_bench
 from src.jsonsync import JsonItem
@@ -33,18 +33,18 @@ def get_target_from_name(name):
 
 
 benchmarks = [  # benchmark object, arguments
-        (clp_s_bench, {}),
-        (clickhouse_native_json_bench, {
+        (clp_bench, {}),
+        (clickhouse_bench, {
             'manual_column_names': False,
             'keys': [],
             'additional_order_by': [],
             'timestamp_key': True
             }),
-        (clp_presto_bench, {
+        (presto_clp_bench, {
             'dataset_variation': "cleaned_log"
             }),
-        (parquet_bench, {'mode': 'json string'}),
-        (parquet_bench, {'mode': 'pairwise arrays'}),
+        (presto_parquet_bench, {'mode': 'json string'}),
+        (presto_parquet_bench, {'mode': 'pairwise arrays'}),
         (elasticsearch_bench, {}),
         (overhead_test_bench, {}),
         (zstandard_bench, {}),
@@ -52,12 +52,11 @@ benchmarks = [  # benchmark object, arguments
         (gzip_bench, {}),
     ]
 
-def run(bencher, kwargs, bench_target, attach=False):
+def run(bencher, kwargs, bench_target, attach=False, attach_on_error=False):
     dataset_name = 'error when finding dataset name'
     bench = None
     try:
         dataset_name = os.path.basename(bench_target.resolve()).strip()
-        # benchmark clp_presto on the cleaned (no spaces) datasets
 
         print(f'Benchmarking {bencher.__name__} ({kwargs}) on dataset {dataset_name}')
 
@@ -70,7 +69,7 @@ def run(bencher, kwargs, bench_target, attach=False):
         with open((current_dir / 'exceptions.log').resolve(), 'a') as file:
             file.write(f"{statement}\n")
         print(statement)
-        if attach:
+        if attach or attach_on_error:
             if bench is not None:
                 bench.docker_attach()
         else:
@@ -82,7 +81,8 @@ for bencher, kwargs in benchmarks:
 
         #if dataset_name != 'mongod': # only use mongod for now
         #    continue
-        run(bencher, kwargs, bench_target)
+        #run(bencher, kwargs, bench_target)
+        run(bencher, kwargs, bench_target, attach_on_error=True)
         #run(bencher, kwargs, bench_target, attach=True)
 
 #run(sparksql_bench, {}, get_target_from_name('mongod'))
