@@ -21,5 +21,5 @@ filesystem caches before each query.
 
 [CLP core Ubuntu-Jammy]: https://ghcr.io/y-scope/clp/clp-core-dependencies-x86-ubuntu-jammy
 [clp-0.5.1]: https://github.com/y-scope/clp/releases/tag/v0.5.1
-[Config File]: assets/clp/config.yaml
+[Config File]: /assets/clp/config.yaml
 [user docs]: https://docs.yscope.com/clp/v0.5.1/user-docs/core-clp-s.html

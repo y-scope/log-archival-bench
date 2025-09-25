@@ -15,4 +15,4 @@ RUN apt-get update \
     tmux \
     vim
 
-COPY --from=clp-core clp/clp-s /clp/clp-s
+COPY --from=clp-core /clp/clp-s /clp/clp-s
