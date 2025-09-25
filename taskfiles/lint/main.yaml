@@ -30,6 +30,7 @@ tasks:
     sources:
       - "{{.LINT_REQUIREMENTS_FILE}}"
       - "{{.ROOT_DIR}}/taskfile.yaml"
+      - "{{.ROOT_DIR}}/tools/yscope-dev-utils/exports/taskfiles/**/*.yaml"
       - "{{.TASKFILE_DIR}}/**/*.yaml"
     generates: ["{{.CHECKSUM_FILE}}"]
     run: "once"
