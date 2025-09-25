@@ -4,7 +4,7 @@ set: ["u", "pipefail"]
 shopt: ["globstar"]
 
 includes:
-  lint: "./taskfiles/lint/main.yaml"
+  lint: "taskfiles/lint/main.yaml"
 
 vars:
   G_OUTPUT_DIR: "{{.ROOT_DIR}}/build"

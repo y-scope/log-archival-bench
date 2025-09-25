@@ -6,7 +6,7 @@ includes:
     taskfile: "../../tools/yscope-dev-utils/exports/taskfiles/utils/utils.yaml"
   yaml:
     flatten: true
-    taskfile: "./yaml.yaml"
+    taskfile: "yaml.yaml"
 
 vars:
   G_LINT_VENV_DIR: "{{.G_OUTPUT_DIR}}/lint-venv"
