@@ -45,7 +45,7 @@ Execute `./assets/{tool name}/main.py {path to <dataset name>.log}` to run inges
 
 ## Linting
 
-Before submitting a pull request, ensure you’ve run the linting commands below and have fixed all
+Before submitting a pull request, ensure you've run the linting commands below and have fixed all
 violations and suppressed all warnings.
 
 To run all linting checks:
