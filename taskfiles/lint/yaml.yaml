@@ -4,11 +4,6 @@ tasks:
   check-yaml:
     aliases:
       - "fix-yaml"
-    sources:
-      - "{{.G_LINT_VENV_CHECKSUM_FILE}}"
-      - "{{.ROOT_DIR}}/**/*.yaml"
-      - exclude: "{{.ROOT_DIR}}/**/build/*"
-      - exclude: "{{.ROOT_DIR}}/tools/yscope-dev-utils/*"
     dir: "{{.ROOT_DIR}}"
     deps: ["venv"]
     cmds:
