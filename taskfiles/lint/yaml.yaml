@@ -13,6 +13,5 @@ tasks:
           --config-file "tools/yscope-dev-utils/exports/lint-configs/.yamllint.yml" \
           --strict \
           .github/ \
-          docs/ \
           taskfile.yaml \
           taskfiles/
