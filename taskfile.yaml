@@ -1,6 +1,6 @@
 version: "3"
 
-set: ["errexit", "nounset", "pipefail"]
+set: ["nounset", "pipefail"]
 shopt: ["globstar"]
 
 includes:

@@ -3,8 +3,8 @@ build/
 venv/
 
 # Cache directories
-__pycache__/
 .task/
+__pycache__/
 
 # Misc
 output.json
