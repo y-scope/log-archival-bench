@@ -3,13 +3,13 @@ version: "3"
 includes:
   py:
     flatten: true
-    taskfile: "./python.yaml"
+    taskfile: "python.yaml"
   utils:
     internal: true
     taskfile: "../../tools/yscope-dev-utils/exports/taskfiles/utils/utils.yaml"
   yaml:
     flatten: true
-    taskfile: "./yaml.yaml"
+    taskfile: "yaml.yaml"
 
 vars:
   G_LINT_VENV_DIR: "{{.G_OUTPUT_DIR}}/lint-venv"
@@ -35,6 +35,7 @@ tasks:
     sources:
       - "{{.LINT_REQUIREMENTS_FILE}}"
       - "{{.ROOT_DIR}}/taskfile.yaml"
+      - "{{.ROOT_DIR}}/tools/yscope-dev-utils/exports/taskfiles/**/*.yaml"
       - "{{.TASKFILE_DIR}}/**/*.yaml"
     generates: ["{{.CHECKSUM_FILE}}"]
     run: "once"

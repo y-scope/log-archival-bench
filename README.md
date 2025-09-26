@@ -1,11 +1,4 @@
 # Log Archival Bench How To
-
-Follow the steps below to develop and contribute to the project.
-
-## Contributing
-
-* [Task] 3.40.0 or higher
-
 ## Setup
 
 Initialize and update submodules:
@@ -43,10 +36,18 @@ Stay in the [Log Archival Bench](/) directory and run [scripts/benchall.py](/scr
 
 Execute `./assets/{tool name}/main.py {path to <dataset name>.log}` to run ingestion and search on that dataset.
 
-## Linting
+## Contributing
 
-Before submitting a pull request, ensure you’ve run the linting commands below and have fixed all
-violations and suppressed all warnings.
+Follow the steps below to develop and contribute to the project.
+
+### Requirements
+
+* [Task] 3.40.0 or higher
+
+### Linting
+
+Before submitting a pull request, ensure you've run the linting commands below and have fixed all
+violations and suppressed any benign warnings.
 
 To run all linting checks:
 
@@ -66,6 +67,6 @@ To see how to run a subset of linters for a specific file type:
 task -a
 ```
 
-Look for all tasks under the `lint` namespace (identified by the `lint:` prefix).
+Look for tasks under the `lint` namespace (identified by the `lint:` prefix).
 
 [Task]: https://taskfile.dev
