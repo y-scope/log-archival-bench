@@ -1,0 +1,22 @@
+version: "3"
+
+set: ["nounset", "pipefail"]
+shopt: ["globstar"]
+
+includes:
+  lint: "taskfiles/lint/main.yaml"
+
+vars:
+  G_OUTPUT_DIR: "{{.ROOT_DIR}}/build"
+
+tasks:
+  clean:
+    cmds:
+      - "rm -rf '{{.G_OUTPUT_DIR}}'"
+
+  init:
+    internal: true
+    silent: true
+    run: "once"
+    cmds:
+      - "mkdir -p '{{.G_OUTPUT_DIR}}'"

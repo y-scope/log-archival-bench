@@ -1,0 +1,54 @@
+version: "3"
+
+includes:
+  utils:
+    internal: true
+    taskfile: "../../tools/yscope-dev-utils/exports/taskfiles/utils/utils.yaml"
+  yaml:
+    flatten: true
+    taskfile: "yaml.yaml"
+
+vars:
+  G_LINT_VENV_DIR: "{{.G_OUTPUT_DIR}}/lint-venv"
+  G_LINT_VENV_CHECKSUM_FILE: "{{.G_LINT_VENV_DIR}}.md5"
+
+tasks:
+  check:
+    cmds:
+      - task: "check-yaml"
+
+  fix:
+    cmds:
+      - task: "fix-yaml"
+
+  venv:
+    internal: true
+    vars:
+      CHECKSUM_FILE: "{{.G_LINT_VENV_CHECKSUM_FILE}}"
+      LINT_REQUIREMENTS_FILE: "{{.ROOT_DIR}}/lint-requirements.txt"
+      OUTPUT_DIR: "{{.G_LINT_VENV_DIR}}"
+    sources:
+      - "{{.LINT_REQUIREMENTS_FILE}}"
+      - "{{.ROOT_DIR}}/taskfile.yaml"
+      - "{{.ROOT_DIR}}/tools/yscope-dev-utils/exports/taskfiles/**/*.yaml"
+      - "{{.TASKFILE_DIR}}/**/*.yaml"
+    generates: ["{{.CHECKSUM_FILE}}"]
+    run: "once"
+    deps:
+      - ":init"
+      - task: "utils:checksum:validate"
+        vars:
+          CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
+          INCLUDE_PATTERNS: ["{{.OUTPUT_DIR}}"]
+    cmds:
+      - task: "utils:misc:create-venv"
+        vars:
+          LABEL: "lint"
+          OUTPUT_DIR: "{{.OUTPUT_DIR}}"
+          REQUIREMENTS_FILE: "{{.LINT_REQUIREMENTS_FILE}}"
+
+      # This command must be last
+      - task: "utils:checksum:compute"
+        vars:
+          CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
+          INCLUDE_PATTERNS: ["{{.OUTPUT_DIR}}"]

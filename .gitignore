@@ -1,6 +1,13 @@
-__pycache__
+# Build-related directories and files
+build/
+venv/
+
+# Cache directories
+.task/
+__pycache__/
+
+# Misc
 output.json
-/venv
 /mongod
 /data/**
 !/data/*

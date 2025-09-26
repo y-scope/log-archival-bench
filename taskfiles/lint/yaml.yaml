@@ -1,0 +1,17 @@
+version: "3"
+
+tasks:
+  check-yaml:
+    aliases:
+      - "fix-yaml"
+    dir: "{{.ROOT_DIR}}"
+    deps: ["venv"]
+    cmds:
+      - |-
+        . "{{.G_LINT_VENV_DIR}}/bin/activate"
+        yamllint \
+          --config-file "tools/yscope-dev-utils/exports/lint-configs/.yamllint.yml" \
+          --strict \
+          .github/ \
+          taskfile.yaml \
+          taskfiles/

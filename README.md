@@ -35,3 +35,38 @@ Stay in the [Log Archival Bench](/) directory and run [scripts/benchall.py](/scr
 ## Run One Tool
 
 Execute `./assets/{tool name}/main.py {path to <dataset name>.log}` to run ingestion and search on that dataset.
+
+## Contributing
+
+Follow the steps below to develop and contribute to the project.
+
+### Requirements
+
+* [Task] 3.40.0 or higher
+
+### Linting
+
+Before submitting a pull request, ensure you've run the linting commands below and have fixed all
+violations and suppressed any benign warnings.
+
+To run all linting checks:
+
+```shell
+task lint:check
+```
+
+To run all linting checks AND fix some violations:
+
+```shell
+task lint:fix
+```
+
+To see how to run a subset of linters for a specific file type:
+
+```shell
+task -a
+```
+
+Look for tasks under the `lint` namespace (identified by the `lint:` prefix).
+
+[Task]: https://taskfile.dev
