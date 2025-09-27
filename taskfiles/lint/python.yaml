@@ -1,0 +1,66 @@
+version: "3"
+
+tasks:
+  check-py:
+    cmds:
+      - task: "check-py-format"
+      - task: "check-py-static"
+
+  fix-py:
+    cmds:
+      - task: "fix-py-format"
+      - task: "fix-py-static"
+
+  check-py-format:
+    cmds:
+      - task: "py"
+        vars:
+          LINT_TOOL: "ruff"
+          COMMAND: "format"
+          FLAGS: "--diff"
+
+  fix-py-format:
+    cmds:
+      - task: "py"
+        vars:
+          LINT_TOOL: "ruff"
+          COMMAND: "format"
+
+  check-py-static:
+    cmds:
+      - task: "py"
+        vars:
+          LINT_TOOL: "ruff"
+          COMMAND: "check"
+      - task: "py"
+        vars:
+          LINT_TOOL: "mypy"
+
+  fix-py-static:
+    cmds:
+      - task: "py"
+        vars:
+          LINT_TOOL: "ruff"
+          COMMAND: "check"
+          FLAGS: "--fix"
+      - task: "py"
+        vars:
+          LINT_TOOL: "mypy"
+
+  py:
+    internal: true
+    vars:
+      COMMAND: >-
+        {{default "" .COMMAND}}
+      FLAGS: >-
+        {{default "" .FLAGS}}
+      PY_LINT_DIRS:
+        - "src/log_archival_bench"
+        - "tests"
+    requires:
+      vars: ["LINT_TOOL"]
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - for:
+          var: "PY_LINT_DIRS"
+        cmd: "uv run {{.LINT_TOOL}} {{.COMMAND}} {{.FLAGS}} {{.ITEM}}"
