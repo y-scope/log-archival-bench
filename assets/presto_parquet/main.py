@@ -15,7 +15,7 @@ logger: A logging.Logger
 PARQUET_DATA_PATH = "/home/hive-data"
 PARQUET_SCHEMA_NAME = "bench_schema"
 PARQUET_TABLE_NAME = "bench_table"
-class parquet_bench(Benchmark):
+class presto_parquet_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset, mode='json string'):
         super().__init__(dataset)
@@ -145,7 +145,7 @@ class parquet_bench(Benchmark):
         time.sleep(10)
 
 def main():
-    bench = parquet_bench(sys.argv[1])
+    bench = presto_parquet_bench(sys.argv[1])
     bench.run_everything()
 
 if __name__ == "__main__":
