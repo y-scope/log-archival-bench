@@ -13,8 +13,13 @@ logger: A logging.Logger
 
 class elasticsearch_bench(Benchmark):
     # add any parameters to the tool here
-    def __init__(self, dataset):
+    def __init__(self, dataset, logsdb=True):
         super().__init__(dataset)
+
+        self.logsdb = logsdb
+        
+        if not logsdb:
+            self.properties["notes"] = "no logsdb"
 
     @property
     def compressed_size(self):
@@ -35,8 +40,13 @@ class elasticsearch_bench(Benchmark):
         """
         Ingests the dataset at self.datasets_path
         """
+        if self.logsdb:
+            logsdb = "anything"
+        else:
+            logsdb = "no_logsdb"
+
         self.docker_execute([
-            f"python3 {ASSETS_DIR}/ingest.py {self.datasets_path}"
+            f"python3 {ASSETS_DIR}/ingest.py {self.datasets_path} {self.dataset_meta['timestamp']} {logsdb}"
             ])
     
     def search(self, query):

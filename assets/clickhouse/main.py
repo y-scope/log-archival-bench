@@ -13,7 +13,7 @@ logger: A logging.Logger
 """
 
 CLICKHOUSE_COLLECTION_NAME = "clickhouse_bench"
-class clickhouse_native_json_bench(Benchmark):
+class clickhouse_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset, manual_column_names=True, keys=[], additional_order_by=[], timestamp_key=False):
         super().__init__(dataset)
@@ -154,7 +154,7 @@ class clickhouse_native_json_bench(Benchmark):
 
 
 def main():
-    bench = clickhouse_native_json_bench(sys.argv[1])
+    bench = clickhouse_bench(sys.argv[1])
     bench.run_everything()
 
 if __name__ == "__main__":
