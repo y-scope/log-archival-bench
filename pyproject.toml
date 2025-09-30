@@ -13,9 +13,6 @@ dependencies = [
     "pyyaml>=6.0.2",
 ]
 
-[project.scripts]
-log-archival-bench = "log_archival_bench:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
