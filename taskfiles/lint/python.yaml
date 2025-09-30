@@ -56,7 +56,6 @@ tasks:
         {{default "" .FLAGS}}
       PY_LINT_DIRS:
         - "src/log_archival_bench"
-        - "tests"
     requires:
       vars: ["LINT_TOOL"]
     dir: "{{.ROOT_DIR}}"
