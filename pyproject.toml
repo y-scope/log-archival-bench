@@ -1,7 +1,7 @@
 [project]
 name = "log-archival-bench"
 version = "0.0.1"
-description = "Benchmark tests for CLP and other log management tools."
+description = "Benchmark suite for CLP and other log management tools."
 readme = "README.md"
 authors = [
     { name = "YScope Inc.", email = "dev@yscope.com" }

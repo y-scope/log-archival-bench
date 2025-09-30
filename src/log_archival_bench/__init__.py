@@ -1,1 +1,1 @@
-"""Benchmark tests for CLP and other log management tools."""
+"""Benchmark suite for CLP and other log management tools."""
