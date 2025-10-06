@@ -13,53 +13,58 @@ tasks:
 
   check-py-format:
     cmds:
-      - task: "py"
+      - task: "run-py-lint-tool"
         vars:
-          LINT_TOOL: "ruff"
-          COMMAND: "format"
-          FLAGS: "--diff"
+          TOOL_NAME: "ruff"
+          TOOL_COMMAND: "format"
+          COMMAND_FLAGS: "--diff"
 
   fix-py-format:
     cmds:
-      - task: "py"
+      - task: "run-py-lint-tool"
         vars:
-          LINT_TOOL: "ruff"
-          COMMAND: "format"
+          TOOL_NAME: "ruff"
+          TOOL_COMMAND: "format"
 
   check-py-static:
     cmds:
-      - task: "py"
+      - task: "run-py-lint-tool"
         vars:
-          LINT_TOOL: "ruff"
-          COMMAND: "check"
-      - task: "py"
+          TOOL_NAME: "ruff"
+          TOOL_COMMAND: "check"
+      - task: "run-py-lint-tool"
         vars:
-          LINT_TOOL: "mypy"
+          TOOL_NAME: "mypy"
 
   fix-py-static:
     cmds:
-      - task: "py"
+      - task: "run-py-lint-tool"
         vars:
-          LINT_TOOL: "ruff"
-          COMMAND: "check"
-          FLAGS: "--fix"
-      - task: "py"
+          TOOL_NAME: "ruff"
+          TOOL_COMMAND: "check"
+          COMMAND_FLAGS: "--fix"
+      - task: "run-py-lint-tool"
         vars:
-          LINT_TOOL: "mypy"
+          TOOL_NAME: "mypy"
 
-  py:
+  # Runs the specified Python linting tool with custom commands and flags over project source files.
+  #
+  # @param {string} TOOL_NAME The name of the linter.
+  # @param {string} [COMMAND_FLAGS] The flags to pass to the linter, as one concatenated string.
+  # @param {string} [TOOL_COMMAND] The sub command to use for the linter.
+  run-py-lint-tool:
     internal: true
     vars:
-      COMMAND: >-
-        {{default "" .COMMAND}}
-      FLAGS: >-
-        {{default "" .FLAGS}}
-      PY_LINT_DIRS:
+      COMMAND_FLAGS: >-
+        {{default "" .COMMAND_FLAGS}}
+      SOURCE_DIRS:
         - "src/log_archival_bench"
+      TOOL_COMMAND: >-
+        {{default "" .TOOL_COMMAND}}
     requires:
-      vars: ["LINT_TOOL"]
+      vars: ["TOOL_NAME"]
     dir: "{{.ROOT_DIR}}"
     cmds:
       - for:
-          var: "PY_LINT_DIRS"
-        cmd: "uv run {{.LINT_TOOL}} {{.COMMAND}} {{.FLAGS}} {{.ITEM}}"
+          var: "SOURCE_DIRS"
+        cmd: "uv run {{.TOOL_NAME}} {{.TOOL_COMMAND}} {{.COMMAND_FLAGS}} {{.ITEM}}"
