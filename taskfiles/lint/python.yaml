@@ -47,11 +47,11 @@ tasks:
         vars:
           TOOL_NAME: "mypy"
 
-  # Runs the specified Python linting tool with custom commands and flags over project source files.
+  # Runs the specified Python linting tool over the project's source files.
   #
   # @param {string} TOOL_NAME The name of the linter.
   # @param {string} [COMMAND_FLAGS] The flags to pass to the linter, as one concatenated string.
-  # @param {string} [TOOL_COMMAND] The sub command to use for the linter.
+  # @param {string} [TOOL_COMMAND] The linter-subcommand to invoke.
   run-py-lint-tool:
     internal: true
     vars:
