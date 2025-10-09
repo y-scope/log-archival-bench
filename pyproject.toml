@@ -24,6 +24,8 @@ dev = [
 ]
 
 [tool.mypy]
+explicit_package_bases = true
+mypy_path = ["src"]
 strict = true
 
 # Additional output
