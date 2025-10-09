@@ -1,0 +1,87 @@
+version: "3"
+
+includes:
+  utils:
+    internal: true
+    taskfile: "../../tools/yscope-dev-utils/exports/taskfiles/utils/utils.yaml"
+
+vars:
+  # Images to build
+  G_DOCKER_ENVS:
+    - "a"
+    #- "clickhouse"
+    #- "clp"
+    #- "ubuntu_jammy_tools"
+    #- "elasticsearch"
+    #- "presto_clp"
+    #- "presto_parquet"
+    #- "sparksql"
+    #- "zstandard"
+
+  # Output directories and files
+  G_DOCKER_IMAGE_CHECKSUMS_DIR: "{{.G_OUTPUT_DIR}}/docker-images/checksums"
+  G_DOCKER_IMAGE_INSPECT_JSON_DIR: "{{.G_OUTPUT_DIR}}/docker-images/inspect-json"
+
+  # Tooling directories and files
+  G_DOCKER_IMAGE_TOOLING_DIR: "{{.G_PROJECT_SRC_DIR}}/tools/docker"
+
+tasks:
+  build:
+    deps:
+      - task: ":init"
+      - task: "init"
+    cmds:
+      #- task: "build-single-image"
+      #  vars:
+      #    ENV_ENGINE: "ubuntu_jammy_base"
+      - task: "build-all-parallel"
+
+  init:
+    internal: true
+    run: "once"
+    cmds:
+      - mkdir -p "{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}"
+      - mkdir -p "{{.G_DOCKER_IMAGE_INSPECT_JSON_DIR}}"
+
+  build-all-parallel:
+    internal: true
+    run: "once"
+    deps:
+      - for:
+          var: "G_DOCKER_ENVS"
+        task: "build-single-image"
+        vars:
+          ENV_ENGINE: "{{.ITEM}}"
+
+  build-single-image:
+    internal: true
+    label: "{{.TASK}}:{{.ENV_ENGINE}}"
+    vars:
+      CHECKSUM_FILE: "{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}/{{.ENV_ENGINE}}.md5"
+      OUTPUT_DIR: "{{.G_DOCKER_IMAGE_INSPECT_JSON_DIR}}/{{.ENV_ENGINE}}"
+
+      IMAGE_INSPECT_JSON_FILE: "{{.OUTPUT_DIR}}/{{.ENV_ENGINE}}-inspect.json"
+      REPOSITORY: "log-archival-bench-{{.ENV_ENGINE}}-ubuntu-jammy"
+      TAG: "dev"
+    requires:
+      vars: ["ENV_ENGINE"]
+    sources:
+      - "{{.G_DOCKER_IMAGE_TOOLING_DIR}}/scripts/**/*"
+      - "{{.G_DOCKER_IMAGE_TOOLING_DIR}}/images/{{.ENV_ENGINE}}/**/*"
+    generates: ["{{.CHECKSUM_FILE}}"]
+    deps:
+      - task: "utils:checksum:validate"
+        vars:
+          CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
+          INCLUDE_PATTERNS: ["{{.OUTPUT_DIR}}"]
+    cmds:
+      - |-
+        {{.G_DOCKER_IMAGE_TOOLING_DIR}}/scripts/build.sh {{.ENV_ENGINE}} {{.REPOSITORY}} {{.TAG}}
+        mkdir -p {{.OUTPUT_DIR}}
+        docker inspect --type=image "{{.REPOSITORY}}:{{.TAG}}" > "{{.IMAGE_INSPECT_JSON_FILE}}"
+
+      # This command must be last
+      - task: "utils:checksum:compute"
+        vars:
+          CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
+          INCLUDE_PATTERNS: ["{{.OUTPUT_DIR}}"]
