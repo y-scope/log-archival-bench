@@ -16,7 +16,7 @@ CLP_PRESTO_CONTAINER_STORAGE = "/home/clp-json-x86_64"
 CLP_PRESTO_HOST_STORAGE = os.path.abspath(os.path.expanduser("~/clp-json-x86_64-v0.4.0-dev"))
 SQL_PASSWORD = "wqEGPyBdx_w"
 HOST_IP = "127.0.0.1"
-class clp_presto_bench(Benchmark):
+class presto_clp_bench(Benchmark):
     # add any parameters to the tool here
     def __init__(self, dataset, dataset_variation='cleaned_log'):
         super().__init__(dataset, dataset_variation=dataset_variation)
@@ -102,7 +102,7 @@ class clp_presto_bench(Benchmark):
 
 
 def main():
-    bench = clp_presto_bench(sys.argv[1])
+    bench = presto_clp_bench(sys.argv[1])
     bench.run_everything()
 
 if __name__ == "__main__":

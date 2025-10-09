@@ -2,11 +2,11 @@
 # dependencies
 
 # If there is any dedicated image available, you should build the benchmarking image on top of that
-FROM ghcr.io/y-scope/clp/clp-core-dependencies-x86-ubuntu-jammy:main
+FROM ubuntu:jammy
 
 # Install necessary packages
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-downgrades \
     tmux \
     vim \
     gzip

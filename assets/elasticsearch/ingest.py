@@ -10,6 +10,14 @@ collection_name = "elasticsearch_bench"
 
 log_path = sys.argv[1]
 
+def pop_by_path(obj, path):
+    keys = path.split('.')
+    for key in keys[:-1]:
+        obj = obj[key]
+    out = obj[keys[-1]]
+    del obj[keys[-1]]
+    return out
+
 def traverse_data(collection_name):
     with open(log_path, encoding="utf-8") as f:
         for line in f:
@@ -55,14 +63,45 @@ def traverse_data(collection_name):
                     id_value = str(attr["query"]["_id"])
                     json_line["attr"]["query"]["_id"] = {}
                     json_line["attr"]["query"]["_id"]["_ooid"] = id_value
+
+            try:
+                timestamp_val = pop_by_path(json_line, sys.argv[2])
+                json_line["@timestamp"] = timestamp_val
+            except KeyError:
+                # no such timestamp, ignore
+                json_line["@timestamp"] = 0
+
             yield {
                 "_index": collection_name,
+                "_op_type": "create",
                 "_source": json_line,
             }
 
 
 def ingest_dataset():
     es = Elasticsearch("http://localhost:9202", request_timeout=1200, retry_on_timeout=True)
+
+    if sys.argv[3] != "no_logsdb":
+        template_body = {
+            "index_patterns": [collection_name],
+            "template": {
+                "settings": {
+                    "index": {
+                        "mode": "logsdb"
+                    },
+                },
+                "mappings": {
+                    "properties": {
+                        "@timestamp": {
+                            "type": "date",
+                            "format": "date_optional_time||epoch_second||epoch_millis||yyyy-MM-dd HH:mm:ss.SSS zzz"
+                            }
+                    }
+                }
+            },
+            "priority": 101
+        }
+        es.indices.put_index_template(name=collection_name, body=template_body)
 
     count = 0
     for success, info in streaming_bulk(

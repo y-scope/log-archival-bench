@@ -1,6 +1,6 @@
 # Elasticsearch methodology
 
-**Version:** [8.6.2](https://www.elastic.co/downloads/past-releases/elasticsearch-8-6-2)
+**Version:** [9.0.3](https://www.elastic.co/downloads/past-releases/elasticsearch-9-0-3)
 
 **File with Formatted Queries:** [Config File](/assets/elasticsearch/config.yaml)
 
@@ -15,6 +15,8 @@ We deploy [Elasticsearch](https://www.elastic.co/downloads/elasticsearch) in a s
 We disable the [xpack](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html) security feature. We use Elasticsearch's Python package for data ingestion and search operations.
 
 Some preprocessing is necessary to make the dataset searchable in Elasticsearch. For more details, refer to the `traverse_data` function in [ingest.py](/assets/elasticsearch/ingest.py). This process generally involves reorganizing specific fields, moving them into outer or inner objects to ensure proper query functionality.
+
+We use the [logs data stream](https://www.elastic.co/docs/manage-data/data-store/data-streams/logs-data-stream) which is optimized for timestamped logs
 
 ### Launch & Shutdown 
 On launch the benchmark framework calls the [launch.sh](/assets/elasticsearch/launch.sh) script. This script automates the configuration of an Elasticsearch instance by modifying its settings to change the HTTP port, disable security features, and ensure it runs in single-node mode. It also updates the `elasticsearch` user settings to allow login and starts the Elasticsearch service in the background.
