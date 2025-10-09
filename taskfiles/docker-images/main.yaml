@@ -13,8 +13,8 @@ vars:
     - "clickhouse"
     - "clp"
     - "elasticsearch"
-    - "presto_clp"
-    - "presto_parquet"
+    #- "presto_clp"
+    #- "presto_parquet"
     - "sparksql"
     - "zstandard"
 
@@ -28,6 +28,7 @@ tasks:
 
   init:
     internal: true
+    silent: true
     run: "once"
     cmds:
       - "mkdir -p '{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}'"
