@@ -40,8 +40,8 @@ tasks:
     internal: true
     run: "once"
     cmds:
-      - mkdir -p "{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}"
-      - mkdir -p "{{.G_DOCKER_IMAGE_INSPECT_JSON_DIR}}"
+      - "mkdir -p '{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}'"
+      - "mkdir -p '{{.G_DOCKER_IMAGE_INSPECT_JSON_DIR}}'"
 
   build-all-parallel:
     internal: true
