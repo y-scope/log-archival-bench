@@ -1,0 +1,70 @@
+version: "3"
+
+tasks:
+  check-py:
+    cmds:
+      - task: "check-py-format"
+      - task: "check-py-static"
+
+  fix-py:
+    cmds:
+      - task: "fix-py-format"
+      - task: "fix-py-static"
+
+  check-py-format:
+    cmds:
+      - task: "run-py-lint-tool"
+        vars:
+          TOOL_NAME: "ruff"
+          TOOL_COMMAND: "format"
+          COMMAND_FLAGS: "--diff"
+
+  fix-py-format:
+    cmds:
+      - task: "run-py-lint-tool"
+        vars:
+          TOOL_NAME: "ruff"
+          TOOL_COMMAND: "format"
+
+  check-py-static:
+    cmds:
+      - task: "run-py-lint-tool"
+        vars:
+          TOOL_NAME: "ruff"
+          TOOL_COMMAND: "check"
+      - task: "run-py-lint-tool"
+        vars:
+          TOOL_NAME: "mypy"
+
+  fix-py-static:
+    cmds:
+      - task: "run-py-lint-tool"
+        vars:
+          TOOL_NAME: "ruff"
+          TOOL_COMMAND: "check"
+          COMMAND_FLAGS: "--fix"
+      - task: "run-py-lint-tool"
+        vars:
+          TOOL_NAME: "mypy"
+
+  # Runs the specified Python linting tool over the project's source files.
+  #
+  # @param {string} TOOL_NAME The name of the linter.
+  # @param {string} [COMMAND_FLAGS] The flags to pass to the linter, as one concatenated string.
+  # @param {string} [TOOL_COMMAND] The linter-subcommand to invoke.
+  run-py-lint-tool:
+    internal: true
+    vars:
+      COMMAND_FLAGS: >-
+        {{default "" .COMMAND_FLAGS}}
+      SOURCE_DIRS:
+        - "src/log_archival_bench"
+      TOOL_COMMAND: >-
+        {{default "" .TOOL_COMMAND}}
+    requires:
+      vars: ["TOOL_NAME"]
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - for:
+          var: "SOURCE_DIRS"
+        cmd: "uv run {{.TOOL_NAME}} {{.TOOL_COMMAND}} {{.COMMAND_FLAGS}} {{.ITEM}}"

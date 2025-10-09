@@ -1,5 +1,6 @@
 # Build-related directories and files
 build/
+dist/
 venv/
 
 # Cache directories
