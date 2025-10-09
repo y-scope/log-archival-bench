@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Builds the specified docker container image, with optional image config dumping."""
+"""Build a Docker image and optionally dump its configuration as JSON."""
 
 import argparse
 import subprocess
 import sys
 from pathlib import Path
 
-from log_archival_bench.scripts.docker_images.utils import get_container_name
+from log_archival_bench.scripts.docker_images.utils import get_image_name
 from log_archival_bench.utils.path_utils import (
     get_config_dir,
     get_package_root,
@@ -16,26 +16,28 @@ from log_archival_bench.utils.path_utils import (
 
 def main(argv: list[str]) -> int:
     """
-    Builds the specified docker container image, with optional image config dumping.
+    Build a Docker image and optionally dump its configuration as JSON.
 
     :param argv:
-    :return: 0 on success, and error code on failure.
+    :return: 0 on success, non-zero error code on failure.
     """
     args_parser = argparse.ArgumentParser()
     args_parser.add_argument(
-        "--image-name", required=True, help="Name of the docker image to build."
+        "--engine-name", required=True, help="The engine to be installed inside the Docker image."
     )
     args_parser.add_argument(
-        "--dump-config-path", help="Path to dump the docker image json info file."
+        "--dump-config-path", help="Path to the file to dump the Docker image JSON metadata."
     )
 
     parsed_args = args_parser.parse_args(argv[1:])
-    image_name = parsed_args.image_name
+    engine_name = parsed_args.engine_name
     dump_config_path = parsed_args.dump_config_path
 
-    docker_file_path = get_config_dir() / "docker-images" / image_name / "Dockerfile"
+    image_name = get_image_name(engine_name)
+
+    docker_file_path = get_config_dir() / "docker-images" / engine_name / "Dockerfile"
     if not docker_file_path.is_file():
-        err_msg = f"Dockerfile for `{image_name}` does not exist."
+        err_msg = f"Dockerfile for `{engine_name}` does not exist."
         raise RuntimeError(err_msg)
 
     docker_bin = which("docker")
@@ -43,7 +45,7 @@ def main(argv: list[str]) -> int:
     build_cmds = [
       docker_bin,
       "build",
-      "--tag", get_container_name(image_name),
+      "--tag", image_name,
       str(get_package_root()),
       "--file", str(docker_file_path),
     ]
@@ -51,16 +53,17 @@ def main(argv: list[str]) -> int:
     subprocess.run(build_cmds, check=True)
 
     if dump_config_path is not None:
-        p = Path(dump_config_path)
-        p.parent.mkdir(parents=True, exist_ok=True)
-        with p.open("w", encoding="utf-8") as f:
+        output_path = Path(dump_config_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with output_path.open("w", encoding="utf-8") as f:
             dump_cmds = [
                 docker_bin,
                 "inspect",
                 "--type=image",
-                get_container_name(image_name),
+                image_name,
             ]
             subprocess.run(dump_cmds, check=True, stdout=f)
+
     return 0
 
 

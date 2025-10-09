@@ -1,4 +1,4 @@
-"""Utilities for project structure and paths."""
+"""Helpers for gettings paths and determining package layouts."""
 
 import shutil
 from pathlib import Path
