@@ -1,4 +1,4 @@
-"""Helpers for gettings paths and determining package layouts."""
+"""Helpers for getting paths and determining package layouts."""
 
 import shutil
 from pathlib import Path
