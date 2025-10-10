@@ -1,0 +1,76 @@
+version: "3"
+
+includes:
+  utils:
+    internal: true
+    taskfile: "../../tools/yscope-dev-utils/exports/taskfiles/utils/utils.yaml"
+
+vars:
+  G_DOCKER_IMAGE_CHECKSUMS_DIR: "{{.G_OUTPUT_DIR}}/docker-images/checksums"
+  G_DOCKER_IMAGE_SCRIPT_DIR: "{{.G_PROJECT_SRC_DIR}}/scripts/docker_images"
+
+  G_DOCKER_IMAGE_ENGINES:
+    - "clickhouse"
+    - "clp"
+    - "elasticsearch"
+    #- "presto_clp"
+    #- "presto_parquet"
+    - "sparksql"
+    - "zstandard"
+
+tasks:
+  build:
+    deps:
+      - task: ":init"
+      - task: "init"
+    cmds:
+      - task: "build-all-parallel"
+
+  init:
+    internal: true
+    silent: true
+    run: "once"
+    cmds:
+      - "mkdir -p '{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}'"
+
+  build-all-parallel:
+    internal: true
+    run: "once"
+    deps:
+      - for:
+          var: "G_DOCKER_IMAGE_ENGINES"
+        task: "build-single-image"
+        vars:
+          ENGINE_NAME: "{{.ITEM}}"
+
+  build-single-image:
+    internal: true
+    label: "{{.TASK}}:{{.ENGINE_NAME}}"
+    vars:
+      CHECKSUM_FILE: "{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}/{{.ENGINE_NAME}}.md5"
+      OUTPUT_DIR: "{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}/{{.ENGINE_NAME}}"
+    requires:
+      vars: ["ENGINE_NAME"]
+    sources:
+      - "{{.G_PROJECT_SRC_DIR}}/config/docker-images/{{.ENGINE_NAME}}/Dockerfile"
+      - "{{.G_PROJECT_SRC_DIR}}/scripts/docker_images/build.py"
+      - "{{.G_PROJECT_SRC_DIR}}/scripts/docker_images/utils.py"
+      - "{{.TASKFILE}}"
+    generates: ["{{.CHECKSUM_FILE}}"]
+    deps:
+      - task: "utils:checksum:validate"
+        vars:
+          CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
+          INCLUDE_PATTERNS: ["{{.OUTPUT_DIR}}"]
+    cmds:
+      - |-
+        mkdir -p {{.OUTPUT_DIR}}
+        uv run {{.G_DOCKER_IMAGE_SCRIPT_DIR}}/build.py \
+          --engine-name {{.ENGINE_NAME}} \
+          --dump-config-path "{{.OUTPUT_DIR}}/docker_inspect.json"
+
+      # This command must be last
+      - task: "utils:checksum:compute"
+        vars:
+          CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
+          INCLUDE_PATTERNS: ["{{.OUTPUT_DIR}}"]
